@@ -5,11 +5,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: rootauth
-  sql:
-    init:
-      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
 server:
-  port: 8080
+  port: 0
 eureka:
   client:
     service-url:

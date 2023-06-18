@@ -1,4 +1,4 @@
-package org.blossom;
+package org.blossom.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
