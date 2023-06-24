@@ -17,6 +17,7 @@
         <module>auth-service</module>
         <module>discovery-server</module>
         <module>api-gateway</module>
+        <module>common-utilities</module>
     </modules>
 
     <properties>
@@ -24,6 +25,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-cloud.version>2022.0.3</spring-cloud.version>
+        <jwt.version>0.11.5</jwt.version>
     </properties>
 
     <dependencyManagement>

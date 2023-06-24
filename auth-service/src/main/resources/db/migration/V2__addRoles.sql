@@ -1,0 +1,1 @@
+INSERT INTO Blossom_Role (name) values ('USER'), ('ADMIN');
