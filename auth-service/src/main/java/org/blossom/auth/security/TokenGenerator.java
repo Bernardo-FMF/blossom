@@ -1,18 +1,16 @@
 package org.blossom.auth.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.blossom.auth.dto.TokenDto;
 import org.blossom.auth.entity.User;
 import org.blossom.common.jwt.RoleParser;
+import org.blossom.common.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.BadJwtException;
-import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

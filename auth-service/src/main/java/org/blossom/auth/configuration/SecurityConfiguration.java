@@ -1,5 +1,6 @@
 package org.blossom.auth.configuration;
 
+import org.blossom.common.filter.CommonUserDetailsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +15,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+    @Bean
+    public CommonUserDetailsFilter commonAuthenticationFilter() {
+        return new CommonUserDetailsFilter();
+    }
+
     @Bean
     public UserDetailsService userDetailsService(){
         return new CustomUserDetailsService();
@@ -51,6 +57,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/v1/auth/register", "/api/v1/auth/validate", "/api/v1/auth/login").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

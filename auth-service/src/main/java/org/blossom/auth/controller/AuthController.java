@@ -2,12 +2,12 @@ package org.blossom.auth.controller;
 
 import org.blossom.auth.dto.LoginDto;
 import org.blossom.auth.dto.RegisterDto;
-import org.blossom.auth.dto.TokenDto;
 import org.blossom.auth.exception.EmailInUseException;
 import org.blossom.auth.exception.LoginCredentialsException;
 import org.blossom.auth.exception.NoRoleFoundException;
 import org.blossom.auth.exception.UsernameInUseException;
 import org.blossom.auth.service.UserService;
+import org.blossom.common.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -2,7 +2,6 @@ package org.blossom.auth.service;
 
 import org.blossom.auth.converter.UserConverter;
 import org.blossom.auth.dto.RegisterDto;
-import org.blossom.auth.dto.TokenDto;
 import org.blossom.auth.entity.Role;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.enums.RoleEnum;
@@ -12,6 +11,7 @@ import org.blossom.auth.exception.UsernameInUseException;
 import org.blossom.auth.repository.RoleRepository;
 import org.blossom.auth.repository.UserRepository;
 import org.blossom.auth.security.TokenGenerator;
+import org.blossom.common.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,6 +63,11 @@ public class UserService {
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
+
+        if (!user.get().isActive()) {
+            throw new UsernameNotFoundException("User is not active");
+        }
+
         return tokenGenerator.generateToken(user.get());
     }
 
