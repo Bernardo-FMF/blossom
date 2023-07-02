@@ -45,14 +45,14 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
     @Column(name = "image_url")
-    private String image_url;
+    private String imageUrl;
 
     @Column(name = "active")
     private boolean active;
 
-    public static UserBuilder buildUser() {
-        return builder();
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private PasswordReset passwordResetToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

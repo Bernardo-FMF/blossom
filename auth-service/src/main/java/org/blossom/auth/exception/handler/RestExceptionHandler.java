@@ -1,8 +1,6 @@
 package org.blossom.auth.exception.handler;
 
-import org.blossom.auth.exception.EmailInUseException;
-import org.blossom.auth.exception.LoginCredentialsException;
-import org.blossom.auth.exception.UsernameInUseException;
+import org.blossom.auth.exception.*;
 import org.blossom.auth.exception.model.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +27,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(LoginCredentialsException.class)
     public ResponseEntity<ErrorMessage> loginCredentialsException(LoginCredentialsException exception, WebRequest request) {
+        ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(NoRoleFoundException.class)
+    public ResponseEntity<ErrorMessage> noRoleFoundException(NoRoleFoundException exception, WebRequest request) {
+        ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorMessage> userNotFoundException(UserNotFoundException exception, WebRequest request) {
         ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST, exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }

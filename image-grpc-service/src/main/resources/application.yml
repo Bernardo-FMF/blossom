@@ -1,0 +1,19 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+spring:
+  application:
+    name: Image-Service
+grpc:
+  server:
+    port: 0
+    awaitTerminationInSeconds: 10
+aws:
+  region: us-east-1
+  s3:
+    mock: false
+    buckets:
+      imageBucket: oni-blossom
+server:
+  port: 60

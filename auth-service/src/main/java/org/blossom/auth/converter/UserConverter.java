@@ -13,7 +13,7 @@ import java.util.Set;
 public class UserConverter implements Converter<RegisterDto, User> {
     @Override
     public User convert(RegisterDto registerDto) {
-        return User.buildUser()
+        return User.builder()
                 .email(registerDto.getEmail())
                 .username(registerDto.getUsername())
                 .password(registerDto.getPassword())

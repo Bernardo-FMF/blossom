@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.blossom.imagecontract";
+
+package org.blossom.imagecontract;
+
+import "google/protobuf/wrappers.proto";
+
+service ImageContract {
+  rpc submitImage(stream Block) returns (Identifier);
+  rpc deleteImage(Identifier) returns (google.protobuf.BoolValue);
+}
+
+message Block {
+  bytes content = 1;
+  string contentType = 2;
+  string blobName = 3;
+}
+
+message Identifier {
+  string url=1;
+}

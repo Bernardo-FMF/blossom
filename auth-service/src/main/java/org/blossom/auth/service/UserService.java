@@ -1,77 +1,58 @@
 package org.blossom.auth.service;
 
-import org.blossom.auth.converter.UserConverter;
-import org.blossom.auth.dto.RegisterDto;
-import org.blossom.auth.entity.Role;
+import org.blossom.auth.delta.DeltaEngine;
+import org.blossom.auth.delta.markable.UserMarkable;
 import org.blossom.auth.entity.User;
-import org.blossom.auth.enums.RoleEnum;
-import org.blossom.auth.exception.EmailInUseException;
-import org.blossom.auth.exception.NoRoleFoundException;
-import org.blossom.auth.exception.UsernameInUseException;
-import org.blossom.auth.repository.RoleRepository;
+import org.blossom.auth.exception.UserNotFoundException;
+import org.blossom.auth.grpc.GrpcClientImageService;
 import org.blossom.auth.repository.UserRepository;
-import org.blossom.auth.security.TokenGenerator;
-import org.blossom.common.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
 public class UserService {
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private UserConverter userConverter;
+    private GrpcClientImageService imageService;
 
-    @Autowired
-    private TokenGenerator tokenGenerator;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    public String saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
-        registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-
-        if (userRepository.existsByUsername(registerDto.getUsername())) {
-            throw new UsernameInUseException("Username is already in use");
+    public String updateUserImage(int userId, int loggedUserId, MultipartFile file)
+            throws UserNotFoundException, IOException, InterruptedException, BadCredentialsException {
+        if (userId != loggedUserId) {
+            throw new BadCredentialsException("Logged in user does not have permission to change other users profile image");
         }
 
-        if (userRepository.existsByEmail(registerDto.getEmail())) {
-            throw new EmailInUseException("Email is already in use");
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+        User user = optionalUser.get();
+
+        if (user.getImageUrl() != null) {
+            imageService.deleteImage(user.getImageUrl());
         }
 
-        Optional<Role> role = roleRepository.findByName(RoleEnum.USER);
+        String url = imageService.uploadImage(file);
 
-        if (role.isEmpty()) {
-            throw new NoRoleFoundException("User role is not present");
-        }
+        UserMarkable userMarkable = new UserMarkable()
+                .markImageUrl(url);
 
-        userRepository.save(Objects.requireNonNull(userConverter.convert(registerDto, role.get())));
-        return "User registered successfully";
-    }
+        DeltaEngine<UserMarkable, User> deltaEngine = new DeltaEngine<>((markable, entity) -> {
+            if (markable.isMarkedImageUrl()) {
+                entity.setImageUrl(markable.getDelegate().getImageUrl());
+            }
+        });
 
-    public String generateToken(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        deltaEngine.applyDelta(userMarkable, user);
 
-        if (!user.get().isActive()) {
-            throw new UsernameNotFoundException("User is not active");
-        }
+        userRepository.saveAndFlush(user);
 
-        return tokenGenerator.generateToken(user.get());
-    }
-
-    public TokenDto validateToken(String token) {
-        return tokenGenerator.validateToken(token);
+        return url;
     }
 }

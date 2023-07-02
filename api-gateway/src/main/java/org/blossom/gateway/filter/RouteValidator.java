@@ -12,6 +12,7 @@ public class RouteValidator {
             "/api/v1/auth/register",
             "/api/v1/auth/login",
             "/api/v1/auth/validate",
+            "/api/v1/auth/password-recovery-request",
             "/eureka"
     );
 
