@@ -18,6 +18,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class TokenGenerator {
@@ -29,6 +30,10 @@ public class TokenGenerator {
 
     @Value("${jwt.refresh}")
     private int refresh;
+
+    public String generateUuidToken() {
+        return UUID.randomUUID().toString();
+    }
 
     public TokenDto validateToken(final String token) {
         Claims claims = extractClaims(token);

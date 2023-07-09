@@ -1,8 +1,6 @@
 package org.blossom.auth.controller;
 
-import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.UserNotFoundException;
-import org.blossom.auth.grpc.GrpcClientImageService;
 import org.blossom.auth.service.UserService;
 import org.blossom.common.model.CommonUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user")

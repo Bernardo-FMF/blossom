@@ -1,11 +1,11 @@
 package org.blossom.auth.controller;
 
 import org.blossom.auth.dto.LoginDto;
+import org.blossom.auth.dto.PasswordChangeDto;
 import org.blossom.auth.dto.PasswordRecoveryDto;
 import org.blossom.auth.dto.RegisterDto;
 import org.blossom.auth.exception.*;
 import org.blossom.auth.service.AuthService;
-import org.blossom.common.model.CommonUserDetails;
 import org.blossom.common.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,5 +47,10 @@ public class AuthController {
     @PostMapping("/password-recovery-request")
     public ResponseEntity<String> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.requestPasswordRecovery(passwordRecoveryDto));
+    }
+
+    @PostMapping("/password-recovery")
+    public ResponseEntity<String> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.changePassword(passwordChangeDto));
     }
 }

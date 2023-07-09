@@ -10,10 +10,10 @@ grpc:
     port: 0
     awaitTerminationInSeconds: 10
 aws:
-  region: us-east-1
+  region: ${BLOSSOM_S3_REGION}
   s3:
     mock: false
     buckets:
-      imageBucket: oni-blossom
+      imageBucket: ${BLOSSOM_S3_BUCKET}
 server:
   port: 60

@@ -2,12 +2,12 @@ package org.blossom.image.server;
 
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
+import io.grpc.Server;
 import lombok.extern.log4j.Log4j2;
 import org.blossom.image.configuration.GrpcConfiguration;
 import org.blossom.image.service.ImageService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import io.grpc.Server;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;

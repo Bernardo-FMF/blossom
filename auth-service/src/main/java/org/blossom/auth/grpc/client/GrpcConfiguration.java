@@ -28,7 +28,7 @@ public class GrpcConfiguration {
         List<ServiceInstance> instances = discoveryClient.getInstances(serverName);
         ServiceInstance instance = instances.get(0);
         String host = instance.getHost();
-        int grpcPort = instance.getPort();
+        int grpcPort = Integer.parseInt(instance.getMetadata().get("grpc-port"));
 
         return ManagedChannelBuilder.forAddress(host, grpcPort)
                 .usePlaintext()

@@ -22,7 +22,7 @@ public class GrpcServerRegistration implements BeanPostProcessor {
         if (bean instanceof GrpcServer) {
             EurekaRegistration eurekaRegistration = (EurekaRegistration) registration;
             eurekaRegistration.setNonSecurePort(((GrpcServer) bean).getPort());
-
+            eurekaRegistration.getMetadata().put("grpc-port", String.valueOf(((GrpcServer) bean).getPort()));
             eurekaServiceRegistry.register(eurekaRegistration);
         }
         return bean;

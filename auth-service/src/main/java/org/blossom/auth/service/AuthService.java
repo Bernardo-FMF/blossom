@@ -3,19 +3,19 @@ package org.blossom.auth.service;
 import org.blossom.auth.converter.UserConverter;
 import org.blossom.auth.delta.DeltaEngine;
 import org.blossom.auth.delta.markable.UserMarkable;
+import org.blossom.auth.dto.PasswordChangeDto;
 import org.blossom.auth.dto.PasswordRecoveryDto;
 import org.blossom.auth.dto.RegisterDto;
+import org.blossom.auth.dto.UserDto;
+import org.blossom.auth.email.EmailService;
 import org.blossom.auth.entity.PasswordReset;
 import org.blossom.auth.entity.Role;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.enums.RoleEnum;
-import org.blossom.auth.exception.EmailInUseException;
-import org.blossom.auth.exception.EmailNotInUseException;
-import org.blossom.auth.exception.NoRoleFoundException;
-import org.blossom.auth.exception.UsernameInUseException;
+import org.blossom.auth.exception.*;
 import org.blossom.auth.repository.RoleRepository;
+import org.blossom.auth.repository.TokenRepository;
 import org.blossom.auth.repository.UserRepository;
-import org.blossom.auth.security.PasswordTokenGenerator;
 import org.blossom.auth.security.TokenGenerator;
 import org.blossom.common.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +36,19 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private TokenRepository tokenRepository;
+
+    @Autowired
     private UserConverter userConverter;
 
     @Autowired
     private TokenGenerator tokenGenerator;
 
     @Autowired
-    private PasswordTokenGenerator passwordTokenGenerator;
-
-    @Autowired
-    private RoleRepository roleRepository;
+    private EmailService emailService;
 
     public String saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
         registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
@@ -91,7 +94,7 @@ public class AuthService {
             throw new EmailNotInUseException("Email not in use");
         }
 
-        String token = passwordTokenGenerator.generateToken();
+        String token = tokenGenerator.generateUuidToken();
 
         User user = optionalUser.get();
 
@@ -112,8 +115,54 @@ public class AuthService {
 
         deltaEngine.applyDelta(userMarkable, user);
 
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
+
+        emailService.sendPasswordRecoveryEmail(
+                UserDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .username(user.getUsername())
+                        .token(user.getPasswordResetToken().getToken())
+                        .expirationDate(user.getPasswordResetToken().getExpirationDate())
+                        .build());
 
         return "Password recovery request completed successfully";
+    }
+
+    public String changePassword(PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
+        Optional<User> optionalUser = userRepository.findById(passwordChangeDto.getUserId());
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        User user = optionalUser.get();
+
+        if (!user.getPasswordResetToken().getToken().equals(passwordChangeDto.getToken())) {
+            throw new InvalidTokenException("Token is invalid");
+        }
+
+        if (LocalDateTime.now().isAfter(user.getPasswordResetToken().getExpirationDate())) {
+            throw new InvalidTokenException("Token has expired");
+        }
+
+        UserMarkable userMarkable = new UserMarkable()
+                .markPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
+
+        DeltaEngine<UserMarkable, User> deltaEngine = new DeltaEngine<>((markable, entity) -> {
+            if (markable.isMarkedPassword()) {
+                entity.setPassword(markable.getDelegate().getPassword());
+            }
+        });
+
+        deltaEngine.applyDelta(userMarkable, user);
+
+        PasswordReset passwordReset = user.getPasswordResetToken();
+
+        user.setPasswordResetToken(null);
+
+        userRepository.save(user);
+        tokenRepository.delete(passwordReset);
+
+        return "Password changed successfully";
     }
 }
