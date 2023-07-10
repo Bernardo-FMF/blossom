@@ -1,4 +1,4 @@
-package org.blossom.common.model;
+package org.blossom.model;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

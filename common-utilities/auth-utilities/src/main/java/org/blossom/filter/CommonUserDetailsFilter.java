@@ -1,11 +1,11 @@
-package org.blossom.common.filter;
+package org.blossom.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.blossom.common.jwt.RoleParser;
-import org.blossom.common.model.CommonUserDetails;
+import org.blossom.jwt.RoleParser;
+import org.blossom.model.CommonUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

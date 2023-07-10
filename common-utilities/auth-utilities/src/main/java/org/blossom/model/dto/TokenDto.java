@@ -1,4 +1,4 @@
-package org.blossom.common.model.dto;
+package org.blossom.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;

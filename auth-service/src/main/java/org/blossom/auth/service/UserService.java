@@ -51,7 +51,7 @@ public class UserService {
 
         deltaEngine.applyDelta(userMarkable, user);
 
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
 
         return url;
     }

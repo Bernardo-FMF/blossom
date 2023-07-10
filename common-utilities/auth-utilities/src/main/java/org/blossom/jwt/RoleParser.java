@@ -1,4 +1,4 @@
-package org.blossom.common.jwt;
+package org.blossom.jwt;
 
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

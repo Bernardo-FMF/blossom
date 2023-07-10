@@ -1,4 +1,4 @@
-package org.blossom.common.model;
+package org.blossom.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,6 @@
 package org.blossom.auth.configuration;
 
-import org.blossom.common.filter.CommonUserDetailsFilter;
+import org.blossom.filter.CommonUserDetailsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

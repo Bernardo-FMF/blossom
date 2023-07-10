@@ -18,6 +18,14 @@ spring:
           auth: true
           starttls:
             enable: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      default-topic: resource-event
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties.spring.json.type.mapping: event:org.blossom.model.ResourceEvent
 vendor:
   frontend:
     callback-url: ${BLOSSOM_CALLBACK}

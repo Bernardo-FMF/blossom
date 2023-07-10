@@ -2,7 +2,7 @@ package org.blossom.gateway.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.blossom.common.model.SimpleGrantedAuthorityDeserializer;
+import org.blossom.model.SimpleGrantedAuthorityDeserializer;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

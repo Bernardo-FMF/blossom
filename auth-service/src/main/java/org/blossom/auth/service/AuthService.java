@@ -13,11 +13,12 @@ import org.blossom.auth.entity.Role;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.enums.RoleEnum;
 import org.blossom.auth.exception.*;
+import org.blossom.auth.kafka.KafkaMessageService;
 import org.blossom.auth.repository.RoleRepository;
 import org.blossom.auth.repository.TokenRepository;
 import org.blossom.auth.repository.UserRepository;
 import org.blossom.auth.security.TokenGenerator;
-import org.blossom.common.model.dto.TokenDto;
+import org.blossom.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +51,9 @@ public class AuthService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private KafkaMessageService messageService;
+
     public String saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
         registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
@@ -67,7 +71,9 @@ public class AuthService {
             throw new NoRoleFoundException("User role is not present");
         }
 
-        userRepository.save(Objects.requireNonNull(userConverter.convert(registerDto, role.get())));
+        User newUser = userRepository.save(Objects.requireNonNull(userConverter.convert(registerDto, role.get())));
+
+        messageService.sendUserCreationMessage(newUser);
         return "User registered successfully";
     }
 

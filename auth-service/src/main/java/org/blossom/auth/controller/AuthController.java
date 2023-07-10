@@ -6,7 +6,7 @@ import org.blossom.auth.dto.PasswordRecoveryDto;
 import org.blossom.auth.dto.RegisterDto;
 import org.blossom.auth.exception.*;
 import org.blossom.auth.service.AuthService;
-import org.blossom.common.model.dto.TokenDto;
+import org.blossom.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

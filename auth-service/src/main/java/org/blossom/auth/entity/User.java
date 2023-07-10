@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.blossom.model.KafkaEntity;
+import org.blossom.model.KafkaUserResource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +24,7 @@ import static java.util.stream.Collectors.toSet;
 @Builder
 @Entity
 @Table(name = "Blossom_User")
-public class User implements UserDetails {
+public class User implements UserDetails, KafkaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -81,5 +83,14 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return active;
+    }
+
+    @Override
+    public KafkaUserResource mapToResource() {
+        return KafkaUserResource.builder()
+                .id(id)
+                .username(username)
+                .imageUrl(imageUrl)
+                .build();
     }
 }

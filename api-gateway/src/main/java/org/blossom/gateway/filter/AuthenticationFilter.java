@@ -1,6 +1,6 @@
 package org.blossom.gateway.filter;
 
-import org.blossom.common.model.dto.TokenDto;
+import org.blossom.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;

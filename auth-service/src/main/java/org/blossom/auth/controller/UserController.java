@@ -2,7 +2,7 @@ package org.blossom.auth.controller;
 
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.service.UserService;
-import org.blossom.common.model.CommonUserDetails;
+import org.blossom.model.CommonUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
