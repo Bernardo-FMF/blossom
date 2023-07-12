@@ -16,6 +16,18 @@ spring:
               packages: "org.blossom.model"
             type:
               mapping: event:org.blossom.model.ResourceEvent
+  data:
+    elasticsearch:
+      cluster-names: search-cluster
+      cluster-nodes: https://localhost:9200
+      local-dev-enabled: true
+      headers:
+        authorization: ApiKey UTRWQ1I0a0IzT3FvSDZoSTRqNUs6aURUUjBaM0ZUMnltclZtOGItSWlOUQ==
+      ssl:
+        ssl-enabled: true
+        ca-fingerprint: 96a5e1bcc9995980e3e4024b502babae3daa9f67094c4e0764459216758f7936
+server:
+  port: 9566
 eureka:
   client:
     service-url:

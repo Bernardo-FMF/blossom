@@ -73,7 +73,7 @@ public class AuthService {
 
         User newUser = userRepository.save(Objects.requireNonNull(userConverter.convert(registerDto, role.get())));
 
-        messageService.sendUserCreationMessage(newUser);
+        messageService.publishCreation(newUser);
         return "User registered successfully";
     }
 
