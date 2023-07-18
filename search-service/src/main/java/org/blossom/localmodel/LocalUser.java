@@ -13,6 +13,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Document(indexName = "user_index")
 public class LocalUser {
     private int id;
-    private String username;
+    private String fullName;
+    private String userName;
     private String imageUrl;
 }

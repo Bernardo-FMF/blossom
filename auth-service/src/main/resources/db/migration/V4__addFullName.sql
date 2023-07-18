@@ -1,0 +1,1 @@
+ALTER TABLE Blossom_User ADD COLUMN fullName varchar(255);

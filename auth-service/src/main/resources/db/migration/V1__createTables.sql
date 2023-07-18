@@ -1,6 +1,6 @@
 CREATE TABLE Blossom_User (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE,
+    userName VARCHAR(255) UNIQUE,
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255),
     image_url VARCHAR(255),

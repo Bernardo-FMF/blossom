@@ -15,7 +15,8 @@ public class UserConverter implements Converter<RegisterDto, User> {
     public User convert(RegisterDto registerDto) {
         return User.builder()
                 .email(registerDto.getEmail())
-                .username(registerDto.getUsername())
+                .fullName(registerDto.getFullName())
+                .username(registerDto.getUserName())
                 .password(registerDto.getPassword())
                 .active(true)
                 .build();

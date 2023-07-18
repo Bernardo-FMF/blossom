@@ -18,7 +18,7 @@ public class SearchService {
 
     public LocalUsersDto userLookup(SearchParametersDto searchParametersDto) {
         Pageable page = buildPage(searchParametersDto);
-        Page<LocalUser> localUsers = localUserRepository.findByUsernameSimilar(searchParametersDto.getContains(), page);
+        Page<LocalUser> localUsers = localUserRepository.findByNameSimilar(searchParametersDto.getContains(), page);
 
         return LocalUsersDto.builder()
                 .localUsers(ImmutableSet.copyOf(localUsers.getContent()))

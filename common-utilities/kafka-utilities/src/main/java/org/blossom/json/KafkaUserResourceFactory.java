@@ -9,7 +9,7 @@ public class KafkaUserResourceFactory implements KafkaResourceFactory<KafkaUserR
     public KafkaUserResource create(JsonNode json) {
         return KafkaUserResource.builder()
                 .id(json.get("id").asInt())
-                .username(json.get("username").asText())
+                .userName(json.get("username").asText())
                 .imageUrl(json.get("imageUrl") instanceof NullNode ? null : json.get("imageUrl").asText())
                 .build();
     }

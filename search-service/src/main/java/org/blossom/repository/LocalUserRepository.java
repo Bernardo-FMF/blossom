@@ -7,6 +7,6 @@ import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 public interface LocalUserRepository extends ElasticsearchRepository<LocalUser, Integer> {
-    @Query("{\"wildcard\": {\"username\": \"*?0*\"}}")
-    Page<LocalUser> findByUsernameSimilar(String searchTerm, Pageable pageable);
+    @Query("{\"bool\": {\"should\": [{\"wildcard\": {\"username\": \"*?0*\"}}, {\"wildcard\": {\"fullName\": \"*?0*\"}}]}}")
+    Page<LocalUser> findByNameSimilar(String searchTerm, Pageable pageable);
 }
