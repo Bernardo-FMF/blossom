@@ -13,7 +13,7 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/{version}/auth/**, /api/{version}/user/**
+            - Path=/api/{version}/auth/**, /api/{version}/user/**, /api/{version}/user-search/**
           filters:
             - AuthenticationFilter
 

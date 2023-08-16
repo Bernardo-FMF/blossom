@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Service
 public class KafkaMessageService implements KafkaPublisherFacade<User> {
-    @Value("${spring.kafka.template.default-topic}")
-    private String topic;
+    @Value("${spring.kafka.topics}")
+    private String[] topics;
 
     @Autowired
     private KafkaTemplate<String, ResourceEvent> kafkaTemplate;
@@ -24,7 +26,7 @@ public class KafkaMessageService implements KafkaPublisherFacade<User> {
         KafkaUserResource resource = entity.mapToResource();
         ResourceEvent resourceEvent = new ResourceEvent(EventType.CREATE, ResourceType.USER, resource);
 
-        kafkaTemplate.send(topic, resourceEvent);
+        Arrays.stream(topics).forEach(topic -> kafkaTemplate.send(topic, resourceEvent));
     }
 
     @Override
@@ -32,7 +34,7 @@ public class KafkaMessageService implements KafkaPublisherFacade<User> {
         KafkaUserResource resource = entity.mapToResource();
         ResourceEvent resourceEvent = new ResourceEvent(EventType.UPDATE, ResourceType.USER, resource);
 
-        kafkaTemplate.send(topic, resourceEvent);
+        Arrays.stream(topics).forEach(topic -> kafkaTemplate.send(topic, resourceEvent));
     }
 
     @Override
@@ -40,6 +42,6 @@ public class KafkaMessageService implements KafkaPublisherFacade<User> {
         KafkaUserResource resource = entity.mapToResource();
         ResourceEvent resourceEvent = new ResourceEvent(EventType.DELETE, ResourceType.USER, resource);
 
-        kafkaTemplate.send(topic, resourceEvent);
+        Arrays.stream(topics).forEach(topic -> kafkaTemplate.send(topic, resourceEvent));
     }
 }

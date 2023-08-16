@@ -12,7 +12,7 @@ public class LocalUserConverter implements Converter<KafkaUserResource, LocalUse
         return LocalUser.builder()
                 .id(source.getId())
                 .fullName(source.getFullName())
-                .userName(source.getUserName())
+                .userName(source.getUsername())
                 .imageUrl(source.getImageUrl())
                 .build();
     }

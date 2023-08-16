@@ -56,7 +56,8 @@ public class SecurityConfiguration {
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers("/api/v1/user/{userId}/profile-image").authenticated()
                                 .requestMatchers("/api/v1/auth/register", "/api/v1/auth/validate",
-                                        "/api/v1/auth/login", "/api/v1/auth/password-recovery-request", "/api/v1/auth/password-recovery").permitAll())
+                                        "/api/v1/auth/login", "/api/v1/auth/password-recovery-request", "/api/v1/auth/password-recovery",
+                                        "/api/v1/user-search/simple-lookup").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

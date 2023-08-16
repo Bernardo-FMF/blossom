@@ -1,6 +1,5 @@
 package org.blossom.auth.service;
 
-import org.blossom.auth.converter.UserConverter;
 import org.blossom.auth.delta.DeltaEngine;
 import org.blossom.auth.delta.markable.UserMarkable;
 import org.blossom.auth.dto.PasswordChangeDto;
@@ -14,6 +13,7 @@ import org.blossom.auth.entity.User;
 import org.blossom.auth.enums.RoleEnum;
 import org.blossom.auth.exception.*;
 import org.blossom.auth.kafka.KafkaMessageService;
+import org.blossom.auth.mapper.UserDtoMapper;
 import org.blossom.auth.repository.RoleRepository;
 import org.blossom.auth.repository.TokenRepository;
 import org.blossom.auth.repository.UserRepository;
@@ -25,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -43,7 +42,7 @@ public class AuthService {
     private TokenRepository tokenRepository;
 
     @Autowired
-    private UserConverter userConverter;
+    private UserDtoMapper userDtoMapper;
 
     @Autowired
     private TokenGenerator tokenGenerator;
@@ -57,7 +56,7 @@ public class AuthService {
     public String saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
         registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
-        if (userRepository.existsByUsername(registerDto.getUserName())) {
+        if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new UsernameInUseException("Username is already in use");
         }
 
@@ -71,7 +70,7 @@ public class AuthService {
             throw new NoRoleFoundException("User role is not present");
         }
 
-        User newUser = userRepository.save(Objects.requireNonNull(userConverter.convert(registerDto, role.get())));
+        User newUser = userRepository.save(userDtoMapper.mapToUser(registerDto, role.get()));
 
         messageService.publishCreation(newUser);
         return "User registered successfully";

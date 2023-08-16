@@ -30,10 +30,10 @@ public class User implements UserDetails, KafkaEntity {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "fullName")
+    @Column(name = "full_name")
     private String fullName;
 
-    @Column(name = "userName", unique = true)
+    @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "email", unique = true)
@@ -93,7 +93,7 @@ public class User implements UserDetails, KafkaEntity {
         return KafkaUserResource.builder()
                 .id(id)
                 .fullName(fullName)
-                .userName(username)
+                .username(username)
                 .imageUrl(imageUrl)
                 .build();
     }

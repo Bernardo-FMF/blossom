@@ -10,6 +10,6 @@ import lombok.Setter;
 public class KafkaUserResource extends KafkaResource {
     int id;
     String fullName;
-    String userName;
+    String username;
     String imageUrl;
 }
