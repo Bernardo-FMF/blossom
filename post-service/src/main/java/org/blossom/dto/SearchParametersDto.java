@@ -8,6 +8,7 @@ import java.util.Objects;
 @Getter
 @Setter
 public class SearchParametersDto {
+    String query;
     Integer page;
     Integer pageLimit;
 

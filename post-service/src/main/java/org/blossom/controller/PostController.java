@@ -1,6 +1,6 @@
 package org.blossom.controller;
 
-import org.blossom.dto.AggregatePostDto;
+import org.blossom.dto.AggregateUserPostsDto;
 import org.blossom.dto.PostInfoDto;
 import org.blossom.dto.SearchParametersDto;
 import org.blossom.exception.PostNotFoundException;
@@ -34,7 +34,7 @@ public class PostController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<AggregatePostDto> getPostsByUser(@PathVariable("userId") Integer userId, SearchParametersDto searchParameters) {
+    public ResponseEntity<AggregateUserPostsDto> getPostsByUser(@PathVariable("userId") Integer userId, SearchParametersDto searchParameters) {
         return ResponseEntity.status(HttpStatus.OK).body(postService.findByUser(userId, searchParameters));
     }
 }

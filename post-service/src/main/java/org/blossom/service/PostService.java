@@ -1,7 +1,7 @@
 package org.blossom.service;
 
 import org.blossom.cache.LocalUserCacheService;
-import org.blossom.dto.AggregatePostDto;
+import org.blossom.dto.AggregateUserPostsDto;
 import org.blossom.dto.PostInfoDto;
 import org.blossom.dto.SearchParametersDto;
 import org.blossom.entity.Post;
@@ -76,17 +76,17 @@ public class PostService {
         return "Post was deleted successfully";
     }
 
-    public AggregatePostDto findByUser(Integer userId, SearchParametersDto searchParameters) {
+    public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
 
         LocalUser user = localUserCacheService.getFromCache(String.valueOf(userId));
 
         Page<Post> posts = postRepository.findByUserId(userId, page);
 
-        return AggregatePostDto.builder()
+        return AggregateUserPostsDto.builder()
                 .posts(posts.get().map(post -> postDtoMapper.mapToPostDto(post)).collect(Collectors.toList()))
                 .user(user)
-                .page(posts.getNumber())
+                .currentPage(posts.getNumber())
                 .totalPages(posts.getTotalPages())
                 .totalElements(posts.getTotalElements())
                 .eof(!posts.hasNext())
