@@ -3,8 +3,8 @@ package org.blossom.auth.grpc;
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import lombok.AllArgsConstructor;
-import org.blossom.auth.grpc.client.GrpcClient;
 import org.blossom.auth.grpc.streamobserver.IdentifierStreamObserver;
+import org.blossom.facade.ImageContractGrpcClientFacade;
 import org.blossom.imagecontract.Block;
 import org.blossom.imagecontract.Identifier;
 import org.springframework.context.annotation.Lazy;
@@ -22,7 +22,7 @@ public class GrpcClientImageService {
     public static final int BUFFER_SIZE = 1024;
 
     @Lazy
-    private final GrpcClient grpcClient;
+    private final ImageContractGrpcClientFacade grpcClient;
 
     public String uploadImage(MultipartFile file) throws IOException, InterruptedException {
         String fileName = file.getOriginalFilename();
@@ -33,7 +33,7 @@ public class GrpcClientImageService {
 
         IdentifierStreamObserver identifierStreamObserver = new IdentifierStreamObserver(countDownLatch);
 
-        StreamObserver<Block> blockStreamObserver = grpcClient.getNonBlockStub().submitImage(identifierStreamObserver);
+        StreamObserver<Block> blockStreamObserver = grpcClient.getNonBlockingStub().submitImage(identifierStreamObserver);
 
         try (InputStream input = file.getInputStream()) {
             while (input.read(buffer) >= 0) {
@@ -58,6 +58,6 @@ public class GrpcClientImageService {
     }
 
     public void deleteImage(String imageUrl) {
-        grpcClient.getBlockStub().deleteImage(Identifier.newBuilder().setUrl(imageUrl).build());
+        grpcClient.getBlockingStub().deleteImage(Identifier.newBuilder().setUrl(imageUrl).build());
     }
 }
