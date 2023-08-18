@@ -1,4 +1,4 @@
-package org.blossom.auth.exception.model;
+package org.blossom.exception.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

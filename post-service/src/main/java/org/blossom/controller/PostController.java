@@ -1,6 +1,7 @@
 package org.blossom.controller;
 
 import org.blossom.dto.PostInfoDto;
+import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
 import org.blossom.model.CommonUserDetails;
 import org.blossom.service.PostService;
@@ -20,8 +21,17 @@ public class PostController {
     private PostService postService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createPost(PostInfoDto postInfoDto, Authentication authentication) throws UserNotFoundException, IOException, InterruptedException {
+    public ResponseEntity<String> createPost(PostInfoDto postInfoDto, Authentication authentication) throws UserNotFoundException, IOException, InterruptedException, PostNotValidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(postInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable("id") String postId) {
+        return null;
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<String> getPostsByUser(@PathVariable("userId") Integer userId) {
+        return null;
+    }
 }

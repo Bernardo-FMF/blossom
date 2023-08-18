@@ -3,6 +3,7 @@ package org.blossom.service;
 import org.blossom.cache.LocalUserCacheService;
 import org.blossom.dto.PostInfoDto;
 import org.blossom.entity.Post;
+import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
 import org.blossom.grpc.GrpcClientImageService;
 import org.blossom.mapper.PostDtoMapper;
@@ -30,9 +31,13 @@ public class PostService {
     @Autowired
     private PostDtoMapper postDtoMapper;
 
-    public String createPost(PostInfoDto postInfoDto, int userId) throws UserNotFoundException, IOException, InterruptedException {
+    public String createPost(PostInfoDto postInfoDto, int userId) throws UserNotFoundException, IOException, InterruptedException, PostNotValidException {
         if (postInfoDto.getUserId() != userId || localUserCacheService.findEntry(String.valueOf(userId))) {
             throw new UserNotFoundException("User not found");
+        }
+
+        if (postInfoDto.getMediaFiles().length == 0 && postInfoDto.getText().isEmpty()) {
+            throw new PostNotValidException("Post has no content");
         }
 
         String[] mediaUrls = imageService.uploadImages(postInfoDto.getMediaFiles());

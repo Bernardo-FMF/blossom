@@ -6,40 +6,52 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.Date;
+
 @ControllerAdvice
-@ResponseStatus
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EmailInUseException.class)
     public ResponseEntity<ErrorMessage> emailInUseException(EmailInUseException exception, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(HttpStatus.CONFLICT, exception.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorMessage message = new ErrorMessage(status, EmailInUseException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(EmailNotInUseException.class)
+    public ResponseEntity<ErrorMessage> emailNotInUseException(EmailInUseException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorMessage message = new ErrorMessage(status, EmailInUseException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
     }
 
     @ExceptionHandler(UsernameInUseException.class)
     public ResponseEntity<ErrorMessage> usernameInUseException(UsernameInUseException exception, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(HttpStatus.CONFLICT, exception.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorMessage message = new ErrorMessage(status, UsernameInUseException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
     }
 
     @ExceptionHandler(LoginCredentialsException.class)
     public ResponseEntity<ErrorMessage> loginCredentialsException(LoginCredentialsException exception, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST, exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorMessage message = new ErrorMessage(status, LoginCredentialsException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
     }
 
     @ExceptionHandler(NoRoleFoundException.class)
     public ResponseEntity<ErrorMessage> noRoleFoundException(NoRoleFoundException exception, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST, exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorMessage message = new ErrorMessage(status, NoRoleFoundException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorMessage> userNotFoundException(UserNotFoundException exception, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST, exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorMessage message = new ErrorMessage(status, UserNotFoundException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
     }
 }
