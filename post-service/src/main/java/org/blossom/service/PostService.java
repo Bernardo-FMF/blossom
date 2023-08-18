@@ -1,15 +1,21 @@
 package org.blossom.service;
 
 import org.blossom.cache.LocalUserCacheService;
+import org.blossom.dto.AggregatePostDto;
 import org.blossom.dto.PostInfoDto;
+import org.blossom.dto.SearchParametersDto;
 import org.blossom.entity.Post;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
 import org.blossom.grpc.GrpcClientImageService;
+import org.blossom.kafka.inbound.model.LocalUser;
 import org.blossom.mapper.PostDtoMapper;
 import org.blossom.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -67,6 +74,23 @@ public class PostService {
         postRepository.delete(post);
 
         return "Post was deleted successfully";
+    }
+
+    public AggregatePostDto findByUser(Integer userId, SearchParametersDto searchParameters) {
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+
+        LocalUser user = localUserCacheService.getFromCache(String.valueOf(userId));
+
+        Page<Post> posts = postRepository.findByUserId(userId, page);
+
+        return AggregatePostDto.builder()
+                .posts(posts.get().map(post -> postDtoMapper.mapToPostDto(post)).collect(Collectors.toList()))
+                .user(user)
+                .page(posts.getNumber())
+                .totalPages(posts.getTotalPages())
+                .totalElements(posts.getTotalElements())
+                .eof(!posts.hasNext())
+                .build();
     }
 
     private String[] parseDescription(String text) {

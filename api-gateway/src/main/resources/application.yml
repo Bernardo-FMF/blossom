@@ -19,7 +19,7 @@ spring:
         - id: post-service
           uri: lb://post-service
           predicates:
-            - Path=/api/{version}/post
+            - Path=/api/{version}/post/**
           filters:
             - AuthenticationFilter
 

@@ -1,6 +1,8 @@
 package org.blossom.controller;
 
+import org.blossom.dto.AggregatePostDto;
 import org.blossom.dto.PostInfoDto;
+import org.blossom.dto.SearchParametersDto;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
@@ -27,12 +29,12 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable("id") String postId) throws PostNotFoundException {
+    public ResponseEntity<String> deletePost(@PathVariable("id") String postId, Authentication authentication) throws PostNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(postService.deletePost(postId));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<String> getPostsByUser(@PathVariable("userId") Integer userId) {
-        return null;
+    public ResponseEntity<AggregatePostDto> getPostsByUser(@PathVariable("userId") Integer userId, SearchParametersDto searchParameters) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.findByUser(userId, searchParameters));
     }
 }
