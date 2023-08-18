@@ -23,6 +23,8 @@
         <module>common-utilities/kafka-utilities</module>
         <module>common-utilities/auth-utilities</module>
         <module>search-service</module>
+        <module>post-service</module>
+        <module>common-utilities/grpc-utilities</module>
     </modules>
 
     <properties>

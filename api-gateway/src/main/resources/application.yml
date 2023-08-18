@@ -16,6 +16,12 @@ spring:
             - Path=/api/{version}/auth/**, /api/{version}/user/**, /api/{version}/user-search/**
           filters:
             - AuthenticationFilter
+        - id: post-service
+          uri: lb://post-service
+          predicates:
+            - Path=/api/{version}/post
+          filters:
+            - AuthenticationFilter
 
         - id: discovery-server
           uri: http://localhost:8761
