@@ -3,6 +3,7 @@ package org.blossom.service;
 import org.blossom.cache.LocalUserCacheService;
 import org.blossom.dto.PostInfoDto;
 import org.blossom.entity.Post;
+import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
 import org.blossom.grpc.GrpcClientImageService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,23 @@ public class PostService {
         Post newPost = postRepository.save(post);
 
         return newPost.getId();
+    }
+
+    public String deletePost(String postId) throws PostNotFoundException {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (optionalPost.isEmpty()) {
+            throw new PostNotFoundException("Post does not exist");
+        }
+
+        Post post = optionalPost.get();
+
+        if (post.getMedia().length != 0) {
+            imageService.deleteImages(post.getMedia());
+        }
+
+        postRepository.delete(post);
+
+        return "Post was deleted successfully";
     }
 
     private String[] parseDescription(String text) {

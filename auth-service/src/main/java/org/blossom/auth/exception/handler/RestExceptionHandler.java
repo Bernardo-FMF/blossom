@@ -54,4 +54,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorMessage message = new ErrorMessage(status, UserNotFoundException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorMessage> invalidTokenException(InvalidTokenException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorMessage message = new ErrorMessage(status, InvalidTokenException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
 }

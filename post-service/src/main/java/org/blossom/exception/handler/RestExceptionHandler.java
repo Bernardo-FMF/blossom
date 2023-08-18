@@ -1,6 +1,7 @@
 package org.blossom.exception.handler;
 
 
+import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
 import org.blossom.exception.model.ErrorMessage;
@@ -26,6 +27,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorMessage> userNotFoundException(UserNotFoundException exception, WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorMessage message = new ErrorMessage(status, UserNotFoundException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ErrorMessage> postNotFoundException(PostNotFoundException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorMessage message = new ErrorMessage(status, PostNotFoundException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
 }

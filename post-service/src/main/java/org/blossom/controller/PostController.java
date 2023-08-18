@@ -1,6 +1,7 @@
 package org.blossom.controller;
 
 import org.blossom.dto.PostInfoDto;
+import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
 import org.blossom.model.CommonUserDetails;
@@ -26,8 +27,8 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable("id") String postId) {
-        return null;
+    public ResponseEntity<String> deletePost(@PathVariable("id") String postId) throws PostNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.deletePost(postId));
     }
 
     @GetMapping("/user/{userId}")

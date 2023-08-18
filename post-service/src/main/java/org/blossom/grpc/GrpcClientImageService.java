@@ -5,6 +5,7 @@ import io.grpc.stub.StreamObserver;
 import org.blossom.facade.ImageContractGrpcClientFacade;
 import org.blossom.grpc.streamobserver.IdentifierStreamObserver;
 import org.blossom.imagecontract.Block;
+import org.blossom.imagecontract.Identifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,4 +63,9 @@ public class GrpcClientImageService {
         return await ? mediaStreams.stream().map(IdentifierStreamObserver::getUrl).toArray(String[]::new) : null;
     }
 
+    public void deleteImages(String[] mediaUrls) {
+        for (String media: mediaUrls) {
+            grpcClient.getBlockingStub().deleteImage(Identifier.newBuilder().setUrl(media).build());
+        }
+    }
 }
