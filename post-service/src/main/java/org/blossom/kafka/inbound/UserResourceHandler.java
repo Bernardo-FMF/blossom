@@ -4,6 +4,7 @@ import org.blossom.cache.LocalUserCacheService;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.mapper.LocalUserMapper;
 import org.blossom.model.KafkaUserResource;
+import org.blossom.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,9 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Autowired
     private LocalUserMapper localUserMapper;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Override
     public void save(KafkaUserResource resource) {
@@ -28,5 +32,6 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     @Override
     public void delete(KafkaUserResource resource) {
         localUserCache.deleteCacheEntry(String.valueOf(resource.getId()));
+        postRepository.deleteByUserId(resource.getId());
     }
 }

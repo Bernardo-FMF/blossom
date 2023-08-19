@@ -10,6 +10,7 @@ import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
 import org.blossom.grpc.GrpcClientImageService;
 import org.blossom.kafka.inbound.model.LocalUser;
+import org.blossom.kafka.outbound.KafkaMessageService;
 import org.blossom.mapper.PostDtoMapper;
 import org.blossom.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class PostService {
     @Autowired
     private PostDtoMapper postDtoMapper;
 
+    @Autowired
+    private KafkaMessageService messageService;
+
     public String createPost(PostInfoDto postInfoDto, int userId) throws UserNotFoundException, IOException, InterruptedException, PostNotValidException {
         if (postInfoDto.getUserId() != userId || localUserCacheService.findEntry(String.valueOf(userId))) {
             throw new UserNotFoundException("User not found");
@@ -55,6 +59,8 @@ public class PostService {
         Post post = postDtoMapper.mapToPost(postInfoDto, mediaUrls, hashtags);
 
         Post newPost = postRepository.save(post);
+
+        messageService.publishCreation(newPost);
 
         return newPost.getId();
     }
@@ -72,6 +78,8 @@ public class PostService {
         }
 
         postRepository.delete(post);
+
+        messageService.publishDelete(post);
 
         return "Post was deleted successfully";
     }

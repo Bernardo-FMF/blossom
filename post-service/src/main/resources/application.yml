@@ -8,8 +8,11 @@ spring:
       database: post-db
   kafka:
     bootstrap-servers: localhost:9092
-    template:
-      default-topic: resource-event-posts
+    topics: resource-event-feed, resource-event-activity
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties.spring.json.type.mapping: event:org.blossom.model.ResourceEvent
     consumer:
       group-id: postListenerId
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
