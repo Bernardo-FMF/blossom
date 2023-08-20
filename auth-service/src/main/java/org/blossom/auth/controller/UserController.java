@@ -24,6 +24,6 @@ public class UserController {
             throws IOException, InterruptedException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 userService.updateUserImage(userId,
-                        ((CommonUserDetails)authentication.getPrincipal()).getUserId(), file));
+                        ((CommonUserDetails) authentication.getPrincipal()).getUserId(), file));
     }
 }

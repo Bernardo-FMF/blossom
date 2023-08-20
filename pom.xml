@@ -24,6 +24,7 @@
         <module>common-utilities/auth-utilities</module>
         <module>post-service</module>
         <module>common-utilities/grpc-utilities</module>
+        <module>social-graph-service</module>
     </modules>
 
     <properties>

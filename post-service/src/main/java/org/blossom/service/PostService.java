@@ -33,7 +33,7 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
-    private LocalUserCacheService localUserCacheService;
+    private LocalUserCacheService localUserCache;
 
     @Autowired
     private GrpcClientImageService imageService;
@@ -45,7 +45,7 @@ public class PostService {
     private KafkaMessageService messageService;
 
     public String createPost(PostInfoDto postInfoDto, int userId) throws UserNotFoundException, IOException, InterruptedException, PostNotValidException {
-        if (postInfoDto.getUserId() != userId || localUserCacheService.findEntry(String.valueOf(userId))) {
+        if (postInfoDto.getUserId() != userId || localUserCache.findEntry(String.valueOf(userId))) {
             throw new UserNotFoundException("User not found");
         }
 
@@ -87,7 +87,7 @@ public class PostService {
     public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
 
-        LocalUser user = localUserCacheService.getFromCache(String.valueOf(userId));
+        LocalUser user = localUserCache.getFromCache(String.valueOf(userId));
 
         Page<Post> posts = postRepository.findByUserId(userId, page);
 

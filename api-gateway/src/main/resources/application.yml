@@ -22,6 +22,12 @@ spring:
             - Path=/api/{version}/post/**, /api/{version}/post-search/**
           filters:
             - AuthenticationFilter
+        - id: social-graph-service
+          uri: lb://social-graph-service
+          predicates:
+            - Path=/api/{version}/social/**
+          filters:
+            - AuthenticationFilter
 
         - id: discovery-server
           uri: http://localhost:8761

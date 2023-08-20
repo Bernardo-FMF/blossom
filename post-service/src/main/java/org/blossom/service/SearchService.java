@@ -23,7 +23,7 @@ public class SearchService {
     private PostRepository postRepository;
 
     @Autowired
-    private LocalUserCacheService localUserCacheService;
+    private LocalUserCacheService localUserCache;
 
     @Autowired
     private PostDtoMapper postDtoMapper;
@@ -33,7 +33,7 @@ public class SearchService {
         Page<Post> posts = postRepository.findByHashtagsIn(searchParameters.getQuery(), page);
 
         List<String> userIds = posts.getContent().stream().map(post -> String.valueOf(post.getUserId())).toList();
-        Map<Integer, LocalUser> allUsers = localUserCacheService.getMultiFromCache(userIds).stream()
+        Map<Integer, LocalUser> allUsers = localUserCache.getMultiFromCache(userIds).stream()
                 .collect(Collectors.toMap(LocalUser::getId, user -> user));
 
         return AggregatePostsDto.builder()

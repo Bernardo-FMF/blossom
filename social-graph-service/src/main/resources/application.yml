@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: Social-Graph-Service
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: social-graph-service
+  redis:
+    host: localhost
+    port: 6380
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping: event:org.blossom.model.ResourceEvent
+    consumer:
+      group-id: postListenerId
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.blossom.json.CustomResourceEventDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "org.blossom.model"
+            type:
+              mapping: event:org.blossom.model.ResourceEvent
+server:
+  port: 65
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
