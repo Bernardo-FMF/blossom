@@ -10,30 +10,30 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface SocialRepository extends Neo4jRepository<GraphUser, Integer> {
-    @Query("MATCH (follower:LocalUser), (followed:LocalUser) " +
+    @Query("MATCH (follower:GraphUser), (followed:GraphUser) " +
             "WHERE follower.userId = $followerId AND followed.userId = $followedId " +
             "CREATE (follower)-[:FOLLOWS]->(followed)")
     void createFollowerRelationship(@Param("followerId") Integer followerId, @Param("followedId") Integer followedId);
 
-    @Query("MATCH (follower:LocalUser { userId: $followerId }) " +
-            "MATCH (followed:LocalUser { userId: $followedId }) " +
+    @Query("MATCH (follower:GraphUser { userId: $followerId }) " +
+            "MATCH (followed:GraphUser { userId: $followedId }) " +
             "RETURN EXISTS((follower)-[:FOLLOWS]->(followed))")
     boolean existsRelationshipBetweenUsers(@Param("followerId") Integer followerId, @Param("followedId") Integer followedId);
 
-    @Query("MATCH (follower:LocalUser)-[r:FOLLOWS]->(followed:LocalUser) " +
+    @Query("MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser) " +
             "WHERE follower.userId = $followerId AND followed.userId = $followedId " +
             "DELETE r")
     void deleteFollowerRelationship(@Param("followerId") Integer followerId, @Param("followedId") Integer followedId);
 
-    @Query("MATCH (follower:LocalUser)-[r:FOLLOWS]->(followed:LocalUser)" +
-            "WHERE followed.userId = $followedId" +
+    @Query("MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser) " +
+            "WHERE followed.userId = $followedId " +
             "RETURN follower.userId")
     List<Integer> findFollowers(@Param("followedId") Integer followedId);
 
-    @Query(value = "MATCH (self:LocalUser)-[:FOLLOWS]->(following:LocalUser)-[:FOLLOWS]->(recommended:LocalUser) " +
+    @Query(value = "MATCH (self:GraphUser)-[:FOLLOWS]->(following:GraphUser)-[:FOLLOWS]->(recommended:GraphUser) " +
             "WHERE self.userId = $user AND NOT (self)-[:FOLLOWS]->(recommended) " +
             "RETURN DISTINCT recommended.userId",
-            countQuery = "MATCH (self:LocalUser)-[:FOLLOWS]->(following:LocalUser)-[:FOLLOWS]->(recommended:LocalUser) " +
+            countQuery = "MATCH (self:GraphUser)-[:FOLLOWS]->(following:GraphUser)-[:FOLLOWS]->(recommended:GraphUser) " +
                     "WHERE self.userId = $user AND NOT (self)-[:FOLLOWS]->(recommended) " +
                     "RETURN DISTINCT COUNT(recommended)")
     Page<Integer> findRecommendations(@Param("user") Integer user, Pageable pageable);

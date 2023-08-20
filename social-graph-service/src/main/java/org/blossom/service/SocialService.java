@@ -27,7 +27,11 @@ public class SocialService {
     @Autowired
     private LocalUserCacheService localUserCache;
 
-    public String createSocialRelation(SocialRelationDto socialRelationDto) throws FollowNotValidException {
+    public String createSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException {
+        if (socialRelationDto.getInitiatingUser() != userId) {
+            throw new FollowNotValidException("Could not perform operation on this user");
+        }
+
         if (socialRelationDto.getInitiatingUser() == socialRelationDto.getReceivingUser()) {
             throw new FollowNotValidException("Follow not valid. A user cannot follow itself");
         }
@@ -45,7 +49,11 @@ public class SocialService {
         return "Relation was created successfully";
     }
 
-    public String deleteSocialRelation(SocialRelationDto socialRelationDto) throws FollowNotValidException, UserNotFoundException {
+    public String deleteSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException, UserNotFoundException {
+        if (socialRelationDto.getInitiatingUser() != userId) {
+            throw new FollowNotValidException("Could not perform operation on this user");
+        }
+
         if (socialRelationDto.getInitiatingUser() == socialRelationDto.getReceivingUser()) {
             throw new FollowNotValidException("Follow not valid. A user cannot follow itself");
         }
@@ -82,8 +90,8 @@ public class SocialService {
 
         return GraphUserDto.builder()
                 .user(allUsers.get(userId))
-                .follows(user.getFollowing().stream().map(graphUser -> allUsers.get(graphUser.getUserId())).collect(Collectors.toSet()))
-                .followers(followers.stream().map(allUsers::get).collect(Collectors.toSet()))
+                .follows(user.getFollowing().stream().map(graphUser -> allUsers.get(graphUser.getUserId())).collect(Collectors.toList()))
+                .followers(followers.stream().map(allUsers::get).collect(Collectors.toList()))
                 .build();
     }
 

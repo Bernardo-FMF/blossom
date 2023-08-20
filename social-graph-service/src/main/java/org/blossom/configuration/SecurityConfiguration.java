@@ -23,7 +23,7 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/v1/social", "/api/v1/social/user", "/api/v1/social/self", "/api/v1/social/follow-recommendation").permitAll())
+                                .requestMatchers("/api/v1/social", "/api/v1/social/user", "/api/v1/social/self", "/api/v1/social/follow-recommendation").authenticated())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

@@ -20,7 +20,7 @@ spring:
             enable: true
   kafka:
     bootstrap-servers: localhost:9092
-    topics: resource-event-posts, resource-event-social, resource-event-feed, resource-event-activity
+    topics: resource-event-posts, resource-event-social
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

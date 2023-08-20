@@ -1,13 +1,17 @@
 package org.blossom.dto;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.blossom.kafka.inbound.model.LocalUser;
 
-import java.util.Set;
+import java.util.List;
 
+@Getter
+@Setter
 @Builder
 public class GraphUserDto {
     private LocalUser user;
-    private Set<LocalUser> followers;
-    private Set<LocalUser> follows;
+    private List<LocalUser> followers;
+    private List<LocalUser> follows;
 }
