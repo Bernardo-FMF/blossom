@@ -6,7 +6,7 @@ import org.blossom.imagecontract.ImageContractGrpc;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ImageContractGrpcClientFacade extends BaseGrpcClientFacade implements IStubAccessor {
+public class ImageContractGrpcClientFacade extends BaseGrpcClientFacade {
     private final ImageContractGrpc.ImageContractStub nonBlockStub;
     private final ImageContractGrpc.ImageContractBlockingStub blockStub;
 

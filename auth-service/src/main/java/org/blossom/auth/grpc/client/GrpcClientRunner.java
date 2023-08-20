@@ -1,18 +1,16 @@
 package org.blossom.auth.grpc.client;
 
-import lombok.AllArgsConstructor;
 import org.blossom.facade.ImageContractGrpcClientFacade;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-@AllArgsConstructor
 @Component
 public class GrpcClientRunner implements ApplicationRunner {
 
-    @Lazy
-    private final ImageContractGrpcClientFacade grpcClient;
+    @Autowired
+    private ImageContractGrpcClientFacade grpcClient;
 
     @Override
     public void run(ApplicationArguments args) {
