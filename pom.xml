@@ -25,6 +25,7 @@
         <module>post-service</module>
         <module>common-utilities/grpc-utilities</module>
         <module>social-graph-service</module>
+        <module>activity-service</module>
     </modules>
 
     <properties>

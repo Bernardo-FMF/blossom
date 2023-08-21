@@ -1,6 +1,6 @@
 spring:
   application:
-    name: social-graph-service
+    name: Social-Graph-Service
   neo4j:
     uri: bolt://localhost:7687
     authentication:
