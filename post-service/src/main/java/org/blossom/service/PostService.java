@@ -5,6 +5,7 @@ import org.blossom.dto.AggregateUserPostsDto;
 import org.blossom.dto.PostInfoDto;
 import org.blossom.dto.SearchParametersDto;
 import org.blossom.entity.Post;
+import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
 import org.blossom.exception.UserNotFoundException;
@@ -65,13 +66,17 @@ public class PostService {
         return newPost.getId();
     }
 
-    public String deletePost(String postId) throws PostNotFoundException {
+    public String deletePost(String postId, int userId) throws PostNotFoundException, OperationNotAllowedException {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
             throw new PostNotFoundException("Post does not exist");
         }
 
         Post post = optionalPost.get();
+
+        if (post.getUserId() != userId) {
+            throw new OperationNotAllowedException("Logged in user cannot delete this post");
+        }
 
         if (post.getMedia().length != 0) {
             imageService.deleteImages(post.getMedia());
