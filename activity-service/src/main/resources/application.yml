@@ -1,6 +1,12 @@
 spring:
   application:
     name: Activity-Service
+  datasource:
+    url: jdbc:postgresql://localhost:5431/postgres
+    username: postgres
+    password: rootactivity
+  flyway:
+    baseline-on-migrate: true
 server:
   port: 9464
 eureka:
