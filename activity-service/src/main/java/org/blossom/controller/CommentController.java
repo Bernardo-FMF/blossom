@@ -1,10 +1,39 @@
 package org.blossom.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.blossom.dto.CommentInfoDto;
+import org.blossom.dto.UpdatedCommentDto;
+import org.blossom.dto.UserCommentsDto;
+import org.blossom.model.CommonUserDetails;
+import org.blossom.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/comment")
 public class CommentController {
+    @Autowired
+    private CommentService commentService;
 
+    @PostMapping
+    public ResponseEntity<Integer> createComment(@RequestBody CommentInfoDto commentInfoDto, Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(commentInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<String> deleteComment(@RequestParam("commentId") Integer commentId, Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.deleteComment(commentId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<String> updateComment(@RequestParam("commentId") Integer commentId, @RequestBody UpdatedCommentDto updatedCommentDto, Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(commentId, updatedCommentDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<UserCommentsDto> getUserComments(@RequestParam("userId") Integer userId, Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getUserComments(userId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
 }

@@ -28,6 +28,12 @@ spring:
             - Path=/api/{version}/social/**
           filters:
             - AuthenticationFilter
+        - id: activity-service
+          uri: lb://activity-service
+          predicates:
+            - Path=/api/{version}/comment/**
+          filters:
+            - AuthenticationFilter
 
         - id: discovery-server
           uri: http://localhost:8761

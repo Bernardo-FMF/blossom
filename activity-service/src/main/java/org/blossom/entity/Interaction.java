@@ -10,6 +10,7 @@ import org.blossom.enums.InteractionType;
 @Getter
 @Setter
 @Entity
+@Table(name = "Blossom_Interaction")
 public class Interaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
