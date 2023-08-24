@@ -1,5 +1,6 @@
 package org.blossom.kafka.inbound;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.blossom.cache.LocalUserCacheService;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.mapper.LocalUserMapper;
@@ -31,7 +32,6 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void delete(KafkaUserResource resource) {
-        localUserCache.deleteCacheEntry(String.valueOf(resource.getId()));
-        postRepository.deleteByUserId(resource.getId());
+        throw new NotImplementedException("User deletes are not available");
     }
 }

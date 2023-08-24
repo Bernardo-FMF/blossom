@@ -1,4 +1,8 @@
 spring:
+  data:
+    redis:
+      repositories:
+        enabled: false
   application:
     name: Activity-Service
   datasource:
@@ -7,6 +11,26 @@ spring:
     password: rootactivity
   flyway:
     baseline-on-migrate: true
+  redis:
+    user-cache:
+      host: localhost
+      port: 6478
+    post-cache:
+      host: localhost
+      port: 6477
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: postListenerId
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.blossom.json.CustomResourceEventDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "org.blossom.model"
+            type:
+              mapping: event:org.blossom.model.ResourceEvent
 server:
   port: 9464
 eureka:

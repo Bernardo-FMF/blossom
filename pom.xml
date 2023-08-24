@@ -20,10 +20,7 @@
         <module>common-utilities</module>
         <module>image-grpc-service</module>
         <module>grpc-interface</module>
-        <module>common-utilities/kafka-utilities</module>
-        <module>common-utilities/auth-utilities</module>
         <module>post-service</module>
-        <module>common-utilities/grpc-utilities</module>
         <module>social-graph-service</module>
         <module>activity-service</module>
     </modules>

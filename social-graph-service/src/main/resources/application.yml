@@ -11,14 +11,6 @@ spring:
     port: 6380
   kafka:
     bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring:
-          json:
-            type:
-              mapping: event:org.blossom.model.ResourceEvent
     consumer:
       group-id: postListenerId
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

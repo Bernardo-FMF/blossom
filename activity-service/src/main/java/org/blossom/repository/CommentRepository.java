@@ -10,4 +10,6 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     @Modifying
     @Query(value = "UPDATE Comment c SET c.parentComment.id = :parentId WHERE c.id = :commentId")
     void updateParentComment(@Param("commentId") Integer commentId, @Param("parentId") Integer parentId);
+
+    void deleteByPostId(String postId);
 }
