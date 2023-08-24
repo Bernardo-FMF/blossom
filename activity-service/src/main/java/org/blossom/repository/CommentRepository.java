@@ -1,6 +1,8 @@
 package org.blossom.repository;
 
 import org.blossom.entity.Comment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,4 +14,6 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     void updateParentComment(@Param("commentId") Integer commentId, @Param("parentId") Integer parentId);
 
     void deleteByPostId(String postId);
+
+    Page<Comment> findByUserId(int userId, Pageable pageable);
 }

@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentMapper {
     public CommentDto mapToCommentDto(Comment comment) {
-        return null;
+        return CommentDto.builder()
+                .id(comment.getId())
+                .userId(comment.getUserId())
+                .postId(comment.getPostId())
+                .commentContent(comment.getCommentContent())
+                .parentComment(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
+                .build();
     }
 }

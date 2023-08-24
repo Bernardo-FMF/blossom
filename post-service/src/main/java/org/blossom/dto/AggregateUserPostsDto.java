@@ -11,8 +11,8 @@ import java.util.List;
 public class AggregateUserPostsDto {
     private LocalUser user;
     private List<PostDto> posts;
-    boolean eof;
-    long currentPage;
-    long totalPages;
-    long totalElements;
+    private boolean eof;
+    private long currentPage;
+    private long totalPages;
+    private long totalElements;
 }
