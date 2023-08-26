@@ -32,6 +32,10 @@ public class Comment {
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment;
 
+    @ManyToOne
+    @JoinColumn(name = "top_level_comment_id")
+    private Comment topLevelComment;
+
     @Column(name = "comment_content", nullable = false)
     private String commentContent;
 

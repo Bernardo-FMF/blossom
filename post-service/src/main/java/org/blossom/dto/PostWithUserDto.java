@@ -1,9 +1,11 @@
 package org.blossom.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.blossom.kafka.inbound.model.LocalUser;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -14,5 +16,5 @@ public class PostWithUserDto {
     private String[] mediaUrls;
     private String[] hashtags;
     private String description;
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
 }

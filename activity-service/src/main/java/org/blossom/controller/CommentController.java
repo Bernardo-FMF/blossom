@@ -1,9 +1,6 @@
 package org.blossom.controller;
 
-import org.blossom.dto.CommentInfoDto;
-import org.blossom.dto.SearchParametersDto;
-import org.blossom.dto.UpdatedCommentDto;
-import org.blossom.dto.UserCommentsDto;
+import org.blossom.dto.*;
 import org.blossom.exception.CommentNotFoundException;
 import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
@@ -23,8 +20,8 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<Integer> createComment(@RequestBody CommentInfoDto commentInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(commentInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    public ResponseEntity<GenericCreationDto> createComment(@RequestBody CommentInfoDto commentInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(commentInfoDto, 1));
     }
 
     @DeleteMapping("/{commentId}")
@@ -37,8 +34,18 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(commentId, updatedCommentDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<UserCommentsDto> getUserComments(@PathVariable("userId") Integer userId, SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException, OperationNotAllowedException {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.getUserComments(userId, searchParametersDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    @GetMapping("/self")
+    public ResponseEntity<UserCommentsDto> getUserComments(SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException, OperationNotAllowedException {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getUserComments(searchParametersDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostCommentsDto> getPostComments(@PathVariable("postId") String postId, SearchParametersDto searchParametersDto) throws PostNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getPostComments(postId, searchParametersDto));
+    }
+
+    @GetMapping("/{commentId}/replies")
+    public ResponseEntity<PostCommentsDto> getCommentReplies(@PathVariable("commentId") Integer commentId, SearchParametersDto searchParametersDto) throws PostNotFoundException, CommentNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentReplies(commentId, searchParametersDto));
     }
 }

@@ -2,7 +2,8 @@ create table Blossom_Interaction (
 	id SERIAL PRIMARY KEY,
 	user_id INT,
     post_id VARCHAR(255),
-    interaction_type VARCHAR(255) NOT NULL
+    interaction_type VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Blossom_Comment (
@@ -10,6 +11,7 @@ CREATE TABLE Blossom_Comment (
     user_id INT,
     post_id VARCHAR(255),
     parent_comment_id INT REFERENCES Blossom_Comment(id),
+    top_level_comment_id INT REFERENCES Blossom_Comment(id),
     comment_content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,

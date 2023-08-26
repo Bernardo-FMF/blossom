@@ -1,17 +1,19 @@
-package org.blossom.dto;
+package org.blossom.projection;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Setter;
-import org.blossom.kafka.model.LocalUser;
 
 import java.sql.Timestamp;
 
 @Builder
 @Setter
-public class CommentDto {
+@Getter
+@AllArgsConstructor
+public class CommentProjection {
     private int id;
     private int userId;
-    private LocalUser user;
     private String postId;
     private String commentContent;
     private Integer parentComment;

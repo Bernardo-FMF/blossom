@@ -1,38 +1,51 @@
 package org.blossom.controller;
 
+import org.blossom.dto.GenericCreationDto;
+import org.blossom.dto.InteractionInfoDto;
+import org.blossom.dto.SearchParametersDto;
+import org.blossom.dto.UserInteractionsDto;
+import org.blossom.exception.*;
+import org.blossom.model.CommonUserDetails;
+import org.blossom.service.InteractionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/interaction")
 public class InteractionController {
-    @GetMapping("/like/user/{id}")
-    public ResponseEntity<String> getUserLikes() {
-        return null;
+    @Autowired
+    private InteractionService interactionService;
+
+    @GetMapping("/like/self")
+    public ResponseEntity<UserInteractionsDto> getUserLikes(SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.getUserLikes(searchParametersDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
-    @GetMapping("/save/user/{id}")
-    public ResponseEntity<String> getUserSaves() {
-        return null;
+    @GetMapping("/save/self")
+    public ResponseEntity<UserInteractionsDto> getUserSaves(SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.getUserSaves(searchParametersDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @PostMapping("/like")
-    public ResponseEntity<String> createLike() {
-        return null;
-    }
-
-    @DeleteMapping("/like/{interactionId}")
-    public ResponseEntity<String> deleteLike() {
-        return null;
+    public ResponseEntity<GenericCreationDto> createLike(InteractionInfoDto interactionInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, InteractionAlreadyExistsException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.createLike(interactionInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> createSave() {
-        return null;
+    public ResponseEntity<GenericCreationDto> createSave(InteractionInfoDto interactionInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, InteractionAlreadyExistsException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.createSave(interactionInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @DeleteMapping("/like/{interactionId}")
+    public ResponseEntity<String> deleteLike(@PathVariable("interactionId") Integer interactionId, Authentication authentication) throws UserNotFoundException, PostNotFoundException, InteractionNotFoundException, OperationNotAllowedException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.deleteLike(interactionId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @DeleteMapping("/save/{interactionId}")
-    public ResponseEntity<String> deleteSave() {
-        return null;
+    public ResponseEntity<String> deleteSave(@PathVariable("interactionId") Integer interactionId, Authentication authentication) throws UserNotFoundException, PostNotFoundException, InteractionNotFoundException, OperationNotAllowedException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.deleteSave(interactionId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

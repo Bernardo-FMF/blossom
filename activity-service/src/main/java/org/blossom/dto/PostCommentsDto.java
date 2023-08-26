@@ -1,13 +1,14 @@
 package org.blossom.dto;
 
 import lombok.Builder;
-import org.blossom.kafka.model.LocalUser;
+import lombok.Getter;
 
 import java.util.List;
 
 @Builder
-public class UserCommentsDto {
-    private LocalUser user;
+@Getter
+public class PostCommentsDto {
+    private String postId;
     private List<CommentDto> comments;
     private boolean eof;
     private long currentPage;

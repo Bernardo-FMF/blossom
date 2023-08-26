@@ -1,9 +1,6 @@
 package org.blossom.exception.handler;
 
-import org.blossom.exception.CommentNotFoundException;
-import org.blossom.exception.OperationNotAllowedException;
-import org.blossom.exception.PostNotFoundException;
-import org.blossom.exception.UserNotFoundException;
+import org.blossom.exception.*;
 import org.blossom.exception.model.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +38,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorMessage> userNotFoundException(UserNotFoundException exception, WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorMessage message = new ErrorMessage(status, UserNotFoundException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(InteractionAlreadyExistsException.class)
+    public ResponseEntity<ErrorMessage> interactionAlreadyExistsException(InteractionAlreadyExistsException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorMessage message = new ErrorMessage(status, InteractionAlreadyExistsException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(InteractionNotFoundException.class)
+    public ResponseEntity<ErrorMessage> interactionNotFoundException(InteractionNotFoundException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorMessage message = new ErrorMessage(status, InteractionNotFoundException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
 }

@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.blossom.enums.InteractionType;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.sql.Timestamp;
 
 @Builder
 @Getter
@@ -25,4 +28,8 @@ public class Interaction {
 
     @Enumerated(EnumType.STRING)
     private InteractionType interactionType;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Timestamp createdAt;
 }
