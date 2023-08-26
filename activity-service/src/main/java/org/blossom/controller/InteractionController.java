@@ -1,9 +1,6 @@
 package org.blossom.controller;
 
-import org.blossom.dto.GenericCreationDto;
-import org.blossom.dto.InteractionInfoDto;
-import org.blossom.dto.SearchParametersDto;
-import org.blossom.dto.UserInteractionsDto;
+import org.blossom.dto.*;
 import org.blossom.exception.*;
 import org.blossom.model.CommonUserDetails;
 import org.blossom.service.InteractionService;
@@ -47,5 +44,15 @@ public class InteractionController {
     @DeleteMapping("/save/{interactionId}")
     public ResponseEntity<String> deleteSave(@PathVariable("interactionId") Integer interactionId, Authentication authentication) throws UserNotFoundException, PostNotFoundException, InteractionNotFoundException, OperationNotAllowedException {
         return ResponseEntity.status(HttpStatus.OK).body(interactionService.deleteSave(interactionId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @GetMapping("/post/{postId}/save")
+    public ResponseEntity<InteractionDto> getPostSaveByUser(@PathVariable("postId") String postId, Authentication authentication) throws UserNotFoundException, PostNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.findSave(postId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @GetMapping("/post/{postId}/like")
+    public ResponseEntity<InteractionDto> getPostLikeByUser(@PathVariable("postId") String postId, Authentication authentication) throws UserNotFoundException, PostNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(interactionService.findLike(postId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

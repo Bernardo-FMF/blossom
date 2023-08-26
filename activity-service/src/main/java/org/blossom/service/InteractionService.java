@@ -2,10 +2,7 @@ package org.blossom.service;
 
 import org.blossom.cache.LocalPostCacheService;
 import org.blossom.cache.LocalUserCacheService;
-import org.blossom.dto.GenericCreationDto;
-import org.blossom.dto.InteractionInfoDto;
-import org.blossom.dto.SearchParametersDto;
-import org.blossom.dto.UserInteractionsDto;
+import org.blossom.dto.*;
 import org.blossom.entity.Interaction;
 import org.blossom.enums.InteractionType;
 import org.blossom.exception.*;
@@ -179,5 +176,31 @@ public class InteractionService {
                 .totalElements(likes.getTotalElements())
                 .eof(!likes.hasNext())
                 .build();
+    }
+
+    public InteractionDto findSave(String postId, int userId) throws UserNotFoundException, PostNotFoundException {
+        if (!localUserCache.findEntry(String.valueOf(userId))) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        if (!localPostCache.findEntry(postId)) {
+            throw new PostNotFoundException("Post not found");
+        }
+
+        Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.SAVE);
+        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction)).orElse(null);
+    }
+
+    public InteractionDto findLike(String postId, int userId) throws UserNotFoundException, PostNotFoundException {
+        if (!localUserCache.findEntry(String.valueOf(userId))) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        if (!localPostCache.findEntry(postId)) {
+            throw new PostNotFoundException("Post not found");
+        }
+
+        Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.LIKE);
+        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction)).orElse(null);
     }
 }
