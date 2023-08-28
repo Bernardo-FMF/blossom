@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.blossom.socialcontract";
+
+package org.blossom.socialcontract;
+
+import "google/protobuf/wrappers.proto";
+
+service SocialContract {
+  rpc submitImage(UserId) returns (Followers);
+}
+
+message UserId {
+  int32 id = 1;
+}
+
+message Followers {
+  repeated int32 userId = 1;
+}

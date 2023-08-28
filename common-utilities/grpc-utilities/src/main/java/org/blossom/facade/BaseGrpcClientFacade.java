@@ -2,18 +2,17 @@ package org.blossom.facade;
 
 import io.grpc.ManagedChannel;
 import lombok.extern.log4j.Log4j2;
-import org.blossom.configuration.GrpcConfiguration;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public abstract class BaseGrpcClientFacade implements IGrpcClientFacade {
-    protected GrpcConfiguration grpcConfiguration;
+    protected IGrpcConfiguration grpcConfiguration;
 
     protected ManagedChannel managedChannel;
 
-    public BaseGrpcClientFacade(GrpcConfiguration grpcConfiguration, ManagedChannel managedChannel) {
+    public BaseGrpcClientFacade(IGrpcConfiguration grpcConfiguration, ManagedChannel managedChannel) {
         this.grpcConfiguration = grpcConfiguration;
         this.managedChannel = managedChannel;
     }

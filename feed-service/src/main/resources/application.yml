@@ -1,18 +1,8 @@
 spring:
   application:
-    name: Post-Service
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: post-db
+    name: Feed-Service
   kafka:
     bootstrap-servers: localhost:9092
-    topics: resource-event-feed, resource-event-activity
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties.spring.json.type.mapping: event:org.blossom.model.ResourceEvent
     consumer:
       group-id: postListenerId
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -24,16 +14,15 @@ spring:
               packages: "org.blossom.model"
             type:
               mapping: event:org.blossom.model.ResourceEvent
-  redis:
-    host: localhost
-    port: 6379
-server:
-  port: 66
 grpc:
   server:
-    name: Image-Service
+    names:
+      social: Social-Service
+      activity: Activity-Service
   client:
     awaitTerminationInSeconds: 10
+server:
+  port: 9460
 eureka:
   client:
     service-url:

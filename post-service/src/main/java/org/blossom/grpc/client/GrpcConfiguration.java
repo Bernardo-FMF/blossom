@@ -1,8 +1,8 @@
-package org.blossom.configuration;
+package org.blossom.grpc.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import lombok.Getter;
+import org.blossom.facade.IGrpcConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -12,16 +12,22 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-@Getter
-public class GrpcConfiguration {
+public class GrpcConfiguration implements IGrpcConfiguration {
     @Value("${grpc.client.awaitTerminationInSeconds}")
     private int clientAwaitTerminationInSeconds;
 
-    @Value("${grpc.client.withDeadlineAfterInSeconds}")
-    private int clientWithDeadlineAfterInSeconds;
-
     @Value("${grpc.server.name}")
     private String serverName;
+
+    @Override
+    public String getServerName() {
+        return serverName;
+    }
+
+    @Override
+    public int getClientAwaitTerminationInSeconds() {
+        return clientAwaitTerminationInSeconds;
+    }
 
     @Bean
     public ManagedChannel grpcChannel(DiscoveryClient discoveryClient) {

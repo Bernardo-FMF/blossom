@@ -2,12 +2,11 @@ package org.blossom.auth.grpc;
 
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
-import lombok.AllArgsConstructor;
+import org.blossom.auth.grpc.client.ImageContractGrpcClientFacade;
 import org.blossom.auth.grpc.streamobserver.IdentifierStreamObserver;
-import org.blossom.facade.ImageContractGrpcClientFacade;
 import org.blossom.imagecontract.Block;
 import org.blossom.imagecontract.Identifier;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +16,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@AllArgsConstructor
 public class GrpcClientImageService {
     public static final int BUFFER_SIZE = 1024;
 
-    @Lazy
-    private final ImageContractGrpcClientFacade grpcClient;
+    @Autowired
+    private ImageContractGrpcClientFacade grpcClient;
 
     public String uploadImage(MultipartFile file) throws IOException, InterruptedException {
         String fileName = file.getOriginalFilename();

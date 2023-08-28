@@ -2,7 +2,7 @@ package org.blossom.grpc;
 
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
-import org.blossom.facade.ImageContractGrpcClientFacade;
+import org.blossom.grpc.client.ImageContractGrpcClientFacade;
 import org.blossom.grpc.streamobserver.IdentifierStreamObserver;
 import org.blossom.imagecontract.Block;
 import org.blossom.imagecontract.Identifier;

@@ -1,7 +1,8 @@
-package org.blossom.facade;
+package org.blossom.auth.grpc.client;
 
 import io.grpc.ManagedChannel;
-import org.blossom.configuration.GrpcConfiguration;
+import org.blossom.facade.BaseGrpcClientFacade;
+import org.blossom.facade.IGrpcConfiguration;
 import org.blossom.imagecontract.ImageContractGrpc;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +11,7 @@ public class ImageContractGrpcClientFacade extends BaseGrpcClientFacade {
     private final ImageContractGrpc.ImageContractStub nonBlockStub;
     private final ImageContractGrpc.ImageContractBlockingStub blockStub;
 
-    public ImageContractGrpcClientFacade(GrpcConfiguration grpcConfiguration, ManagedChannel managedChannel) {
+    public ImageContractGrpcClientFacade(IGrpcConfiguration grpcConfiguration, ManagedChannel managedChannel) {
         super(grpcConfiguration, managedChannel);
         this.nonBlockStub = buildNonBlockingStub();
         this.blockStub = buildBlockingStub();

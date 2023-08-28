@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.blossom.activitycontract";
+
+package org.blossom.activitycontract;
+
+import "google/protobuf/wrappers.proto";
+
+service ActivityContract {
+  rpc getPostMetadata(PostInfoRequest) returns (PostInfoResponse);
+}
+
+message PostInfoRequest {
+  repeated string postId = 1;
+  int32 userId = 2;
+}
+
+message PostInfoResponses {
+  repeated PostInfoResponse postRequests = 1;
+}
+
+message PostInfoResponse {
+  int32 totalLikes = 1;
+  int32 totalSaves = 2;
+  int32 totalComments = 3;
+  bool userLikedPost = 4;
+  bool userSavedPost = 5;
+}

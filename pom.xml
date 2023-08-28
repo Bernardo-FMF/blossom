@@ -23,6 +23,7 @@
         <module>post-service</module>
         <module>social-graph-service</module>
         <module>activity-service</module>
+        <module>feed-service</module>
     </modules>
 
     <properties>

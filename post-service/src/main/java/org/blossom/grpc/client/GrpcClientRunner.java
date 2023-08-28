@@ -1,4 +1,4 @@
-package org.blossom.auth.grpc.client;
+package org.blossom.grpc.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GrpcClientRunner implements ApplicationRunner {
-
     @Autowired
     private ImageContractGrpcClientFacade grpcClient;
 
