@@ -8,7 +8,7 @@ package org.blossom.socialcontract;
 import "google/protobuf/wrappers.proto";
 
 service SocialContract {
-  rpc submitImage(UserId) returns (Followers);
+  rpc getUserFollowers(UserId) returns (Followers);
 }
 
 message UserId {

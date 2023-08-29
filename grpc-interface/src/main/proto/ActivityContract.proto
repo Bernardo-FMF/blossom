@@ -26,4 +26,5 @@ message PostInfoResponse {
   int32 totalComments = 3;
   bool userLikedPost = 4;
   bool userSavedPost = 5;
+  bool userCommented = 6;
 }

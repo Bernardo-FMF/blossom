@@ -31,6 +31,10 @@ spring:
               packages: "org.blossom.model"
             type:
               mapping: event:org.blossom.model.ResourceEvent
+grpc:
+  server:
+    port: 0
+    awaitTerminationInSeconds: 10
 server:
   port: 9464
 eureka:

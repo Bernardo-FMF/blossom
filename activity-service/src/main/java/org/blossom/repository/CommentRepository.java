@@ -1,6 +1,7 @@
 package org.blossom.repository;
 
 import org.blossom.entity.Comment;
+import org.blossom.projection.CommentCountProjection;
 import org.blossom.projection.CommentProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +28,6 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     @Query("SELECT c FROM Comment c WHERE c.topLevelComment.id = :topLevelCommentId")
     Page<Comment> findByTopLevelCommentId(@Param("topLevelCommentId") Integer topLevelCommentId, Pageable pageable);
+
+    CommentCountProjection getCommentCount(@Param("postId") String postId);
 }
