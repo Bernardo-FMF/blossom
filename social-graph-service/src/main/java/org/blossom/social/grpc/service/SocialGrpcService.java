@@ -1,6 +1,7 @@
 package org.blossom.social.grpc.service;
 
 import io.grpc.stub.StreamObserver;
+import org.blossom.social.entity.GraphUser;
 import org.blossom.social.repository.SocialRepository;
 import org.blossom.socialcontract.Followers;
 import org.blossom.socialcontract.SocialContractGrpc;
@@ -19,9 +20,9 @@ public class SocialGrpcService extends SocialContractGrpc.SocialContractImplBase
     public void getUserFollowers(UserId request, StreamObserver<Followers> responseObserver) {
         int userId = request.getId();
 
-        List<Integer> followers = socialRepository.findFollowers(userId);
+        List<GraphUser> followers = socialRepository.findFollowers(userId);
 
-        responseObserver.onNext(Followers.newBuilder().addAllUserId(followers).build());
+        responseObserver.onNext(Followers.newBuilder().addAllUserId(followers.stream().map(GraphUser::getUserId).toList()).build());
         responseObserver.onCompleted();
     }
 }

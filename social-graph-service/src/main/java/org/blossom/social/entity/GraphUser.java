@@ -17,6 +17,12 @@ public class GraphUser {
     @Id
     private Integer userId;
 
+    String fullName;
+
+    String username;
+
+    String imageUrl;
+
     @Relationship(type = "FOLLOWS", direction = Relationship.Direction.OUTGOING)
     private Set<GraphUser> following;
 }

@@ -6,9 +6,6 @@ spring:
     authentication:
       username: neo4j
       password: social-graph-service
-  redis:
-    host: localhost
-    port: 6380
   kafka:
     bootstrap-servers: localhost:9092
     consumer:

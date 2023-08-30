@@ -1,6 +1,5 @@
 package org.blossom.social.service;
 
-import org.blossom.social.cache.LocalUserCacheService;
 import org.blossom.social.dto.GraphUserDto;
 import org.blossom.social.dto.RecommendationsDto;
 import org.blossom.social.dto.SearchParametersDto;
@@ -8,7 +7,7 @@ import org.blossom.social.dto.SocialRelationDto;
 import org.blossom.social.entity.GraphUser;
 import org.blossom.social.exception.FollowNotValidException;
 import org.blossom.social.exception.UserNotFoundException;
-import org.blossom.social.kafka.inbound.model.LocalUser;
+import org.blossom.social.mapper.LocalUserMapper;
 import org.blossom.social.repository.SocialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +25,7 @@ public class SocialService {
     private SocialRepository socialRepository;
 
     @Autowired
-    private LocalUserCacheService localUserCache;
+    private LocalUserMapper localUserMapper;
 
     public String createSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException {
         if (socialRelationDto.getInitiatingUser() != userId) {
@@ -78,20 +78,12 @@ public class SocialService {
         }
 
         GraphUser user = optionalUser.get();
-        List<Integer> followers = socialRepository.findFollowers(userId);
-
-        Set<String> combinedSet = new HashSet<>();
-        combinedSet.add(String.valueOf(userId));
-        combinedSet.addAll(followers.stream().map(String::valueOf).toList());
-        combinedSet.addAll(user.getFollowing().stream().map(graphUser -> String.valueOf(graphUser.getUserId())).toList());
-
-        Map<Integer, LocalUser> allUsers = localUserCache.getMultiFromCache(new ArrayList<>(combinedSet)).stream()
-                .collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
+        List<GraphUser> followers = socialRepository.findFollowers(userId);
 
         return GraphUserDto.builder()
-                .user(allUsers.get(userId))
-                .follows(user.getFollowing().stream().map(graphUser -> allUsers.get(graphUser.getUserId())).collect(Collectors.toList()))
-                .followers(followers.stream().map(allUsers::get).collect(Collectors.toList()))
+                .user(localUserMapper.mapToLocalUser(user))
+                .follows(user.getFollowing().stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
+                .followers(followers.stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
                 .build();
     }
 
@@ -103,12 +95,10 @@ public class SocialService {
 
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
 
-        Page<Integer> recommendations = socialRepository.findRecommendations(userId, page);
-        Map<Integer, LocalUser> allUsers = localUserCache.getMultiFromCache(recommendations.get().map(String::valueOf).toList()).stream()
-                .collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
+        Page<GraphUser> recommendations = socialRepository.findRecommendations(userId, page);
 
         return RecommendationsDto.builder()
-                .recommendations(recommendations.stream().map(allUsers::get).collect(Collectors.toList()))
+                .recommendations(recommendations.stream().map(user -> localUserMapper.mapToLocalUser(user)).collect(Collectors.toList()))
                 .currentPage(recommendations.getNumber())
                 .totalPages(recommendations.getTotalPages())
                 .totalElements(recommendations.getTotalElements())

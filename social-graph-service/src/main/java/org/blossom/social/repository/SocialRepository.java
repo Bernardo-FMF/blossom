@@ -27,14 +27,14 @@ public interface SocialRepository extends Neo4jRepository<GraphUser, Integer> {
 
     @Query("MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser) " +
             "WHERE followed.userId = $followedId " +
-            "RETURN follower.userId")
-    List<Integer> findFollowers(@Param("followedId") Integer followedId);
+            "RETURN follower")
+    List<GraphUser> findFollowers(@Param("followedId") Integer followedId);
 
     @Query(value = "MATCH (self:GraphUser)-[:FOLLOWS]->(following:GraphUser)-[:FOLLOWS]->(recommended:GraphUser) " +
             "WHERE self.userId = $user AND NOT (self)-[:FOLLOWS]->(recommended) " +
-            "RETURN DISTINCT recommended.userId",
+            "RETURN DISTINCT recommended",
             countQuery = "MATCH (self:GraphUser)-[:FOLLOWS]->(following:GraphUser)-[:FOLLOWS]->(recommended:GraphUser) " +
                     "WHERE self.userId = $user AND NOT (self)-[:FOLLOWS]->(recommended) " +
                     "RETURN DISTINCT COUNT(recommended)")
-    Page<Integer> findRecommendations(@Param("user") Integer user, Pageable pageable);
+    Page<GraphUser> findRecommendations(@Param("user") Integer user, Pageable pageable);
 }
