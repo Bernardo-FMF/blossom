@@ -2,7 +2,7 @@ package org.blossom.dto;
 
 import lombok.Builder;
 import lombok.Setter;
-import org.blossom.kafka.model.LocalUser;
+import org.blossom.entity.LocalUser;
 
 import java.sql.Timestamp;
 

@@ -1,7 +1,7 @@
 package org.blossom.dto;
 
 import lombok.Builder;
-import org.blossom.kafka.model.LocalUser;
+import org.blossom.entity.LocalUser;
 
 import java.util.List;
 

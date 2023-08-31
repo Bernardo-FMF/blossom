@@ -10,7 +10,7 @@ public class InteractionDtoMapper {
         return InteractionDto.builder()
                 .id(interaction.getId())
                 .postId(interaction.getPostId())
-                .userId(interaction.getUserId())
+                .userId(interaction.getUser().getId())
                 .interactionType(interaction.getInteractionType())
                 .build();
     }

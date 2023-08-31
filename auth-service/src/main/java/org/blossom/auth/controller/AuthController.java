@@ -40,7 +40,7 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<TokenDto> validate(@RequestParam("token") String token) {
+    public ResponseEntity<TokenDto> validate(@RequestParam("token") String token) throws UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(authService.validateToken(token));
     }
 

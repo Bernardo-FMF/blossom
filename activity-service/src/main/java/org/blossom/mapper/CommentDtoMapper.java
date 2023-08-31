@@ -2,17 +2,16 @@ package org.blossom.mapper;
 
 import org.blossom.dto.CommentDto;
 import org.blossom.entity.Comment;
-import org.blossom.kafka.model.LocalUser;
+import org.blossom.entity.LocalUser;
 import org.blossom.projection.CommentProjection;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CommentDtoMapper {
-    public CommentDto mapToCommentDto(Comment comment, LocalUser user) {
+    public CommentDto mapToCommentDto(Comment comment) {
         return CommentDto.builder()
                 .id(comment.getId())
-                .user(user)
-                .userId(comment.getUserId())
+                .user(comment.getUser())
                 .postId(comment.getPostId())
                 .commentContent(comment.isDeleted() ? null : comment.getCommentContent())
                 .parentComment(comment.getParentComment() != null ? comment.getParentComment().getId() : null)

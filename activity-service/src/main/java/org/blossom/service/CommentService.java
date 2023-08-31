@@ -2,18 +2,18 @@ package org.blossom.service;
 
 import jakarta.transaction.Transactional;
 import org.blossom.cache.LocalPostCacheService;
-import org.blossom.cache.LocalUserCacheService;
 import org.blossom.dto.*;
 import org.blossom.entity.Comment;
+import org.blossom.entity.LocalUser;
 import org.blossom.exception.CommentNotFoundException;
 import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.UserNotFoundException;
-import org.blossom.kafka.model.LocalUser;
 import org.blossom.mapper.CommentDtoMapper;
 import org.blossom.mapper.CommentMapper;
 import org.blossom.projection.CommentProjection;
 import org.blossom.repository.CommentRepository;
+import org.blossom.repository.LocalUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,9 +31,6 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     @Autowired
-    private LocalUserCacheService localUserCache;
-
-    @Autowired
     private LocalPostCacheService localPostCache;
 
     @Autowired
@@ -42,14 +39,13 @@ public class CommentService {
     @Autowired
     private CommentMapper commentMapper;
 
+    @Autowired
+    private LocalUserRepository localUserRepository;
+
     @Transactional
     public GenericCreationDto createComment(CommentInfoDto commentInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
         if (commentInfoDto.getUserId() != userId) {
             throw new OperationNotAllowedException("Logged in user cannot perform this operation");
-        }
-
-        if (!localUserCache.findEntry(String.valueOf(userId))) {
-            throw new UserNotFoundException("User not found");
         }
 
         if (!localPostCache.findEntry(commentInfoDto.getPostId())) {
@@ -68,7 +64,12 @@ public class CommentService {
             }
         }
 
-        Comment comment = commentMapper.mapToComment(commentInfoDto);
+        Optional<LocalUser> optionalLocalUser = localUserRepository.findById(userId);
+        if (optionalLocalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        Comment comment = commentMapper.mapToComment(commentInfoDto, optionalLocalUser.get());
 
         Comment newComment = commentRepository.save(comment);
 
@@ -98,12 +99,8 @@ public class CommentService {
 
         Comment comment = optionalComment.get();
 
-        if (comment.getUserId() != userId) {
+        if (comment.getUser().getId() != userId) {
             throw new OperationNotAllowedException("Logged in user cannot perform this operation");
-        }
-
-        if (!localUserCache.findEntry(String.valueOf(userId))) {
-            throw new UserNotFoundException("User not found");
         }
 
         if (!localPostCache.findEntry(comment.getPostId())) {
@@ -129,12 +126,8 @@ public class CommentService {
 
         Comment comment = optionalComment.get();
 
-        if (comment.getUserId() != userId) {
+        if (comment.getUser().getId() != userId) {
             throw new OperationNotAllowedException("Logged in user cannot perform this operation");
-        }
-
-        if (!localUserCache.findEntry(String.valueOf(userId))) {
-            throw new UserNotFoundException("User not found");
         }
 
         if (!localPostCache.findEntry(comment.getPostId())) {
@@ -153,8 +146,9 @@ public class CommentService {
     }
 
     public UserCommentsDto getUserComments(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
-        if (!localUserCache.findEntry(String.valueOf(userId))) {
-            throw new UserNotFoundException("User not found");
+        Optional<LocalUser> optionalLocalUser = localUserRepository.findById(userId);
+        if (optionalLocalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
         }
 
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : null;
@@ -162,8 +156,8 @@ public class CommentService {
         Page<Comment> comments = commentRepository.findByUserId(userId, page);
 
         return UserCommentsDto.builder()
-                .user(localUserCache.getFromCache(String.valueOf(userId)))
-                .comments(comments.get().map(comment -> commentDtoMapper.mapToCommentDto(comment, localUserCache.getFromCache(String.valueOf(userId)))).toList())
+                .user(optionalLocalUser.get())
+                .comments(comments.get().map(comment -> commentDtoMapper.mapToCommentDto(comment)).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())
                 .totalElements(comments.getTotalElements())
@@ -180,7 +174,7 @@ public class CommentService {
 
         Page<CommentProjection> comments = commentRepository.findTopLevelCommentsWithReplyCount(postId, page);
 
-        Map<Integer, LocalUser> allUsers = localUserCache.getMultiFromCache(comments.get().map(comment -> String.valueOf(comment.getUserId())).toList()).stream()
+        Map<Integer, LocalUser> allUsers = localUserRepository.findAllById(comments.get().map(CommentProjection::getUserId).toList()).stream()
                 .collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
 
         return PostCommentsDto.builder()
@@ -205,12 +199,9 @@ public class CommentService {
 
         Page<Comment> comments = commentRepository.findByTopLevelCommentId(commentId, page);
 
-        Map<Integer, LocalUser> allUsers = localUserCache.getMultiFromCache(comments.get().map(comment1 -> String.valueOf(comment1.getUserId())).toList()).stream()
-                .collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
-
         return PostCommentsDto.builder()
                 .postId(comment.getPostId())
-                .comments(comments.get().map(comment1 -> commentDtoMapper.mapToCommentDto(comment1, allUsers.get(comment1.getUserId()))).toList())
+                .comments(comments.get().map(comment1 -> commentDtoMapper.mapToCommentDto(comment1)).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())
                 .totalElements(comments.getTotalElements())

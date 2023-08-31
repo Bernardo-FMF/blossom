@@ -1,6 +1,6 @@
 package org.blossom.mapper;
 
-import org.blossom.kafka.model.LocalUser;
+import org.blossom.entity.LocalUser;
 import org.blossom.model.KafkaUserResource;
 import org.springframework.stereotype.Component;
 

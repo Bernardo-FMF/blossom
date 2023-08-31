@@ -20,11 +20,6 @@ public class SocialController {
     @Autowired
     private SocialService socialService;
 
-    @GetMapping("/xpto")
-    public ResponseEntity<String> x() {
-        return ResponseEntity.status(HttpStatus.OK).body("This is a test");
-    }
-
     @PostMapping
     public ResponseEntity<String> createSocialRelation(@RequestBody SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(socialService.createSocialRelation(socialRelationDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));

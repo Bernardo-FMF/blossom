@@ -21,19 +21,7 @@ public class LocalUserCacheService {
         redisTemplate.opsForValue().set(key, newValue);
     }
 
-    public LocalUser getFromCache(String key) {
-        return redisTemplate.opsForValue().get(key);
-    }
-
     public List<LocalUser> getMultiFromCache(Collection<String> keys) {
         return redisTemplate.opsForValue().multiGet(keys);
-    }
-
-    public void deleteCacheEntry(String s) {
-        redisTemplate.delete(s);
-    }
-
-    public boolean findEntry(String key) {
-        return getFromCache(key) != null;
     }
 }

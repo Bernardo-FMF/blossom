@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PostDtoMapper {
-    public Post mapToPost(PostInfoDto post, String[] mediaUrls, String[] hashtags) {
+    public Post mapToPost(PostInfoDto post, int userId, String[] mediaUrls, String[] hashtags) {
         return Post.builder()
-                .userId(post.getUserId())
+                .userId(userId)
                 .description(post.getText())
                 .media(mediaUrls)
                 .hashtags(hashtags)

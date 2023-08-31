@@ -1,12 +1,12 @@
 package org.blossom.controller;
 
 import org.blossom.dto.AggregateUserPostsDto;
+import org.blossom.dto.PostIdentifierDto;
 import org.blossom.dto.PostInfoDto;
 import org.blossom.dto.SearchParametersDto;
 import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
-import org.blossom.exception.UserNotFoundException;
 import org.blossom.model.CommonUserDetails;
 import org.blossom.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +25,22 @@ public class PostController {
     private PostService postService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createPost(PostInfoDto postInfoDto, Authentication authentication) throws UserNotFoundException, IOException, InterruptedException, PostNotValidException {
+    public ResponseEntity<String> createPost(PostInfoDto postInfoDto, Authentication authentication) throws IOException, InterruptedException, PostNotValidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(postInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable("id") String postId, Authentication authentication) throws PostNotFoundException, OperationNotAllowedException {
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, OperationNotAllowedException {
         return ResponseEntity.status(HttpStatus.OK).body(postService.deletePost(postId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<AggregateUserPostsDto> getPostsByUser(@PathVariable("userId") Integer userId, SearchParametersDto searchParameters) {
         return ResponseEntity.status(HttpStatus.OK).body(postService.findByUser(userId, searchParameters));
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostIdentifierDto> getPostIdentifier(@PathVariable("postId") String postId) throws PostNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getPostIdentifier(postId));
     }
 }

@@ -89,8 +89,12 @@ public class AuthService {
         return tokenGenerator.generateToken(user.get());
     }
 
-    public TokenDto validateToken(String token) {
-        return tokenGenerator.validateToken(token);
+    public TokenDto validateToken(String token) throws UserNotFoundException {
+        TokenDto tokenDto = tokenGenerator.validateToken(token);
+        if (!userRepository.existsById(tokenDto.getUserId())) {
+            throw new UserNotFoundException("User does not exist");
+        }
+        return tokenDto;
     }
 
     public String requestPasswordRecovery(PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {

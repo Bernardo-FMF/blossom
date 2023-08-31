@@ -1,8 +1,8 @@
 package org.blossom.dto;
 
 import lombok.Builder;
+import org.blossom.entity.LocalUser;
 import org.blossom.enums.InteractionType;
-import org.blossom.kafka.model.LocalUser;
 
 import java.util.List;
 

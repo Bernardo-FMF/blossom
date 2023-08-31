@@ -9,7 +9,9 @@ import org.blossom.projection.InteractionCountProjection;
 import org.blossom.repository.CommentRepository;
 import org.blossom.repository.InteractionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ActivityGrpcService extends ActivityContractGrpc.ActivityContractImplBase {
     @Autowired
     private InteractionRepository interactionRepository;
@@ -23,7 +25,8 @@ public class ActivityGrpcService extends ActivityContractGrpc.ActivityContractIm
 
         for (String postId: request.getPostIdList()) {
             InteractionCountProjection interactionCount = interactionRepository.getInteractionCount(postId, userId);
-            CommentCountProjection commentCount = commentRepository.getCommentCount(postId);
+            //TODO CommentCountProjection commentCount = commentRepository.getCommentCount(postId);
+            CommentCountProjection commentCount = null;
             responseObserver.onNext(PostInfoResponse.newBuilder()
                     .setUserCommented(commentCount.isHasUserCommented())
                     .setTotalComments(commentCount.getCommentCount())

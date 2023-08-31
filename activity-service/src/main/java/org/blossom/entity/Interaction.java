@@ -20,8 +20,9 @@ public class Interaction {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "user_id")
-    private int userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private LocalUser user;
 
     @Column(name = "post_id")
     private String postId;

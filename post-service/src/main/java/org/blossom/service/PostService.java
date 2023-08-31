@@ -2,15 +2,14 @@ package org.blossom.service;
 
 import org.blossom.cache.LocalUserCacheService;
 import org.blossom.dto.AggregateUserPostsDto;
+import org.blossom.dto.PostIdentifierDto;
 import org.blossom.dto.PostInfoDto;
 import org.blossom.dto.SearchParametersDto;
 import org.blossom.entity.Post;
 import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
-import org.blossom.exception.UserNotFoundException;
 import org.blossom.grpc.GrpcClientImageService;
-import org.blossom.kafka.inbound.model.LocalUser;
 import org.blossom.kafka.outbound.KafkaMessageService;
 import org.blossom.mapper.PostDtoMapper;
 import org.blossom.repository.PostRepository;
@@ -45,11 +44,7 @@ public class PostService {
     @Autowired
     private KafkaMessageService messageService;
 
-    public String createPost(PostInfoDto postInfoDto, int userId) throws UserNotFoundException, IOException, InterruptedException, PostNotValidException {
-        if (postInfoDto.getUserId() != userId || localUserCache.findEntry(String.valueOf(userId))) {
-            throw new UserNotFoundException("User not found");
-        }
-
+    public String createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException {
         if (postInfoDto.getMediaFiles().length == 0 && postInfoDto.getText().isEmpty()) {
             throw new PostNotValidException("Post has no content");
         }
@@ -57,7 +52,7 @@ public class PostService {
         String[] mediaUrls = imageService.uploadImages(postInfoDto.getMediaFiles());
         String[] hashtags = parseDescription(postInfoDto.getText());
 
-        Post post = postDtoMapper.mapToPost(postInfoDto, mediaUrls, hashtags);
+        Post post = postDtoMapper.mapToPost(postInfoDto, userId, mediaUrls, hashtags);
 
         Post newPost = postRepository.save(post);
 
@@ -92,17 +87,29 @@ public class PostService {
     public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
 
-        LocalUser user = localUserCache.getFromCache(String.valueOf(userId));
-
         Page<Post> posts = postRepository.findByUserId(userId, page);
 
         return AggregateUserPostsDto.builder()
                 .posts(posts.get().map(post -> postDtoMapper.mapToPostDto(post)).collect(Collectors.toList()))
-                .user(user)
+                .userId(userId)
                 .currentPage(posts.getNumber())
                 .totalPages(posts.getTotalPages())
                 .totalElements(posts.getTotalElements())
                 .eof(!posts.hasNext())
+                .build();
+    }
+
+    public PostIdentifierDto getPostIdentifier(String postId) throws PostNotFoundException {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (optionalPost.isEmpty()) {
+            throw new PostNotFoundException("Post does not exist");
+        }
+
+        Post post = optionalPost.get();
+
+        return PostIdentifierDto.builder()
+                .postId(post.getId())
+                .userId(post.getUserId())
                 .build();
     }
 

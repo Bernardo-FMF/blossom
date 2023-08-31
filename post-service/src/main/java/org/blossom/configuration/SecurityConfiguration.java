@@ -21,7 +21,7 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/v1/post", "/api/v1/post/{id}", "/api/v1/post/user/{userId}", "/api/v1/post-search/simple-hashtag-lookup").authenticated())
+                                .requestMatchers("/api/v1/post", "/api/v1/post/{postId}", "/api/v1/post/user/{userId}", "/api/v1/post-search/simple-hashtag-lookup").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
