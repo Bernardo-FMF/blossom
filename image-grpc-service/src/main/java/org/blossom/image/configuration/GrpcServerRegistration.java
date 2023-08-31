@@ -21,7 +21,6 @@ public class GrpcServerRegistration implements BeanPostProcessor {
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof GrpcServer) {
             EurekaRegistration eurekaRegistration = (EurekaRegistration) registration;
-            eurekaRegistration.setNonSecurePort(((GrpcServer) bean).getPort());
             eurekaRegistration.getMetadata().put("grpc-port", String.valueOf(((GrpcServer) bean).getPort()));
             eurekaServiceRegistry.register(eurekaRegistration);
         }

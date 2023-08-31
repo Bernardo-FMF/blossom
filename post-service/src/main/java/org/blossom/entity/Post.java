@@ -10,7 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -34,7 +34,7 @@ public class Post implements KafkaEntity {
 
     @CreatedDate
     @Field(name = "created_at")
-    private Timestamp createdAt;
+    private Date createdAt;
 
     @Override
     public KafkaPostResource mapToResource() {

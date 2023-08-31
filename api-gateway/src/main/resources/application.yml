@@ -2,6 +2,10 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG
 server:
   port: 8181
 spring:
@@ -16,18 +20,21 @@ spring:
             - Path=/api/{version}/auth/**, /api/{version}/user/**, /api/{version}/user-search/**
           filters:
             - AuthenticationFilter
+
         - id: post-service
           uri: lb://post-service
           predicates:
             - Path=/api/{version}/post/**, /api/{version}/post-search/**
           filters:
             - AuthenticationFilter
+
         - id: social-graph-service
           uri: lb://social-graph-service
           predicates:
             - Path=/api/{version}/social/**
           filters:
             - AuthenticationFilter
+
         - id: activity-service
           uri: lb://activity-service
           predicates:
@@ -41,6 +48,7 @@ spring:
             - Path=/eureka/web
           filters:
             - SetPath=/
+
         - id: discovery-server-static
           uri: http://localhost:8761
           predicates:

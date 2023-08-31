@@ -121,7 +121,7 @@ public class PostService {
 
         while (matcher.find()) {
             String hashtag = matcher.group();
-            hashtags.add(hashtag);
+            hashtags.add(hashtag.substring(1));
         }
 
         return hashtags.toArray(new String[0]);

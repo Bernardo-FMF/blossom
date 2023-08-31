@@ -4,6 +4,7 @@ import org.blossom.filter.CommonUserDetailsFilter;
 import org.blossom.jwt.RoleParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,8 +30,10 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/v1/social/xpto").permitAll()
-                                .requestMatchers("/api/v1/social", "/api/v1/social/user", "/api/v1/social/self", "/api/v1/social/follow-recommendation").authenticated())
+                                .requestMatchers(HttpMethod.POST, "/api/v1/social").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/social").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/social/self").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/social/follow-recommendation").authenticated())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

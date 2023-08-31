@@ -3,6 +3,7 @@ package org.blossom.configuration;
 import org.blossom.filter.CommonUserDetailsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,7 +22,11 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/v1/post", "/api/v1/post/{postId}", "/api/v1/post/user/{userId}", "/api/v1/post-search/simple-hashtag-lookup").permitAll())
+                                .requestMatchers(HttpMethod.POST, "/api/v1/post").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/post/{postId}").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/post/user/{userId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/post/{postId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/post-search/simple-hashtag-lookup").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

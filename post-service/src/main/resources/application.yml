@@ -8,7 +8,7 @@ spring:
       database: post-db
   kafka:
     bootstrap-servers: localhost:9092
-    topics: resource-event-feed, resource-event-activity
+    topics: post-resource-event-feed, post-resource-event-activity
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

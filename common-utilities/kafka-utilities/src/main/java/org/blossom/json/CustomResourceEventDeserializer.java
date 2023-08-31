@@ -37,7 +37,7 @@ public class CustomResourceEventDeserializer implements Deserializer<ResourceEve
     private KafkaResourceFactory<? extends KafkaResource> buildFactory(ResourceType resourceType) {
         return switch (resourceType) {
             case USER -> new KafkaUserResourceFactory();
-            case POST -> null;
+            case POST -> new KafkaPostResourceFactory();
         };
     }
 }
