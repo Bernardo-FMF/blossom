@@ -35,8 +35,8 @@ public interface SocialRepository extends Neo4jRepository<GraphUser, Integer> {
 
     @Query("MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser) " +
             "WHERE followed.userId = $followedId " +
-            "RETURN follower")
-    List<GraphUser> findFollowersUnpaged(@Param("followedId") Integer followedId);
+            "RETURN follower.userId")
+    List<Integer> findFollowersUnpaged(@Param("followedId") Integer followedId);
 
     @Query(value = "MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser) " +
             "WHERE follower.userId = $followerId " +
