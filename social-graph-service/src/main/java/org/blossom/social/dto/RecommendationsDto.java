@@ -8,9 +8,10 @@ import java.util.List;
 @Getter
 @Builder
 public class RecommendationsDto {
+    private int userId;
     private List<LocalUserDto> recommendations;
-    boolean eof;
-    long currentPage;
-    long totalPages;
-    long totalElements;
+    private boolean eof;
+    private long currentPage;
+    private long totalPages;
+    private long totalElements;
 }

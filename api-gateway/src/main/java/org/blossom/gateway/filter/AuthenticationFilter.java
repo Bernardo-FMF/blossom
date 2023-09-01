@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.function.Supplier;
 
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<Config> {
@@ -33,7 +32,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Config> {
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
-            Supplier<ServerHttpRequest> consumer = () -> null;
             if (validator.isSecured.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getHeaders().containsKey(config.getHeaderName())) {
                     throw new RuntimeException("Missing authorization header");

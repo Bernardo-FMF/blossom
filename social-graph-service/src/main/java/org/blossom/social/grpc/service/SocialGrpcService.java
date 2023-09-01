@@ -20,7 +20,7 @@ public class SocialGrpcService extends SocialContractGrpc.SocialContractImplBase
     public void getUserFollowers(UserId request, StreamObserver<Followers> responseObserver) {
         int userId = request.getId();
 
-        List<GraphUser> followers = socialRepository.findFollowers(userId);
+        List<GraphUser> followers = socialRepository.findFollowersUnpaged(userId);
 
         responseObserver.onNext(Followers.newBuilder().addAllUserId(followers.stream().map(GraphUser::getUserId).toList()).build());
         responseObserver.onCompleted();

@@ -15,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,26 +69,9 @@ public class SocialService {
         return "Relation was deleted successfully";
     }
 
-    public GraphUserDto getUserSocialGraph(int userId) throws UserNotFoundException {
-        Optional<GraphUser> optionalUser = socialRepository.findById(userId);
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Users not found");
-        }
-
-        GraphUser user = optionalUser.get();
-        List<GraphUser> followers = socialRepository.findFollowers(userId);
-
-        return GraphUserDto.builder()
-                .user(localUserMapper.mapToLocalUser(user))
-                .follows(user.getFollowing().stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
-                .followers(followers.stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
-                .build();
-    }
-
     public RecommendationsDto getFollowRecommendations(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
-        Optional<GraphUser> optionalUser = socialRepository.findById(userId);
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Users not found");
+        if (!socialRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found");
         }
 
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
@@ -98,11 +79,50 @@ public class SocialService {
         Page<GraphUser> recommendations = socialRepository.findRecommendations(userId, page);
 
         return RecommendationsDto.builder()
+                .userId(userId)
                 .recommendations(recommendations.stream().map(user -> localUserMapper.mapToLocalUser(user)).collect(Collectors.toList()))
                 .currentPage(recommendations.getNumber())
                 .totalPages(recommendations.getTotalPages())
                 .totalElements(recommendations.getTotalElements())
                 .eof(!recommendations.hasNext())
+                .build();
+    }
+
+    public GraphUserDto getUserFollowers(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
+        if (!socialRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+
+        Page<GraphUser> followers = socialRepository.findFollowers(userId, page);
+
+        return GraphUserDto.builder()
+                .userId(userId)
+                .otherUsers(followers.stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
+                .totalPages(followers.getTotalPages())
+                .currentPage(searchParameters.getPage())
+                .totalElements(followers.getTotalElements())
+                .eof(!followers.hasNext())
+                .build();
+    }
+
+    public GraphUserDto getUserFollowings(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
+        if (!socialRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+
+        Page<GraphUser> followers = socialRepository.findFollowing(userId, page);
+
+        return GraphUserDto.builder()
+                .userId(userId)
+                .otherUsers(followers.stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
+                .totalPages(followers.getTotalPages())
+                .currentPage(searchParameters.getPage())
+                .totalElements(followers.getTotalElements())
+                .eof(!followers.hasNext())
                 .build();
     }
 }

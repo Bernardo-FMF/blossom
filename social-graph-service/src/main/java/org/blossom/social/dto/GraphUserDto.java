@@ -10,7 +10,10 @@ import java.util.List;
 @Setter
 @Builder
 public class GraphUserDto {
-    private LocalUserDto user;
-    private List<LocalUserDto> followers;
-    private List<LocalUserDto> follows;
+    private int userId;
+    private List<LocalUserDto> otherUsers;
+    private long totalPages;
+    private long currentPage;
+    private long totalElements;
+    private boolean eof;
 }

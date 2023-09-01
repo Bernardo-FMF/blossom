@@ -30,9 +30,14 @@ public class SocialController {
         return ResponseEntity.status(HttpStatus.OK).body(socialService.deleteSocialRelation(socialRelationDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
-    @GetMapping("/self")
-    public ResponseEntity<GraphUserDto> getUserSocialGraph(Authentication authentication) throws UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(socialService.getUserSocialGraph(((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    @GetMapping("/follower")
+    public ResponseEntity<GraphUserDto> getUserFollowers(SearchParametersDto searchParameters, Authentication authentication) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(socialService.getUserFollowers(searchParameters, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @GetMapping("/following")
+    public ResponseEntity<GraphUserDto> getUserFollowings(SearchParametersDto searchParameters, Authentication authentication) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(socialService.getUserFollowings(searchParameters, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @GetMapping("/follow-recommendation")
