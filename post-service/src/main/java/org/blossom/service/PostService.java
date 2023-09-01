@@ -120,7 +120,7 @@ public class PostService {
 
         Post post = optionalPost.get();
 
-        LocalUser user = localUserCache.getFromCache(String.valueOf(post.getUserId()));
+        LocalUser user = localUserCache.getFromCache(post.getUserId());
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }

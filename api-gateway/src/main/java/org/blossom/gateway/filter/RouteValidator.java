@@ -22,8 +22,11 @@ public class RouteValidator {
         openApiEndpoints.put("/api/v1/auth/password-recovery-request", Collections.singletonList(HttpMethod.POST));
         openApiEndpoints.put("/api/v1/auth/password-recovery", Collections.singletonList(HttpMethod.POST));
         openApiEndpoints.put("/api/v1/user-search/simple-lookup", Collections.singletonList(HttpMethod.GET));
+        openApiEndpoints.put("/api/v1/user-search/username-lookup", Collections.singletonList(HttpMethod.GET));
+        openApiEndpoints.put("/api/v1/user/{userId}", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/post/user/{userId}", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/post/{postId}", Collections.singletonList(HttpMethod.GET));
+        openApiEndpoints.put("/api/v1/post/{postId}/identifier", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/post-search/simple-hashtag-lookup", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/eureka", Collections.singletonList(HttpMethod.GET));
     }

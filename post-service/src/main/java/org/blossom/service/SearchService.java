@@ -32,8 +32,9 @@ public class SearchService {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
         Page<Post> posts = postRepository.findByHashtagsIn(searchParameters.getQuery(), page);
 
-        List<String> userIds = posts.getContent().stream().map(post -> String.valueOf(post.getUserId())).toList();
-        Map<Integer, LocalUser> allUsers = localUserCache.getMultiFromCache(userIds).stream()
+        List<Integer> userIds = posts.getContent().stream().map(Post::getUserId).toList();
+
+        Map<Integer, LocalUser> allUsers = userIds.stream().map(id -> localUserCache.getFromCache(id))
                 .collect(Collectors.toMap(LocalUser::getId, user -> user));
 
         return AggregatePostsDto.builder()
