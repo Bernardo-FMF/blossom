@@ -67,6 +67,8 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/password-recovery-request").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/password-recovery").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/user/{userId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/user-search/username-lookup").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/user-search/simple-lookup").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

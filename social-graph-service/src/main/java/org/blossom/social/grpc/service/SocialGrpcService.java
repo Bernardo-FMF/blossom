@@ -1,7 +1,6 @@
 package org.blossom.social.grpc.service;
 
 import io.grpc.stub.StreamObserver;
-import org.blossom.social.entity.GraphUser;
 import org.blossom.social.repository.SocialRepository;
 import org.blossom.socialcontract.Followers;
 import org.blossom.socialcontract.SocialContractGrpc;

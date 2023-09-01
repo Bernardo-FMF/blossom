@@ -1,12 +1,10 @@
 package org.blossom.controller;
 
-import org.blossom.dto.AggregateUserPostsDto;
-import org.blossom.dto.PostIdentifierDto;
-import org.blossom.dto.PostInfoDto;
-import org.blossom.dto.SearchParametersDto;
+import org.blossom.dto.*;
 import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
+import org.blossom.exception.UserNotFoundException;
 import org.blossom.model.CommonUserDetails;
 import org.blossom.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +37,13 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(postService.findByUser(userId, searchParameters));
     }
 
-    @GetMapping("/{postId}")
+    @GetMapping("/{postId}/identifier")
     public ResponseEntity<PostIdentifierDto> getPostIdentifier(@PathVariable("postId") String postId) throws PostNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(postService.getPostIdentifier(postId));
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostWithUserDto> getPost(@PathVariable("postId") String postId) throws PostNotFoundException, UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getPost(postId));
     }
 }

@@ -13,6 +13,10 @@ public class LocalUserCacheService {
     @Autowired
     private RedisTemplate<String, LocalUser> redisTemplate;
 
+    public LocalUser getFromCache(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
     public void addToCache(String key, LocalUser value) {
         redisTemplate.opsForValue().set(key, value);
     }

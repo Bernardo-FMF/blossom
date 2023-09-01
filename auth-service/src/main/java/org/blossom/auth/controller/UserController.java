@@ -1,5 +1,6 @@
 package org.blossom.auth.controller;
 
+import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.service.UserService;
 import org.blossom.model.CommonUserDetails;
@@ -25,5 +26,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 userService.updateUserImage(userId,
                         ((CommonUserDetails) authentication.getPrincipal()).getUserId(), file));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<SimplifiedUserDto> getUserById(@PathVariable("userId") Integer userId) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
     }
 }

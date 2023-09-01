@@ -25,7 +25,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/api/v1/post").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/post/{postId}").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/post/user/{userId}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/post/{postId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/post/{postId}/identifier").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/post-search/simple-hashtag-lookup").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

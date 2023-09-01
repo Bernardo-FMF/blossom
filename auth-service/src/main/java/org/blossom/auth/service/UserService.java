@@ -2,10 +2,12 @@ package org.blossom.auth.service;
 
 import org.blossom.auth.delta.DeltaEngine;
 import org.blossom.auth.delta.markable.UserMarkable;
+import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.grpc.GrpcClientImageService;
 import org.blossom.auth.kafka.KafkaMessageService;
+import org.blossom.auth.mapper.UserMapper;
 import org.blossom.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +27,9 @@ public class UserService {
 
     @Autowired
     private KafkaMessageService messageService;
+
+    @Autowired
+    private UserMapper userMapper;
 
     public String updateUserImage(int userId, int loggedUserId, MultipartFile file)
             throws UserNotFoundException, IOException, InterruptedException, BadCredentialsException {
@@ -60,5 +65,15 @@ public class UserService {
         messageService.publishUpdate(user);
 
         return url;
+    }
+
+    public SimplifiedUserDto getUserById(Integer userId) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+        User user = optionalUser.get();
+
+        return userMapper.mapToSimplifiedUser(user);
     }
 }

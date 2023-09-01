@@ -1,15 +1,14 @@
 package org.blossom.service;
 
 import org.blossom.cache.LocalUserCacheService;
-import org.blossom.dto.AggregateUserPostsDto;
-import org.blossom.dto.PostIdentifierDto;
-import org.blossom.dto.PostInfoDto;
-import org.blossom.dto.SearchParametersDto;
+import org.blossom.dto.*;
 import org.blossom.entity.Post;
 import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.PostNotValidException;
+import org.blossom.exception.UserNotFoundException;
 import org.blossom.grpc.GrpcClientImageService;
+import org.blossom.kafka.inbound.model.LocalUser;
 import org.blossom.kafka.outbound.KafkaMessageService;
 import org.blossom.mapper.PostDtoMapper;
 import org.blossom.repository.PostRepository;
@@ -111,6 +110,22 @@ public class PostService {
                 .postId(post.getId())
                 .userId(post.getUserId())
                 .build();
+    }
+
+    public PostWithUserDto getPost(String postId) throws PostNotFoundException, UserNotFoundException {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (optionalPost.isEmpty()) {
+            throw new PostNotFoundException("Post does not exist");
+        }
+
+        Post post = optionalPost.get();
+
+        LocalUser user = localUserCache.getFromCache(String.valueOf(post.getUserId()));
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        return postDtoMapper.mapToPostWithUserDto(post, user);
     }
 
     private String[] parseDescription(String text) {
