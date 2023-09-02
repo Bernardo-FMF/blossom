@@ -21,7 +21,7 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<GenericCreationDto> createComment(@RequestBody CommentInfoDto commentInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(commentInfoDto, 1));
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(commentInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @DeleteMapping("/{commentId}")
@@ -34,8 +34,8 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(commentId, updatedCommentDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
-    @GetMapping("/self")
-    public ResponseEntity<UserCommentsDto> getUserComments(SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException, OperationNotAllowedException {
+    @GetMapping("/user/self")
+    public ResponseEntity<UserCommentsDto> getUserComments(SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getUserComments(searchParametersDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
@@ -45,7 +45,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}/replies")
-    public ResponseEntity<PostCommentsDto> getCommentReplies(@PathVariable("commentId") Integer commentId, SearchParametersDto searchParametersDto) throws PostNotFoundException, CommentNotFoundException {
+    public ResponseEntity<PostCommentsDto> getCommentReplies(@PathVariable("commentId") Integer commentId, SearchParametersDto searchParametersDto) throws CommentNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentReplies(commentId, searchParametersDto));
     }
 }

@@ -1,6 +1,7 @@
 package org.blossom.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Setter;
 import org.blossom.entity.LocalUser;
 
@@ -8,6 +9,7 @@ import java.sql.Timestamp;
 
 @Builder
 @Setter
+@Getter
 public class CommentDto {
     private int id;
     private int userId;

@@ -1,11 +1,13 @@
 package org.blossom.dto;
 
 import lombok.Builder;
+import lombok.Getter;
 import org.blossom.entity.LocalUser;
 
 import java.util.List;
 
 @Builder
+@Getter
 public class UserCommentsDto {
     private LocalUser user;
     private List<CommentDto> comments;

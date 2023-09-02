@@ -11,6 +11,7 @@ public class CommentDtoMapper {
     public CommentDto mapToCommentDto(Comment comment) {
         return CommentDto.builder()
                 .id(comment.getId())
+                .userId(comment.getUser().getId())
                 .user(comment.getUser())
                 .postId(comment.getPostId())
                 .commentContent(comment.isDeleted() ? null : comment.getCommentContent())
@@ -32,6 +33,7 @@ public class CommentDtoMapper {
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .isDeleted(comment.getIsDeleted())
+                .replyCount(comment.getReplyCount())
                 .build();
     }
 }

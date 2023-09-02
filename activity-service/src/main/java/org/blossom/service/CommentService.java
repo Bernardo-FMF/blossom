@@ -59,6 +59,9 @@ public class CommentService {
                 if (!optionalParentComment.get().getPostId().equals(commentInfoDto.getPostId())) {
                     throw new OperationNotAllowedException("Parent comment mismatch");
                 }
+                if (optionalParentComment.get().getParentComment() != null) {
+                    throw new OperationNotAllowedException("Cannot reply to a reply");
+                }
             } else {
                 throw new CommentNotFoundException("Parent comment not found");
             }
