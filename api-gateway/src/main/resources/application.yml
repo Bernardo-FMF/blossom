@@ -38,7 +38,7 @@ spring:
         - id: activity-service
           uri: lb://activity-service
           predicates:
-            - Path=/api/{version}/comment/**
+            - Path=/api/{version}/comment/**, /api/{version}/interaction/**, /api/{version}/metadata/**
           filters:
             - AuthenticationFilter
 

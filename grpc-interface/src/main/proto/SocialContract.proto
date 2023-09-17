@@ -8,13 +8,31 @@ package org.blossom.socialcontract;
 import "google/protobuf/wrappers.proto";
 
 service SocialContract {
-  rpc getUserFollowers(UserId) returns (Followers);
+  rpc getUserFollowers(UserRequest) returns (FollowersResponse);
+  rpc getMostFollowed(MostFollowedRequest) returns (MostFollowedResponse);
 }
 
-message UserId {
+message MostFollowedRequest {
+  int32 limit = 1;
+  int32 page = 2;
+}
+
+message MostFollowedResponse {
+  int32 totalPages = 1;
+  repeated int32 users = 2;
+}
+
+message UserResponse {
+  int32 id = 1;
+  string fullName = 2;
+  string username = 3;
+  string imageUrl = 4;
+}
+
+message UserRequest {
   int32 id = 1;
 }
 
-message Followers {
+message FollowersResponse {
   repeated int32 userId = 1;
 }

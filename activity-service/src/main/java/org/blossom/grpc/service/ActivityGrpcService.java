@@ -4,37 +4,31 @@ import io.grpc.stub.StreamObserver;
 import org.blossom.activitycontract.ActivityContractGrpc;
 import org.blossom.activitycontract.PostInfoRequest;
 import org.blossom.activitycontract.PostInfoResponse;
-import org.blossom.projection.CommentCountProjection;
-import org.blossom.projection.InteractionCountProjection;
-import org.blossom.repository.CommentRepository;
-import org.blossom.repository.InteractionRepository;
+import org.blossom.dto.MetadataDto;
+import org.blossom.service.MetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ActivityGrpcService extends ActivityContractGrpc.ActivityContractImplBase {
     @Autowired
-    private InteractionRepository interactionRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
+    private MetadataService metadataService;
 
     @Override
     public void getPostMetadata(PostInfoRequest request, StreamObserver<PostInfoResponse> responseObserver) {
-        int userId = request.getUserId();
+        Integer userId = request.getUserId();
 
         for (String postId: request.getPostIdList()) {
-            InteractionCountProjection interactionCount = interactionRepository.getInteractionCount(postId, userId);
-            //TODO CommentCountProjection commentCount = commentRepository.getCommentCount(postId);
-            CommentCountProjection commentCount = null;
-            responseObserver.onNext(PostInfoResponse.newBuilder()
-                    .setUserCommented(commentCount.isHasUserCommented())
-                    .setTotalComments(commentCount.getCommentCount())
-                    .setTotalLikes(interactionCount.getLikeCount())
-                    .setTotalSaves(interactionCount.getSaveCount())
-                    .setUserLikedPost(interactionCount.isHasUserLiked())
-                    .setUserSavedPost(interactionCount.isHasUserSaved())
-                    .build());
+            MetadataDto metadata = metadataService.getPostMetadata(postId, userId);
+            PostInfoResponse.Builder metadataBuilder = PostInfoResponse.newBuilder();
+            if (userId != null) {
+                metadataBuilder.setUserCommented(metadata.getCommentMetadata().isUserCommented())
+                        .setUserSavedPost(metadata.getInteractionMetadata().isUserSaved())
+                        .setUserLikedPost(metadata.getInteractionMetadata().isUserLiked());
+            }
+            metadataBuilder.setTotalLikes(metadata.getInteractionMetadata().getLikeCount())
+                    .setTotalComments(metadata.getCommentMetadata().getCommentCount());
+            responseObserver.onNext(metadataBuilder.build());
         }
         responseObserver.onCompleted();
     }

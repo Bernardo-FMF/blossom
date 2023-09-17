@@ -21,9 +21,8 @@ message PostInfoResponses {
 }
 
 message PostInfoResponse {
-  int32 totalLikes = 1;
-  int32 totalSaves = 2;
-  int32 totalComments = 3;
+  int64 totalLikes = 1;
+  int64 totalComments = 3;
   bool userLikedPost = 4;
   bool userSavedPost = 5;
   bool userCommented = 6;

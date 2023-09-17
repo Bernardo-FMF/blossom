@@ -21,10 +21,16 @@ public interface InteractionRepository extends JpaRepository<Interaction, Intege
     Page<Interaction> findByUserIdAndInteractionType(int userId, InteractionType interactionType, Pageable page);
 
     @Query("SELECT NEW org.blossom.projection.InteractionCountProjection(" +
-            "SUM(CASE WHEN i.interactionType = 'LIKE' THEN 1 ELSE 0 END), SUM(CASE WHEN i.interactionType = 'SAVE' THEN 1 ELSE 0 END)," +
+            "COALESCE(SUM(CASE WHEN i.interactionType = 'LIKE' THEN 1 ELSE 0 END), 0), " +
             "COUNT(CASE WHEN i.interactionType = 'LIKE' AND i.user.id = :userId THEN 1 END) > 0, " +
             "COUNT(CASE WHEN i.interactionType = 'SAVE' AND i.user.id = :userId THEN 1 END) > 0) " +
             "FROM Interaction i " +
             "WHERE i.postId = :postId")
     InteractionCountProjection getInteractionCount(@Param("postId") String postId, @Param("userId") Integer userId);
+
+    @Query("SELECT NEW org.blossom.projection.InteractionCountProjection(" +
+            "COALESCE(SUM(CASE WHEN i.interactionType = 'LIKE' THEN 1 ELSE 0 END), 0)) " +
+            "FROM Interaction i " +
+            "WHERE i.postId = :postId")
+    InteractionCountProjection getInteractionCountWithNoUser(@Param("postId") String postId);
 }

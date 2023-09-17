@@ -1,14 +1,15 @@
 package org.blossom.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.blossom.enums.InteractionType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Getter
 @Setter

@@ -10,8 +10,13 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class InteractionCountProjection {
-    private int likeCount;
-    private int saveCount;
-    private boolean hasUserLiked;
-    private boolean hasUserSaved;
+    private long likeCount;
+    private boolean userLiked;
+    private boolean userSaved;
+
+    public InteractionCountProjection(int likeCount) {
+        this.likeCount = likeCount;
+        this.userLiked = false;
+        this.userSaved = false;
+    }
 }

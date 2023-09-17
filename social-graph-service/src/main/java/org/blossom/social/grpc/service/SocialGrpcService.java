@@ -2,9 +2,7 @@ package org.blossom.social.grpc.service;
 
 import io.grpc.stub.StreamObserver;
 import org.blossom.social.repository.SocialRepository;
-import org.blossom.socialcontract.Followers;
-import org.blossom.socialcontract.SocialContractGrpc;
-import org.blossom.socialcontract.UserId;
+import org.blossom.socialcontract.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +14,17 @@ public class SocialGrpcService extends SocialContractGrpc.SocialContractImplBase
     private SocialRepository socialRepository;
 
     @Override
-    public void getUserFollowers(UserId request, StreamObserver<Followers> responseObserver) {
+    public void getUserFollowers(UserRequest request, StreamObserver<FollowersResponse> responseObserver) {
         int userId = request.getId();
 
         List<Integer> followers = socialRepository.findFollowersUnpaged(userId);
 
-        responseObserver.onNext(Followers.newBuilder().addAllUserId(followers).build());
+        responseObserver.onNext(FollowersResponse.newBuilder().addAllUserId(followers).build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getMostFollowed(MostFollowedRequest request, StreamObserver<MostFollowedResponse> responseObserver) {
+
     }
 }

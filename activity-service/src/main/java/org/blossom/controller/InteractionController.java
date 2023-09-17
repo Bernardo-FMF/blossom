@@ -27,12 +27,12 @@ public class InteractionController {
     }
 
     @PostMapping("/like")
-    public ResponseEntity<GenericCreationDto> createLike(InteractionInfoDto interactionInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, InteractionAlreadyExistsException {
+    public ResponseEntity<GenericCreationDto> createLike(@RequestBody InteractionInfoDto interactionInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, InteractionAlreadyExistsException {
         return ResponseEntity.status(HttpStatus.OK).body(interactionService.createLike(interactionInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @PostMapping("/save")
-    public ResponseEntity<GenericCreationDto> createSave(InteractionInfoDto interactionInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, InteractionAlreadyExistsException {
+    public ResponseEntity<GenericCreationDto> createSave(@RequestBody InteractionInfoDto interactionInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, InteractionAlreadyExistsException {
         return ResponseEntity.status(HttpStatus.OK).body(interactionService.createSave(interactionInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
@@ -47,12 +47,12 @@ public class InteractionController {
     }
 
     @GetMapping("/post/{postId}/save")
-    public ResponseEntity<InteractionDto> getPostSaveByUser(@PathVariable("postId") String postId, Authentication authentication) throws UserNotFoundException, PostNotFoundException {
+    public ResponseEntity<InteractionDto> getPostSaveByUser(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(interactionService.findSave(postId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @GetMapping("/post/{postId}/like")
-    public ResponseEntity<InteractionDto> getPostLikeByUser(@PathVariable("postId") String postId, Authentication authentication) throws UserNotFoundException, PostNotFoundException {
+    public ResponseEntity<InteractionDto> getPostLikeByUser(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(interactionService.findLike(postId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

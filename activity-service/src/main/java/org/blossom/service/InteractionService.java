@@ -175,7 +175,12 @@ public class InteractionService {
                 .build();
     }
 
-    public InteractionDto findSave(String postId, int userId) throws UserNotFoundException, PostNotFoundException {
+    public InteractionDto findSave(String postId, int userId) throws PostNotFoundException, UserNotFoundException {
+        Optional<LocalUser> optionalLocalUser = localUserRepository.findById(userId);
+        if (optionalLocalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
         if (!localPostCache.findEntry(postId)) {
             throw new PostNotFoundException("Post not found");
         }
@@ -184,7 +189,12 @@ public class InteractionService {
         return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction)).orElse(null);
     }
 
-    public InteractionDto findLike(String postId, int userId) throws UserNotFoundException, PostNotFoundException {
+    public InteractionDto findLike(String postId, int userId) throws PostNotFoundException, UserNotFoundException {
+        Optional<LocalUser> optionalLocalUser = localUserRepository.findById(userId);
+        if (optionalLocalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
         if (!localPostCache.findEntry(postId)) {
             throw new PostNotFoundException("Post not found");
         }
