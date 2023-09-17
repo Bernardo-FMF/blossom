@@ -14,7 +14,7 @@ public class InteractionCountProjection {
     private boolean userLiked;
     private boolean userSaved;
 
-    public InteractionCountProjection(int likeCount) {
+    public InteractionCountProjection(long likeCount) {
         this.likeCount = likeCount;
         this.userLiked = false;
         this.userSaved = false;

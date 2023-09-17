@@ -34,6 +34,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Config> {
         return ((exchange, chain) -> {
             if (validator.isSecured.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getHeaders().containsKey(config.getHeaderName())) {
+                    if (!validator.requiresAuthentication.test(exchange.getRequest())) {
+                        return chain.filter(exchange);
+                    }
                     throw new RuntimeException("Missing authorization header");
                 }
 

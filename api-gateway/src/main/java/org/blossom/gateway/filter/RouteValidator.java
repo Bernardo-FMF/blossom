@@ -9,11 +9,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 @Component
 public class RouteValidator {
     public static final Map<String, List<HttpMethod>> openApiEndpoints = new HashMap<>();
+    public static final Map<String, List<HttpMethod>> optionallyAuthenticatedApiEndpoints = new HashMap<>();
 
     static {
         openApiEndpoints.put("/api/v1/auth/register", Collections.singletonList(HttpMethod.POST));
@@ -31,10 +33,20 @@ public class RouteValidator {
         openApiEndpoints.put("/api/v1/comment/{postId}", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/comment/{commentId}/replies", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/eureka", Collections.singletonList(HttpMethod.GET));
+
+        optionallyAuthenticatedApiEndpoints.put("/api/v1/metadata/{postId}", Collections.singletonList(HttpMethod.GET));
     }
 
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    public Predicate<ServerHttpRequest> isSecured = request ->
-            openApiEndpoints.keySet().stream().noneMatch(uri -> pathMatcher.match(uri, request.getURI().getPath()) && openApiEndpoints.get(uri).contains(request.getMethod()));
+    private final BiPredicate<ServerHttpRequest, Map<String, List<HttpMethod>>> matchEndpoint = (request, endpointMap) ->
+            endpointMap.keySet().stream().noneMatch(uri -> pathMatcher.match(uri, request.getURI().getPath()) && endpointMap.get(uri).contains(request.getMethod()));
+
+    public Predicate<ServerHttpRequest> isSecured = request -> {
+        boolean isOpenEndpoint = matchEndpoint.test(request, openApiEndpoints);
+        boolean isOptionallyAuthenticatedEndpoint = matchEndpoint.test(request, optionallyAuthenticatedApiEndpoints);
+        return isOpenEndpoint || isOptionallyAuthenticatedEndpoint;
+    };
+
+    public Predicate<ServerHttpRequest> requiresAuthentication = request -> matchEndpoint.test(request, optionallyAuthenticatedApiEndpoints);
 }
