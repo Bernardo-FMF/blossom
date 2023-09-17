@@ -9,6 +9,7 @@ import org.blossom.exception.CommentNotFoundException;
 import org.blossom.exception.OperationNotAllowedException;
 import org.blossom.exception.PostNotFoundException;
 import org.blossom.exception.UserNotFoundException;
+import org.blossom.kafka.model.LocalPost;
 import org.blossom.mapper.CommentDtoMapper;
 import org.blossom.mapper.CommentMapper;
 import org.blossom.projection.CommentProjection;
@@ -169,7 +170,8 @@ public class CommentService {
     }
 
     public PostCommentsDto getPostComments(String postId, SearchParametersDto searchParameters) throws PostNotFoundException {
-        if (!localPostCache.findEntry(postId)) {
+        LocalPost localPost = localPostCache.getFromCache(postId);
+        if (localPost == null) {
             throw new PostNotFoundException("Post not found");
         }
 
@@ -182,6 +184,7 @@ public class CommentService {
 
         return PostCommentsDto.builder()
                 .postId(postId)
+                .post(localPost)
                 .comments(comments.get().peek(comment -> comment.setCommentContent(comment.getIsDeleted() ? null : comment.getCommentContent())).map(comment -> commentDtoMapper.mapToCommentDto(comment, allUsers.get(comment.getUserId()))).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())
@@ -190,7 +193,7 @@ public class CommentService {
                 .build();
     }
 
-    public PostCommentsDto getCommentReplies(Integer commentId, SearchParametersDto searchParameters) throws CommentNotFoundException {
+    public PostCommentsDto getCommentReplies(Integer commentId, SearchParametersDto searchParameters) throws CommentNotFoundException, PostNotFoundException {
         Optional<Comment> optionalComment = commentRepository.findById(commentId);
         if (optionalComment.isEmpty()) {
             throw new CommentNotFoundException("Comment not found");
@@ -198,12 +201,18 @@ public class CommentService {
 
         Comment comment = optionalComment.get();
 
+        LocalPost localPost = localPostCache.getFromCache(comment.getPostId());
+        if (localPost == null) {
+            throw new PostNotFoundException("Post not found");
+        }
+
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : Pageable.unpaged();
 
         Page<Comment> comments = commentRepository.findByTopLevelCommentId(commentId, page);
 
         return PostCommentsDto.builder()
                 .postId(comment.getPostId())
+                .post(localPost)
                 .comments(comments.get().map(comment1 -> commentDtoMapper.mapToCommentDto(comment1)).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())

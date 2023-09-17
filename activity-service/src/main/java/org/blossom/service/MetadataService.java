@@ -33,7 +33,10 @@ public class MetadataService {
             commentCountProjection = commentRepository.getCommentCount(postId, userId);
         }
 
-        metadataBuilder.interactionMetadata(interactionCountProjection)
+        metadataBuilder
+                .userId(userId)
+                .postId(postId)
+                .interactionMetadata(interactionCountProjection)
                 .commentMetadata(commentCountProjection);
 
         return metadataBuilder.build();

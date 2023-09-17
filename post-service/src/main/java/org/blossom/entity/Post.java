@@ -41,6 +41,8 @@ public class Post implements KafkaEntity {
         return KafkaPostResource.builder()
                 .id(id)
                 .userId(userId)
+                .media(media)
+                .description(description)
                 .build();
     }
 }

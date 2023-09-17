@@ -6,6 +6,7 @@ import org.blossom.entity.Interaction;
 import org.blossom.entity.LocalUser;
 import org.blossom.enums.InteractionType;
 import org.blossom.exception.*;
+import org.blossom.kafka.model.LocalPost;
 import org.blossom.mapper.InteractionDtoMapper;
 import org.blossom.mapper.InteractionMapper;
 import org.blossom.repository.InteractionRepository;
@@ -16,7 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class InteractionService {
@@ -143,10 +146,13 @@ public class InteractionService {
 
         Page<Interaction> likes = interactionRepository.findByUserIdAndInteractionType(userId, InteractionType.LIKE, page);
 
+        Map<String, LocalPost> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
+                .collect(Collectors.toMap(LocalPost::getPostId, post -> post));
+
         return UserInteractionsDto.builder()
                 .user(optionalLocalUser.get())
                 .interactionType(InteractionType.LIKE)
-                .interactions(likes.get().map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction)).toList())
+                .interactions(likes.get().map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, allPosts.get(interaction.getPostId()))).toList())
                 .totalPages(likes.getTotalPages())
                 .currentPage(searchParameters.getPage())
                 .totalElements(likes.getTotalElements())
@@ -164,10 +170,13 @@ public class InteractionService {
 
         Page<Interaction> likes = interactionRepository.findByUserIdAndInteractionType(userId, InteractionType.SAVE, page);
 
+        Map<String, LocalPost> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
+                .collect(Collectors.toMap(LocalPost::getPostId, post -> post));
+
         return UserInteractionsDto.builder()
                 .user(optionalLocalUser.get())
                 .interactionType(InteractionType.SAVE)
-                .interactions(likes.get().map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction)).toList())
+                .interactions(likes.get().map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, allPosts.get(interaction.getPostId()))).toList())
                 .totalPages(likes.getTotalPages())
                 .currentPage(searchParameters.getPage())
                 .totalElements(likes.getTotalElements())
@@ -181,12 +190,13 @@ public class InteractionService {
             throw new UserNotFoundException("User does not exist");
         }
 
-        if (!localPostCache.findEntry(postId)) {
+        LocalPost localPost = localPostCache.getFromCache(postId);
+        if (localPost == null) {
             throw new PostNotFoundException("Post not found");
         }
 
         Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.SAVE);
-        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction)).orElse(null);
+        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, localPost)).orElse(null);
     }
 
     public InteractionDto findLike(String postId, int userId) throws PostNotFoundException, UserNotFoundException {
@@ -195,11 +205,12 @@ public class InteractionService {
             throw new UserNotFoundException("User does not exist");
         }
 
-        if (!localPostCache.findEntry(postId)) {
+        LocalPost localPost = localPostCache.getFromCache(postId);
+        if (localPost == null) {
             throw new PostNotFoundException("Post not found");
         }
 
         Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.LIKE);
-        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction)).orElse(null);
+        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, localPost)).orElse(null);
     }
 }

@@ -45,7 +45,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}/replies")
-    public ResponseEntity<PostCommentsDto> getCommentReplies(@PathVariable("commentId") Integer commentId, SearchParametersDto searchParametersDto) throws CommentNotFoundException {
+    public ResponseEntity<PostCommentsDto> getCommentReplies(@PathVariable("commentId") Integer commentId, SearchParametersDto searchParametersDto) throws CommentNotFoundException, PostNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentReplies(commentId, searchParametersDto));
     }
 }

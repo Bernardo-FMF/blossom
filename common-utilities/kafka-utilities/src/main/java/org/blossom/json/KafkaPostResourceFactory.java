@@ -9,6 +9,8 @@ public class KafkaPostResourceFactory implements KafkaResourceFactory<KafkaPostR
         return KafkaPostResource.builder()
                 .id(json.get("id").asText())
                 .userId(json.get("userId").asInt())
+                .media(null)
+                .description(json.get("description").asText())
                 .build();
     }
 }

@@ -8,6 +8,8 @@ import lombok.Setter;
 @Setter
 @Builder
 public class KafkaPostResource extends KafkaResource {
-    String id;
-    int userId;
+    private String id;
+    private int userId;
+    private String[] media;
+    private String description;
 }
