@@ -25,6 +25,11 @@ public class SocialGrpcService extends SocialContractGrpc.SocialContractImplBase
 
     @Override
     public void getMostFollowed(MostFollowedRequest request, StreamObserver<MostFollowedResponse> responseObserver) {
+        int limit = request.getLimit();
 
+        List<Integer> mostFollowedUsers = socialRepository.findMostFollowedUsers(limit);
+
+        responseObserver.onNext(MostFollowedResponse.newBuilder().addAllUsers(mostFollowedUsers).build());
+        responseObserver.onCompleted();
     }
 }

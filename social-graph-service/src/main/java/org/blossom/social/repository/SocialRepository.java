@@ -53,4 +53,11 @@ public interface SocialRepository extends Neo4jRepository<GraphUser, Integer> {
                     "WHERE self.userId = $user AND NOT (self)-[:FOLLOWS]->(recommended) " +
                     "RETURN DISTINCT COUNT(recommended)")
     Page<GraphUser> findRecommendations(@Param("user") Integer user, Pageable pageable);
+
+    @Query("MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser) "
+            + "WITH follower, COUNT(r) AS numFollowers "
+            + "ORDER BY numFollowers DESC "
+            + "LIMIT $limit "
+            + "RETURN followed.userId")
+    List<Integer> findMostFollowedUsers(@Param("limit") Integer limit);
 }

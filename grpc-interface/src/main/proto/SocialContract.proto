@@ -14,11 +14,9 @@ service SocialContract {
 
 message MostFollowedRequest {
   int32 limit = 1;
-  int32 page = 2;
 }
 
 message MostFollowedResponse {
-  int32 totalPages = 1;
   repeated int32 users = 2;
 }
 
