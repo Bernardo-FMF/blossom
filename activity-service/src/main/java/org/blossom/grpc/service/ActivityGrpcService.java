@@ -21,12 +21,10 @@ public class ActivityGrpcService extends ActivityContractGrpc.ActivityContractIm
         for (String postId: request.getPostIdList()) {
             MetadataDto metadata = metadataService.getPostMetadata(postId, userId);
             PostInfoResponse.Builder metadataBuilder = PostInfoResponse.newBuilder();
-            if (userId != null) {
-                metadataBuilder.setUserCommented(metadata.getCommentMetadata().isUserCommented())
-                        .setUserSavedPost(metadata.getInteractionMetadata().isUserSaved())
-                        .setUserLikedPost(metadata.getInteractionMetadata().isUserLiked());
-            }
-            metadataBuilder.setTotalLikes(metadata.getInteractionMetadata().getLikeCount())
+            metadataBuilder.setUserCommented(metadata.getCommentMetadata().isUserCommented())
+                    .setUserSavedPost(metadata.getInteractionMetadata().isUserSaved())
+                    .setUserLikedPost(metadata.getInteractionMetadata().isUserLiked())
+                    .setTotalLikes(metadata.getInteractionMetadata().getLikeCount())
                     .setTotalComments(metadata.getCommentMetadata().getCommentCount());
             responseObserver.onNext(metadataBuilder.build());
         }

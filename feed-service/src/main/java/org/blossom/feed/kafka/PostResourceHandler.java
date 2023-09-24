@@ -2,7 +2,7 @@ package org.blossom.feed.kafka;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
-import org.blossom.feed.grpc.GrpcClientSocialService;
+import org.blossom.feed.grpc.service.GrpcClientSocialService;
 import org.blossom.feed.mapper.FeedEntryMapper;
 import org.blossom.feed.mapper.LocalPostMapper;
 import org.blossom.feed.repository.FeedEntryRepository;

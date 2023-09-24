@@ -1,4 +1,4 @@
-package org.blossom.feed.grpc;
+package org.blossom.feed.grpc.service;
 
 import org.blossom.feed.grpc.client.SocialContractGrpcClientFacade;
 import org.blossom.socialcontract.FollowersResponse;

@@ -10,4 +10,5 @@ public class LocalPostDto {
     private LocalUserDto creator;
     private String[] media;
     private String description;
+    private MetadataDto metadata;
 }

@@ -1,12 +1,14 @@
 package org.blossom.feed.service;
 
 import org.blossom.feed.dto.FeedDto;
+import org.blossom.feed.dto.MetadataDto;
 import org.blossom.feed.dto.SearchParametersDto;
 import org.blossom.feed.entity.FeedEntry;
 import org.blossom.feed.entity.LocalPost;
 import org.blossom.feed.entity.LocalUser;
 import org.blossom.feed.exception.UserNotFoundException;
-import org.blossom.feed.grpc.GrpcClientSocialService;
+import org.blossom.feed.grpc.service.GrpcClientActivityService;
+import org.blossom.feed.grpc.service.GrpcClientSocialService;
 import org.blossom.feed.mapper.LocalPostDtoMapper;
 import org.blossom.feed.mapper.LocalUserDtoMapper;
 import org.blossom.feed.repository.FeedEntryRepository;
@@ -41,7 +43,10 @@ public class FeedService {
     @Autowired
     private GrpcClientSocialService grpcClientSocialService;
 
-    public FeedDto getUserFeed(int userId, SearchParametersDto searchParameters) throws UserNotFoundException {
+    @Autowired
+    private GrpcClientActivityService grpcClientActivityService;
+
+    public FeedDto getUserFeed(int userId, SearchParametersDto searchParameters) throws UserNotFoundException, InterruptedException {
         Optional<LocalUser> optionalUser = localUserRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User not found");
@@ -59,9 +64,11 @@ public class FeedService {
         List<LocalPost> allPosts = localPostRepository.findAllById(allPostIds);
         Map<Integer, LocalUser> allUsers = localUserRepository.findAllById(allUserIds).stream().collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
 
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, allPosts.stream().map(LocalPost::getId).distinct().collect(Collectors.toList()));
+
         return FeedDto.builder()
                 .user(localUserDtoMapper.mapToLocalUserDto(user))
-                .posts(allPosts.stream().map(post -> localPostDtoMapper.mapToLocalPostDto(post, localUserDtoMapper.mapToLocalUserDto(allUsers.get(post.getUserId())))).collect(Collectors.toList()))
+                .posts(allPosts.stream().map(post -> localPostDtoMapper.mapToLocalPostDto(post, localUserDtoMapper.mapToLocalUserDto(allUsers.get(post.getUserId())), metadata.get(post.getId()))).collect(Collectors.toList()))
                 .totalPages((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()))
                 .currentPage(searchParameters.getPage())
                 .totalElements(totalElements)
@@ -69,7 +76,7 @@ public class FeedService {
                 .build();
     }
 
-    public FeedDto getGenericFeed(SearchParametersDto searchParameters) {
+    public FeedDto getGenericFeed(SearchParametersDto searchParameters) throws InterruptedException {
         List<Integer> mostFollowed = grpcClientSocialService.getMostFollowed();
 
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : Pageable.unpaged();
@@ -78,8 +85,10 @@ public class FeedService {
 
         Map<Integer, LocalUser> allUsers = localUserRepository.findAllById(mostFollowed).stream().collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
 
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(null, posts.get().map(LocalPost::getId).distinct().collect(Collectors.toList()));
+
         return FeedDto.builder()
-                .posts(posts.stream().map(post -> localPostDtoMapper.mapToLocalPostDto(post, localUserDtoMapper.mapToLocalUserDto(allUsers.get(post.getUserId())))).collect(Collectors.toList()))
+                .posts(posts.stream().map(post -> localPostDtoMapper.mapToLocalPostDto(post, localUserDtoMapper.mapToLocalUserDto(allUsers.get(post.getUserId())), metadata.get(post.getId()))).collect(Collectors.toList()))
                 .totalPages((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()))
                 .currentPage(searchParameters.getPage())
                 .totalElements(totalElements)

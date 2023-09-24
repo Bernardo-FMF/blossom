@@ -1,4 +1,4 @@
-package org.blossom.feed.grpc.client;
+package org.blossom.feed.grpc.configuration;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class GrpcSocialConfiguration implements IGrpcConfiguration {
+public class GrpcActivityConfiguration implements IGrpcConfiguration {
     @Value("${grpc.client.awaitTerminationInSeconds}")
     private int clientAwaitTerminationInSeconds;
 
-    @Value("${grpc.server.names.social}")
+    @Value("${grpc.server.names.activity}")
     private String serverName;
 
     @Override
@@ -29,7 +29,7 @@ public class GrpcSocialConfiguration implements IGrpcConfiguration {
         return clientAwaitTerminationInSeconds;
     }
 
-    @Bean(name = "social-grpc-channel")
+    @Bean(name = "activity-grpc-channel")
     public ManagedChannel grpcChannel(DiscoveryClient discoveryClient) {
         List<ServiceInstance> instances = discoveryClient.getInstances(serverName);
         ServiceInstance instance = instances.get(0);

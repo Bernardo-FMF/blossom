@@ -20,7 +20,7 @@ public class FeedController {
     private FeedService feedService;
 
     @GetMapping
-    public ResponseEntity<FeedDto> getFeed(SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException {
+    public ResponseEntity<FeedDto> getFeed(SearchParametersDto searchParametersDto, Authentication authentication) throws UserNotFoundException, InterruptedException {
         return ResponseEntity.status(HttpStatus.OK).body(authentication != null ? feedService.getUserFeed(((CommonUserDetails) authentication.getPrincipal()).getUserId(), searchParametersDto) : feedService.getGenericFeed(searchParametersDto));
     }
 }

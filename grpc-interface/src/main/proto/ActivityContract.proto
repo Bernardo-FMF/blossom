@@ -8,7 +8,7 @@ package org.blossom.activitycontract;
 import "google/protobuf/wrappers.proto";
 
 service ActivityContract {
-  rpc getPostMetadata(PostInfoRequest) returns (PostInfoResponse);
+  rpc getPostMetadata(PostInfoRequest) returns (stream PostInfoResponse);
 }
 
 message PostInfoRequest {
@@ -21,7 +21,8 @@ message PostInfoResponses {
 }
 
 message PostInfoResponse {
-  int64 totalLikes = 1;
+  string postId = 1;
+  int64 totalLikes = 2;
   int64 totalComments = 3;
   bool userLikedPost = 4;
   bool userSavedPost = 5;
