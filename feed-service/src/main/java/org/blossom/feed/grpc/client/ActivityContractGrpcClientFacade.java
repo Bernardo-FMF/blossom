@@ -4,7 +4,9 @@ import io.grpc.ManagedChannel;
 import org.blossom.activitycontract.ActivityContractGrpc;
 import org.blossom.facade.BaseGrpcClientFacade;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ActivityContractGrpcClientFacade extends BaseGrpcClientFacade {
     private final ActivityContractGrpc.ActivityContractStub nonBlockStub;
     private final ActivityContractGrpc.ActivityContractBlockingStub blockStub;

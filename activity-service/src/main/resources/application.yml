@@ -4,7 +4,7 @@ spring:
       repositories:
         enabled: false
   application:
-    name: activity-service
+    name: Activity-Service
   datasource:
     url: jdbc:postgresql://localhost:5431/postgres
     username: postgres

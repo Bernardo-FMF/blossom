@@ -1,6 +1,13 @@
 spring:
   application:
     name: Feed-Service
+  data:
+    cassandra:
+      keyspace-name: feedSpace
+      contact-points: localhost
+      port: 9042
+      local-datacenter: datacenter1
+      schema-action: CREATE_IF_NOT_EXISTS
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -17,7 +24,7 @@ spring:
 grpc:
   server:
     names:
-      social: Social-Service
+      social: Social-Graph-Service
       activity: Activity-Service
   client:
     awaitTerminationInSeconds: 10

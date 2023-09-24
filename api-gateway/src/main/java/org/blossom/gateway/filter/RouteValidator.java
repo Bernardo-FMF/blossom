@@ -42,11 +42,7 @@ public class RouteValidator {
     private final BiPredicate<ServerHttpRequest, Map<String, List<HttpMethod>>> matchEndpoint = (request, endpointMap) ->
             endpointMap.keySet().stream().noneMatch(uri -> pathMatcher.match(uri, request.getURI().getPath()) && endpointMap.get(uri).contains(request.getMethod()));
 
-    public Predicate<ServerHttpRequest> isSecured = request -> {
-        boolean isOpenEndpoint = matchEndpoint.test(request, openApiEndpoints);
-        boolean isOptionallyAuthenticatedEndpoint = matchEndpoint.test(request, optionallyAuthenticatedApiEndpoints);
-        return isOpenEndpoint || isOptionallyAuthenticatedEndpoint;
-    };
+    public Predicate<ServerHttpRequest> isSecured = request -> matchEndpoint.test(request, openApiEndpoints);
 
     public Predicate<ServerHttpRequest> requiresAuthentication = request -> matchEndpoint.test(request, optionallyAuthenticatedApiEndpoints);
 }
