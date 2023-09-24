@@ -1,11 +1,10 @@
 package org.blossom.auth.controller;
 
-import org.blossom.auth.dto.LoginDto;
-import org.blossom.auth.dto.PasswordChangeDto;
-import org.blossom.auth.dto.PasswordRecoveryDto;
-import org.blossom.auth.dto.RegisterDto;
+import org.blossom.auth.dto.*;
 import org.blossom.auth.exception.*;
 import org.blossom.auth.service.AuthService;
+import org.blossom.auth.service.UserService;
+import org.blossom.model.CommonUserDetails;
 import org.blossom.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -52,5 +54,10 @@ public class AuthController {
     @PostMapping("/password-recovery")
     public ResponseEntity<String> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.changePassword(passwordChangeDto));
+    }
+
+    @GetMapping("/self")
+    public ResponseEntity<SimplifiedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }
