@@ -5,8 +5,6 @@ option java_package = "org.blossom.socialcontract";
 
 package org.blossom.socialcontract;
 
-import "google/protobuf/wrappers.proto";
-
 service SocialContract {
   rpc getUserFollowers(UserRequest) returns (FollowersResponse);
   rpc getMostFollowed(MostFollowedRequest) returns (MostFollowedResponse);
