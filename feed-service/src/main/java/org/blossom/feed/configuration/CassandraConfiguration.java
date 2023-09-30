@@ -1,4 +1,4 @@
-package org.blossom.feed.config;
+package org.blossom.feed.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Configuration
 @EnableCassandraRepositories(basePackages = "org.blossom.feed.repository")
-public class CassandraConfig extends AbstractCassandraConfiguration {
+public class CassandraConfiguration extends AbstractCassandraConfiguration {
 
     @Value("${spring.data.cassandra.keyspace-name}")
     private String keyspace;

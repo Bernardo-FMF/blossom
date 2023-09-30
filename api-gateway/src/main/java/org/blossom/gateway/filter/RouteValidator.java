@@ -35,6 +35,7 @@ public class RouteValidator {
         openApiEndpoints.put("/eureka", Collections.singletonList(HttpMethod.GET));
 
         optionallyAuthenticatedApiEndpoints.put("/api/v1/metadata/{postId}", Collections.singletonList(HttpMethod.GET));
+        optionallyAuthenticatedApiEndpoints.put("/api/v1/feed", Collections.singletonList(HttpMethod.GET));
     }
 
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();

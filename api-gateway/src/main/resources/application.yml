@@ -38,6 +38,13 @@ spring:
           filters:
             - AuthenticationFilter
 
+        - id: feed-service
+          uri: lb://feed-service
+          predicates:
+            - Path=/api/{version}/feed/**
+          filters:
+            - AuthenticationFilter
+
         - id: discovery-server
           uri: http://localhost:8761
           predicates:
