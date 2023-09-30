@@ -96,7 +96,7 @@ public class FeedService {
         List<LocalUserPosts> allUserPosts = localUserPostsRepository.findAllById(mostFollowed);
 
         List<String> allPostsIds = allUserPosts.stream()
-                .map(LocalUserPosts::getMedia)
+                .map(LocalUserPosts::getPosts)
                 .flatMap(List::stream)
                 .toList();
         int totalElements = allPostsIds.stream()

@@ -4,6 +4,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.feed.entity.LocalUser;
 import org.blossom.feed.mapper.LocalUserMapper;
+import org.blossom.feed.repository.LocalUserPostsRepository;
 import org.blossom.feed.repository.LocalUserRepository;
 import org.blossom.model.KafkaUserResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,16 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     private LocalUserRepository localUserRepository;
 
     @Autowired
+    private LocalUserPostsRepository localUserPostsRepository;
+
+    @Autowired
     private LocalUserMapper localUserMapper;
 
     @Override
     public void save(KafkaUserResource resource) {
         if (!localUserRepository.existsById(resource.getId())) {
             localUserRepository.save(localUserMapper.mapToLocalUser(resource));
+            localUserPostsRepository.save(localUserMapper.mapToLocalUserPosts(resource.getId()));
         }
     }
 

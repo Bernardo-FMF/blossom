@@ -8,6 +8,7 @@ import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,5 +20,12 @@ public class LocalUserPosts {
     @PrimaryKey
     private int userId;
     @CassandraType(type = CassandraType.Name.LIST, typeArguments = CassandraType.Name.TEXT)
-    private List<String> media;
+    private List<String> posts;
+
+    public void addPost(String postId) {
+        if (posts == null) {
+            this.posts = new ArrayList<>();
+        }
+        this.posts.add(postId);
+    }
 }
