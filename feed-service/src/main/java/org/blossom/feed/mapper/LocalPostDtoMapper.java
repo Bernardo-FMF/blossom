@@ -12,7 +12,7 @@ public class LocalPostDtoMapper {
         return LocalPostDto.builder()
                 .id(localPost.getId())
                 .creator(localUser)
-                .media(localPost.getMedia())
+                .media(localPost.getMedia().toArray(String[]::new))
                 .description(localPost.getDescription())
                 .metadata(metadataDto)
                 .build();

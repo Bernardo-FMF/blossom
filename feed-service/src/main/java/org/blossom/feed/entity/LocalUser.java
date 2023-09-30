@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 @Getter
@@ -14,7 +13,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @AllArgsConstructor
 @Table("Blossom_Local_User")
 public class LocalUser {
-    @PrimaryKeyColumn(name = "user_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+    @PrimaryKey
     private int id;
     private String username;
     private String fullName;

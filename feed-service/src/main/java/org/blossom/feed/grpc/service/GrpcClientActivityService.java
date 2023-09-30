@@ -25,7 +25,12 @@ public class GrpcClientActivityService {
         final CountDownLatch countDownLatch = new CountDownLatch(postIds.size());
 
         MetadataStreamObserver responseObserver = new MetadataStreamObserver(countDownLatch, metadataDtoMapper, userId, postIds);
-        grpcClient.getNonBlockingStub().getPostMetadata(PostInfoRequest.newBuilder().setUserId(userId).addAllPostId(postIds).build(), responseObserver);
+        PostInfoRequest.Builder builder = PostInfoRequest.newBuilder();
+        if (userId != null) {
+            builder.setUserId(userId);
+        }
+        PostInfoRequest request = builder.addAllPostId(postIds).build();
+        grpcClient.getNonBlockingStub().getPostMetadata(request, responseObserver);
 
         boolean await = countDownLatch.await(2, TimeUnit.MINUTES);
 

@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,10 +15,8 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @AllArgsConstructor
 @Table("Blossom_Feed_Entry")
 public class FeedEntry {
-    @PrimaryKeyColumn(name = "entry_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-    private int id;
-
+    @PrimaryKey
+    private UUID id;
     private int userId;
-
     private String postId;
 }

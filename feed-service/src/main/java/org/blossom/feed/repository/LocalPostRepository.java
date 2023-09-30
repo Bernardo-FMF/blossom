@@ -8,6 +8,5 @@ import org.springframework.data.domain.Slice;
 import java.util.List;
 
 public interface LocalPostRepository extends CassandraRepository<LocalPost, String> {
-    Slice<LocalPost> findByUserIdIn(List<Integer> userIds, Pageable pageable);
-    long countByUserIdIn(List<Integer> userIds);
+    Slice<LocalPost> findByIdIn(List<String> postIds, Pageable pageable);
 }
