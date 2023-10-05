@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface LocalPostRepository extends CassandraRepository<LocalPost, String> {
     Slice<LocalPost> findByIdIn(List<String> postIds, Pageable pageable);
+    Slice<LocalPost> findByIdIn(List<String> postIds);
 }

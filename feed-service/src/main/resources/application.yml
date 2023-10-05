@@ -21,6 +21,9 @@ spring:
               packages: "org.blossom.model"
             type:
               mapping: event:org.blossom.model.ResourceEvent
+  redis:
+    host: localhost
+    port: 6381
 grpc:
   server:
     names:

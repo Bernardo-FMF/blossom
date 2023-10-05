@@ -2,6 +2,7 @@ package org.blossom.feed.kafka;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
+import org.blossom.feed.cache.FeedCacheService;
 import org.blossom.feed.entity.InvertedFeedEntry;
 import org.blossom.feed.entity.LocalUserPostCount;
 import org.blossom.feed.grpc.service.GrpcClientSocialService;
@@ -50,6 +51,9 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
     @Autowired
     private GrpcClientSocialService grpcClientSocialService;
 
+    @Autowired
+    private FeedCacheService feedCacheService;
+
     @Override
     public void save(KafkaPostResource resource) {
         if (!localPostRepository.existsById(resource.getId())) {
@@ -93,5 +97,7 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
         }
 
         invertedFeedEntryRepository.deleteById(resource.getId());
+
+        feedCacheService.invalidateCache(resource.getId());
     }
 }
