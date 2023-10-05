@@ -6,7 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface FeedEntryRepository extends CassandraRepository<FeedEntry, Integer> {
-    Slice<FeedEntry> findByUserId(int userId, Pageable pageable);
-    long countByUserId(int userId);
-    void deleteByPostId(String postId);
+    Slice<FeedEntry> findByKeyUserId(int userId, Pageable pageable);
+    long countByKeyUserId(int userId);
+
+    void deleteByKeyUserIdAndKeyPostId(int userId, String postId);
 }

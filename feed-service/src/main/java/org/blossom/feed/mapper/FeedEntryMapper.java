@@ -1,14 +1,19 @@
 package org.blossom.feed.mapper;
 
-import com.datastax.oss.driver.api.core.uuid.Uuids;
 import org.blossom.feed.entity.FeedEntry;
+import org.blossom.feed.entity.InvertedFeedEntry;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FeedEntryMapper {
     public FeedEntry mapToFeedEntry(String postId, int userId) {
         return FeedEntry.builder()
-                .id(Uuids.timeBased())
+                .key(new FeedEntry.FeedEntryKey(userId, postId))
+                .build();
+    }
+
+    public InvertedFeedEntry mapToInvertedFeedEntry(String postId, int userId) {
+        return InvertedFeedEntry.builder()
                 .postId(postId)
                 .userId(userId)
                 .build();

@@ -1,11 +1,9 @@
 package org.blossom.feed.mapper;
 
 import org.blossom.feed.entity.LocalUser;
-import org.blossom.feed.entity.LocalUserPosts;
+import org.blossom.feed.entity.LocalUserPostCount;
 import org.blossom.model.KafkaUserResource;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 
 @Component
 public class LocalUserMapper {
@@ -18,10 +16,10 @@ public class LocalUserMapper {
                 .build();
     }
 
-    public LocalUserPosts mapToLocalUserPosts(int userId) {
-        return LocalUserPosts.builder()
-                .userId(userId)
-                .posts(new ArrayList<>())
+    public LocalUserPostCount mapToLocalUserPostCount(KafkaUserResource resource) {
+        return LocalUserPostCount.builder()
+                .userId(resource.getId())
+                .postCount(0)
                 .build();
     }
 }
