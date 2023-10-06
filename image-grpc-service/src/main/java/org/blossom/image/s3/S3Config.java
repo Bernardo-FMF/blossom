@@ -16,6 +16,10 @@ public class S3Config {
 
     @Bean
     public S3Client s3Client() {
+        if (mock) {
+            return new S3Facade();
+        }
+
         return S3Client.builder()
                 .region(Region.of(awsRegion))
                 .build();
