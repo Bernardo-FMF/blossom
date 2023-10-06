@@ -1,5 +1,6 @@
 package org.blossom.service;
 
+import com.google.common.base.Strings;
 import org.blossom.cache.LocalUserCacheService;
 import org.blossom.dto.*;
 import org.blossom.entity.Post;
@@ -48,8 +49,15 @@ public class PostService {
             throw new PostNotValidException("Post has no content");
         }
 
-        String[] mediaUrls = imageService.uploadImages(postInfoDto.getMediaFiles());
-        String[] hashtags = parseDescription(postInfoDto.getText());
+        String[] mediaUrls = null;
+        if (postInfoDto.getMediaFiles().length != 0) {
+            mediaUrls = imageService.uploadImages(postInfoDto.getMediaFiles());
+        }
+
+        String[] hashtags = null;
+        if (Strings.isNullOrEmpty(postInfoDto.getText())) {
+            hashtags = parseDescription(postInfoDto.getText());
+        }
 
         Post post = postDtoMapper.mapToPost(postInfoDto, userId, mediaUrls, hashtags);
 
