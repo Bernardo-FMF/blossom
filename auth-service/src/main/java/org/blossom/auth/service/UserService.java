@@ -10,7 +10,6 @@ import org.blossom.auth.kafka.KafkaMessageService;
 import org.blossom.auth.mapper.UserMapper;
 import org.blossom.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,12 +30,8 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public String updateUserImage(int userId, int loggedUserId, MultipartFile file)
-            throws UserNotFoundException, IOException, InterruptedException, BadCredentialsException {
-        if (userId != loggedUserId) {
-            throw new BadCredentialsException("Logged in user does not have permission to change other users profile image");
-        }
-
+    public String updateUserImage(int userId, MultipartFile file)
+            throws UserNotFoundException, IOException, InterruptedException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User not found");

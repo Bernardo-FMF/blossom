@@ -20,12 +20,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping(value = "/{userId}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateProfileImage(@PathVariable("userId") Integer userId, @RequestParam("file") MultipartFile file, Authentication authentication)
+    @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateProfileImage(@RequestParam("file") MultipartFile file, Authentication authentication)
             throws IOException, InterruptedException, UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                userService.updateUserImage(userId,
-                        ((CommonUserDetails) authentication.getPrincipal()).getUserId(), file));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserImage(((CommonUserDetails) authentication.getPrincipal()).getUserId(), file));
     }
 
     @GetMapping("/{userId}")

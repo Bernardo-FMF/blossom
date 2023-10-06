@@ -8,16 +8,15 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.*;
 
 public class S3Facade implements S3Client {
     @Value("${aws.s3.path}")
     private String path;
+
+    private static final String KEY_PREFIX = "amazonaws.com/";
 
     @Override
     public String serviceName() {
@@ -40,6 +39,26 @@ public class S3Facade implements S3Client {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public DeleteObjectResponse deleteObject(DeleteObjectRequest deleteObjectRequest) throws AwsServiceException, SdkClientException, S3Exception {
+        File fileToDelete = new File(buildObjectFullPath(deleteObjectRequest.bucket(), extractKey(deleteObjectRequest.key())));
+
+        if (fileToDelete.exists()) {
+            if (fileToDelete.delete()) {
+                return DeleteObjectResponse.builder().build();
+            } else {
+                throw new RuntimeException("Failed to delete file: " + fileToDelete.getAbsolutePath());
+            }
+        } else {
+            // File doesn't exist
+            throw new RuntimeException("File not found: " + fileToDelete.getAbsolutePath());
+        }
+    }
+
+    private String extractKey(String key) {
+        return key.substring(key.indexOf("amazonaws.com/") + "amazonaws.com/".length());
     }
 
     @Override

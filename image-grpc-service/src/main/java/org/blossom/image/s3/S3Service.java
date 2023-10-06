@@ -38,7 +38,7 @@ public class S3Service {
 
             s3Client.deleteObject(deleteObjectRequest);
             return true;
-        } catch (S3Exception e) {
+        } catch (S3Exception | UnsupportedOperationException e) {
             return false;
         }
     }
