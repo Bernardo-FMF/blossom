@@ -4,7 +4,7 @@ spring:
   data:
     mongodb:
       host: localhost
-      port: 27017
+      port: 6385
       database: post-db
   kafka:
     bootstrap-servers: localhost:9092
@@ -28,7 +28,7 @@ spring:
     host: localhost
     port: 6379
 server:
-  port: 66
+  port: 8183
 grpc:
   server:
     name: Image-Service

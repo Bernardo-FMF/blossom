@@ -2,7 +2,7 @@ spring:
   application:
     name: Auth-Service
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:6380/postgres
     username: postgres
     password: rootauth
   flyway:
@@ -32,7 +32,7 @@ jwt:
   secret: ${BLOSSOM_JWT_SECRET}
   refresh: ${BLOSSOM_JWT_REFRESH}
 server:
-  port: 9564
+  port: 8182
 grpc:
   server:
     name: Image-Service

@@ -6,7 +6,7 @@ spring:
   application:
     name: Activity-Service
   datasource:
-    url: jdbc:postgresql://localhost:5431/postgres
+    url: jdbc:postgresql://localhost:6381/postgres
     username: postgres
     password: rootactivity
   flyway:
@@ -32,7 +32,7 @@ grpc:
     port: 0
     awaitTerminationInSeconds: 10
 server:
-  port: 9464
+  port: 8185
 eureka:
   client:
     service-url:
