@@ -12,6 +12,4 @@ import java.io.Serializable;
 public class LocalPost implements Serializable {
     private String postId;
     private int userId;
-    private String[] media;
-    private String description;
 }
