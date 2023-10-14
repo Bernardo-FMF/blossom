@@ -89,7 +89,7 @@ public class ChatService {
                 .build();
     }
 
-    public String addToChat(int chatId, int userId, int ownerId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
+    public String addToChat(int chatId, int userId, int participantId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
         if (optionalChat.isEmpty()) {
             throw new ChatNotFoundException("Chat does not exist");
@@ -97,7 +97,11 @@ public class ChatService {
 
         Chat chat = optionalChat.get();
 
-        if (chat.getOwner().getId() != ownerId) {
+        if (chat.getChatType() != ChatType.GROUP) {
+            throw new IllegalChatOperationException("Cannot add participants to a chat that is not a group");
+        }
+
+        if (chat.getParticipants().stream().noneMatch(participant -> participant.getId() == participantId)) {
             throw new IllegalChatOperationException("Authenticated user is not the owner of the chat");
         }
 
@@ -123,6 +127,10 @@ public class ChatService {
         }
 
         Chat chat = optionalChat.get();
+
+        if (chat.getChatType() != ChatType.GROUP) {
+            throw new IllegalChatOperationException("Cannot leave a chat that is not a group");
+        }
 
         if (chat.getParticipants().stream().noneMatch(participant -> participant.getId() == userId)) {
             throw new IllegalChatOperationException("User is not in the chat");
@@ -155,6 +163,10 @@ public class ChatService {
         }
 
         Chat chat = optionalChat.get();
+
+        if (chat.getChatType() != ChatType.GROUP) {
+            throw new IllegalChatOperationException("Cannot remove participants from a chat that is not a group");
+        }
 
         if (chat.getOwner().getId() != ownerId) {
             throw new IllegalChatOperationException("Authenticated user is not the owner of the chat");
