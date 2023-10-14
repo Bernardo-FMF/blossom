@@ -55,9 +55,7 @@ public class SocialService {
                 .isMutualFollow(socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), socialRelationDto.getInitiatingUser()))
                 .build();
 
-        if (socialFollow.isMutualFollow()) {
-            socialService.publishCreation(socialFollow);
-        }
+        socialService.publishCreation(socialFollow);
 
         return "Relation was created successfully";
     }
@@ -80,14 +78,6 @@ public class SocialService {
         }
 
         socialRepository.deleteFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
-
-        SocialFollow socialFollow = SocialFollow.builder()
-                .initiatingUser(socialRelationDto.getInitiatingUser())
-                .receivingUser(socialRelationDto.getReceivingUser())
-                .isMutualFollow(false)
-                .build();
-
-        socialService.publishDelete(socialFollow);
 
         return "Relation was deleted successfully";
     }

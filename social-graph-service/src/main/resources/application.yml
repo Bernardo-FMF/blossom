@@ -8,6 +8,7 @@ spring:
       password: social-graph-service
   kafka:
     bootstrap-servers: localhost:9092
+    topic: social-follow-resource-event-message
     consumer:
       group-id: socialListenerId
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
