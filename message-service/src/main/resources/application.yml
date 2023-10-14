@@ -1,6 +1,24 @@
 spring:
   application:
     name: message-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    topics: message-resource-event-notification
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties.spring.json.type.mapping: event:org.blossom.model.ResourceEvent
+    consumer:
+      group-id: messageListenerId
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.blossom.json.CustomResourceEventDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "org.blossom.model"
+            type:
+              mapping: event:org.blossom.model.ResourceEvent
 broker:
   host: localhost
   port: 61613

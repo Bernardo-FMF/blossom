@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.blossom.model.KafkaEntity;
+import org.blossom.model.KafkaMessageResource;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,7 +19,7 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "Blossom_Chat_Message")
-public class Message {
+public class Message implements KafkaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -44,4 +46,18 @@ public class Message {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
+
+    @Override
+    public KafkaMessageResource mapToResource() {
+        return KafkaMessageResource.builder()
+                .id(id)
+                .senderId(sender.getId())
+                .recipientsIds(chat.getParticipants().stream().map(User::getId).filter(participantId -> participantId != id).toList())
+                .chatId(chat.getId())
+                .content(content)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .isDeleted(isDeleted)
+                .build();
+    }
 }
