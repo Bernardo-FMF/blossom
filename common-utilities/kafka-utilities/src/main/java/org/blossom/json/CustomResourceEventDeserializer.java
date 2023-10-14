@@ -38,6 +38,8 @@ public class CustomResourceEventDeserializer implements Deserializer<ResourceEve
         return switch (resourceType) {
             case USER -> new KafkaUserResourceFactory();
             case POST -> new KafkaPostResourceFactory();
+            case MESSAGE -> new KafkaMessageResourceFactory();
+            case SOCIAL_FOLLOW -> new KafkaSocialFollowResourceFactory();
         };
     }
 }

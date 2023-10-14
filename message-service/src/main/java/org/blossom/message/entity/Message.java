@@ -52,7 +52,7 @@ public class Message implements KafkaEntity {
         return KafkaMessageResource.builder()
                 .id(id)
                 .senderId(sender.getId())
-                .recipientsIds(chat.getParticipants().stream().map(User::getId).filter(participantId -> participantId != id).toList())
+                .recipientsIds(chat.getParticipants().stream().map(User::getId).filter(participantId -> participantId != id).toArray(Integer[]::new))
                 .chatId(chat.getId())
                 .content(content)
                 .createdAt(createdAt)

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,7 +12,7 @@ import java.util.List;
 public class KafkaMessageResource extends KafkaResource {
     private int id;
     private int senderId;
-    private List<Integer> recipientsIds;
+    private Integer[] recipientsIds;
     private int chatId;
     private String content;
     private Date createdAt;
