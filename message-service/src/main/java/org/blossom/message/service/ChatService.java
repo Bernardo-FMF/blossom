@@ -7,6 +7,7 @@ import org.blossom.message.dto.UserChatsDto;
 import org.blossom.message.entity.Chat;
 import org.blossom.message.entity.User;
 import org.blossom.message.enums.BroadcastType;
+import org.blossom.message.enums.ChatType;
 import org.blossom.message.exception.ChatNotFoundException;
 import org.blossom.message.exception.IllegalChatOperationException;
 import org.blossom.message.exception.InvalidChatException;
@@ -46,7 +47,7 @@ public class ChatService {
         return optionalChat.get().getParticipants();
     }
 
-    public ChatDto createChat(ChatCreationDto chatCreation, int userId) throws InvalidChatException {
+    public ChatDto createChat(ChatCreationDto chatCreation, int userId, ChatType type) throws InvalidChatException {
         if (chatCreation.getInitialParticipants().isEmpty() || chatCreation.getInitialParticipants().contains(userId)) {
             throw new InvalidChatException("Chat participants are not valid");
         }
@@ -64,6 +65,7 @@ public class ChatService {
                 .owner(participants.get(userId))
                 .participants(new HashSet<>(participants.values()))
                 .name(chatCreation.getName())
+                .chatType(type)
                 .build();
 
         Chat newChat = chatRepository.save(chat);

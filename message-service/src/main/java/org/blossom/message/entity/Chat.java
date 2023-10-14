@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.blossom.message.enums.ChatType;
 import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -36,6 +37,10 @@ public class Chat {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "chat_type")
+    private ChatType chatType;
 
     @UpdateTimestamp(source = SourceType.DB)
     @Column(name = "last_update")
