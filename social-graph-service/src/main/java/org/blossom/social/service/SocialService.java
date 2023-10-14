@@ -7,6 +7,8 @@ import org.blossom.social.dto.SocialRelationDto;
 import org.blossom.social.entity.GraphUser;
 import org.blossom.social.exception.FollowNotValidException;
 import org.blossom.social.exception.UserNotFoundException;
+import org.blossom.social.kafka.outbound.KafkaSocialService;
+import org.blossom.social.kafka.outbound.model.SocialFollow;
 import org.blossom.social.mapper.LocalUserMapper;
 import org.blossom.social.repository.SocialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 public class SocialService {
     @Autowired
     private SocialRepository socialRepository;
+
+    @Autowired
+    private KafkaSocialService socialService;
 
     @Autowired
     private LocalUserMapper localUserMapper;
@@ -44,6 +49,16 @@ public class SocialService {
 
         socialRepository.createFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
 
+        SocialFollow socialFollow = SocialFollow.builder()
+                .initiatingUser(socialRelationDto.getInitiatingUser())
+                .receivingUser(socialRelationDto.getReceivingUser())
+                .isMutualFollow(socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), socialRelationDto.getInitiatingUser()))
+                .build();
+
+        if (socialFollow.isMutualFollow()) {
+            socialService.publishCreation(socialFollow);
+        }
+
         return "Relation was created successfully";
     }
 
@@ -65,6 +80,14 @@ public class SocialService {
         }
 
         socialRepository.deleteFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
+
+        SocialFollow socialFollow = SocialFollow.builder()
+                .initiatingUser(socialRelationDto.getInitiatingUser())
+                .receivingUser(socialRelationDto.getReceivingUser())
+                .isMutualFollow(false)
+                .build();
+
+        socialService.publishDelete(socialFollow);
 
         return "Relation was deleted successfully";
     }

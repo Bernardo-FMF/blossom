@@ -3,5 +3,6 @@ package org.blossom.model;
 public enum ResourceType {
     USER,
     POST,
-    MESSAGE
+    MESSAGE,
+    SOCIAL_FOLLOW
 }
