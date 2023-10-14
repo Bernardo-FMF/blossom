@@ -25,12 +25,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties.spring.json.type.mapping: event:org.blossom.model.ResourceEvent
-    consumer:
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      properties:
-        spring.deserializer.key.delegate: org.apache.kafka.common.serialization.StringDeserializer
-        spring.deserializer.value.delegate: org.apache.kafka.common.serialization.StringDeserializer
 vendor:
   frontend:
     callback-url: ${BLOSSOM_CALLBACK}
