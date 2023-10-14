@@ -24,6 +24,7 @@
         <module>social-graph-service</module>
         <module>activity-service</module>
         <module>feed-service</module>
+        <module>message-service</module>
     </modules>
 
     <properties>

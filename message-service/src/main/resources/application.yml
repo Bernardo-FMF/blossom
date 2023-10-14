@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: message-service
+broker:
+  host: localhost
+  port: 61613
+  username: guest
+  password: guest
+server:
+  port: 8187
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
