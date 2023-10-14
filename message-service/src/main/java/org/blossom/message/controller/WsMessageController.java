@@ -10,6 +10,7 @@ import org.blossom.message.exception.IllegalMessageOperationException;
 import org.blossom.message.exception.MessageNotFoundException;
 import org.blossom.message.exception.UserNotFoundException;
 import org.blossom.message.service.BroadcastService;
+import org.blossom.message.service.ChatService;
 import org.blossom.message.service.MessageService;
 import org.blossom.model.CommonUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,16 @@ public class WsMessageController {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private ChatService chatService;
+
     @MessageMapping("/chat/{chatId}/publishMessage")
     public void handlePublishMessage(@DestinationVariable int chatId, PublishMessageDto publishMessage, SimpMessageHeaderAccessor headerAccessor) throws ChatNotFoundException, UserNotFoundException {
         CommonUserDetails userDetails = ensureAuthentication(headerAccessor);
 
         Message message = messageService.createMessage(publishMessage, chatId, userDetails.getUserId());
+
+        chatService.updateActivity(chatId);
 
         broadcastService.broadcastMessage(chatId, message, BroadcastType.MESSAGE_CREATED);
     }

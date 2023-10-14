@@ -195,4 +195,12 @@ public class ChatService {
 
         return "User removed from chat with success";
     }
+
+    public void updateActivity(int chatId) throws ChatNotFoundException {
+        if (!chatRepository.existsById(chatId)) {
+            throw new ChatNotFoundException("Chat does not exist");
+        }
+
+        chatRepository.updateLastUpdateDate(chatId);
+    }
 }

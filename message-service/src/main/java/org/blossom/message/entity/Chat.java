@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.blossom.message.enums.ChatType;
-import org.hibernate.annotations.SourceType;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.Set;
@@ -42,7 +40,6 @@ public class Chat {
     @Column(name = "chat_type")
     private ChatType chatType;
 
-    @UpdateTimestamp(source = SourceType.DB)
     @Column(name = "last_update")
     private Date lastUpdate;
 
