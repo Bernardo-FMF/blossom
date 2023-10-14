@@ -147,6 +147,9 @@ public class ChatService {
 
         if (chat.getParticipants().isEmpty()) {
             chatRepository.deleteById(chatId);
+
+            broadcastService.broadcastChat(chat, BroadcastType.CHAT_DELETED);
+
             return "Chat was deleted due to no participants";
         } else {
             chat.setNewOwner(chat.getParticipants().stream().findAny().get());

@@ -39,7 +39,7 @@ public class BroadcastService {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
                 messagingTemplate.convertAndSend("/topic/user/" + user.getId() + "/message", messageOperationMapper.mapToMessageOperationDto(message, type));
             } else {
-                notificationService.sendMessageNotification(user.getId(), message, type);
+                notificationService.sendMessageNotification(message, type);
             }
         }
     }
@@ -48,8 +48,6 @@ public class BroadcastService {
         for (User user: chat.getParticipants()) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
                 messagingTemplate.convertAndSend("/topic/user/" + user.getId() + "/chat", chatOperationMapper.mapToChatOperationDto(chat, type));
-            } else {
-                notificationService.sendMessageNotification(user.getId(), chat, type);
             }
         }
     }
