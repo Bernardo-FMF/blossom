@@ -45,6 +45,20 @@ spring:
           filters:
             - AuthenticationFilter
 
+        - id: message-service-ws
+          uri: lb:ws://message-service
+          predicates:
+            - Path=/ws-chat/**
+          metadata:
+            websocket: true
+
+        - id: message-service
+          uri: lb://message-service
+          predicates:
+            - Path=/api/{version}/message/**, /api/{version}/chat/**
+          metadata:
+            websocket: true
+
         - id: discovery-server
           uri: http://localhost:8761
           predicates:
