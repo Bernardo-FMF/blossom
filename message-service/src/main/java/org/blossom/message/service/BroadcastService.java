@@ -4,7 +4,6 @@ import org.blossom.message.entity.Chat;
 import org.blossom.message.entity.Message;
 import org.blossom.message.entity.User;
 import org.blossom.message.enums.BroadcastType;
-import org.blossom.message.exception.ChatNotFoundException;
 import org.blossom.message.mapper.ChatOperationMapper;
 import org.blossom.message.mapper.MessageOperationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,6 @@ import java.util.Set;
 
 @Service
 public class BroadcastService {
-    @Autowired
-    private ChatService chatService;
-
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
@@ -33,8 +29,7 @@ public class BroadcastService {
     @Autowired
     private ChatOperationMapper chatOperationMapper;
 
-    public void broadcastMessage(int chatId, Message message, BroadcastType type) throws ChatNotFoundException {
-        Set<User> usersInChat = chatService.getUsersInChat(chatId);
+    public void broadcastMessage(Set<User> usersInChat, Message message, BroadcastType type) {
         for (User user: usersInChat) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
                 messagingTemplate.convertAndSend("/topic/user/" + user.getId() + "/message", messageOperationMapper.mapToMessageOperationDto(message, type));
@@ -51,6 +46,4 @@ public class BroadcastService {
             }
         }
     }
-
-
 }

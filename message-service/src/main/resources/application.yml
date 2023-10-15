@@ -1,6 +1,10 @@
 spring:
   application:
     name: message-service
+  datasource:
+    url: jdbc:postgresql://localhost:6386/postgres
+    username: postgres
+    password: rootmessage
   kafka:
     bootstrap-servers: localhost:9092
     topic: message-resource-event-notification

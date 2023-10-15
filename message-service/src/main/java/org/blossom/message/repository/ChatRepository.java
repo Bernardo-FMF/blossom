@@ -10,11 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ChatRepository extends JpaRepository<Chat, Integer> {
-    @Query("SELECT bc FROM Blossom_Chat bc WHERE bc.owner.id = :userId")
+    @Query("SELECT c FROM Chat c WHERE c.owner.id = :userId and c.lastUpdate is not null")
     Page<Chat> findByUserId(@Param("userId") int userId, Pageable page);
 
     @Transactional
     @Modifying
-    @Query("UPDATE Blossom_Chat c SET c.lastUpdate = CURRENT_TIMESTAMP WHERE c.id = :chatId")
+    @Query("UPDATE Chat c SET c.lastUpdate = CURRENT_TIMESTAMP WHERE c.id = :chatId")
     void updateLastUpdateDate(@Param("chatId") int chatId);
 }

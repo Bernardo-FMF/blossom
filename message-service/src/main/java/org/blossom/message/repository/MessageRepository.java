@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface MessageRepository extends JpaRepository<Message, Integer> {
-    @Query("SELECT bcm FROM Blossom_Chat_Message bcm WHERE bcm.chat.id = :chatId")
+    @Query("SELECT m FROM Message m WHERE m.chat.id = :chatId")
     Page<Message> findByChatId(@Param("chatId") int chatId, Pageable page);
 }

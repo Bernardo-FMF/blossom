@@ -40,7 +40,7 @@ public class WsMessageController {
 
         chatService.updateActivity(chatId);
 
-        broadcastService.broadcastMessage(chatId, message, BroadcastType.MESSAGE_CREATED);
+        broadcastService.broadcastMessage(chatService.getUsersInChat(chatId), message, BroadcastType.MESSAGE_CREATED);
     }
 
     @MessageMapping("/chat/{chatId}/deleteMessage")
@@ -49,7 +49,7 @@ public class WsMessageController {
 
         Message message = messageService.deleteMessage(deleteMessage, userDetails.getUserId());
 
-        broadcastService.broadcastMessage(chatId, message, BroadcastType.MESSAGE_DELETED);
+        broadcastService.broadcastMessage(chatService.getUsersInChat(chatId), message, BroadcastType.MESSAGE_DELETED);
     }
 
     @MessageMapping("/chat/{chatId}/updateMessage")
@@ -58,7 +58,7 @@ public class WsMessageController {
 
         Message message = messageService.updateMessage(updateMessage, userDetails.getUserId());
 
-        broadcastService.broadcastMessage(chatId, message, BroadcastType.MESSAGE_UPDATED);
+        broadcastService.broadcastMessage(chatService.getUsersInChat(chatId), message, BroadcastType.MESSAGE_UPDATED);
     }
 
     private static CommonUserDetails ensureAuthentication(SimpMessageHeaderAccessor headerAccessor) {
