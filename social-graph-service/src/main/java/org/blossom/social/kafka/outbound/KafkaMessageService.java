@@ -10,7 +10,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KafkaSocialService implements KafkaPublisherFacade<SocialFollow> {
+public class KafkaMessageService implements KafkaPublisherFacade<SocialFollow> {
     @Value("${spring.kafka.topic}")
     private String topic;
 

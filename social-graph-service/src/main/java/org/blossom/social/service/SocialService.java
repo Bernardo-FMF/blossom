@@ -7,7 +7,7 @@ import org.blossom.social.dto.SocialRelationDto;
 import org.blossom.social.entity.GraphUser;
 import org.blossom.social.exception.FollowNotValidException;
 import org.blossom.social.exception.UserNotFoundException;
-import org.blossom.social.kafka.outbound.KafkaSocialService;
+import org.blossom.social.kafka.outbound.KafkaMessageService;
 import org.blossom.social.kafka.outbound.model.SocialFollow;
 import org.blossom.social.mapper.LocalUserMapper;
 import org.blossom.social.repository.SocialRepository;
@@ -25,7 +25,7 @@ public class SocialService {
     private SocialRepository socialRepository;
 
     @Autowired
-    private KafkaSocialService socialService;
+    private KafkaMessageService messageService;
 
     @Autowired
     private LocalUserMapper localUserMapper;
@@ -55,7 +55,7 @@ public class SocialService {
                 .isMutualFollow(socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), socialRelationDto.getInitiatingUser()))
                 .build();
 
-        socialService.publishCreation(socialFollow);
+        messageService.publishCreation(socialFollow);
 
         return "Relation was created successfully";
     }
