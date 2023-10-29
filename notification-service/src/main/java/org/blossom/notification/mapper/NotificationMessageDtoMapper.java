@@ -15,7 +15,6 @@ public class NotificationMessageDtoMapper {
                 .content(messageNotification.getContent())
                 .sentAt(messageNotification.getSentAt())
                 .isDeleted(messageNotification.isDeleted())
-                .updatedAt(messageNotification.getUpdatedAt())
                 .build();
     }
 }

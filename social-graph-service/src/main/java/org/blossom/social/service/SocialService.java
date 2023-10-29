@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +54,7 @@ public class SocialService {
                 .initiatingUser(socialRelationDto.getInitiatingUser())
                 .receivingUser(socialRelationDto.getReceivingUser())
                 .isMutualFollow(socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), socialRelationDto.getInitiatingUser()))
+                .createdAt(new Date())
                 .build();
 
         messageService.publishCreation(socialFollow);
@@ -83,6 +85,7 @@ public class SocialService {
                 .initiatingUser(socialRelationDto.getInitiatingUser())
                 .receivingUser(socialRelationDto.getReceivingUser())
                 .isMutualFollow(false)
+                .createdAt(new Date())
                 .build();
         messageService.publishCreation(socialFollow);
 

@@ -12,6 +12,6 @@ import java.util.Date;
 public class KafkaSocialFollowResource extends KafkaResource {
     private int initiatingUser;
     private int receivingUser;
-    boolean isMutualFollow;
+    private boolean isMutualFollow;
     private Date createdAt;
 }
