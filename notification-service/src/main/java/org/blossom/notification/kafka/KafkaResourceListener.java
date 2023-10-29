@@ -40,7 +40,7 @@ public class KafkaResourceListener implements KafkaConsumerFacade {
         handlers.put(EventType.DELETE, deleteHandlers);
     }
 
-    @KafkaListener(topics = "user-resource-event-message")
+    @KafkaListener(topics = {"message-resource-event-notification", "social-follow-resource-event-notification"})
     public void handleResource(ResourceEvent resourceEvent) {
         handlers.get(resourceEvent.getEventType()).get(resourceEvent.getResourceType()).accept(resourceEvent.getResource());
     }

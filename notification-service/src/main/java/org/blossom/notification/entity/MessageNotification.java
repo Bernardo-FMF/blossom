@@ -15,7 +15,10 @@ import java.util.Date;
 @Document(collection = "Blossom_Notification_Message")
 public class MessageNotification {
     @Id
-    private int id;
+    private String id;
+
+    @Field(name = "message_id")
+    private int messageId;
 
     @Field(name = "recipient_id")
     private int recipientId;
@@ -31,9 +34,6 @@ public class MessageNotification {
 
     @Field(name = "is_deleted")
     private boolean isDeleted;
-
-    @Field(name = "updated_at")
-    private Date updatedAt;
 
     @Field(name = "sent_at")
     private Date sentAt;

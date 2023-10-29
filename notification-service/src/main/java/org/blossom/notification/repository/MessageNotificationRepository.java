@@ -5,6 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
+
 public interface MessageNotificationRepository extends MongoRepository<MessageNotification, String> {
     Page<MessageNotification> findByRecipientIdAndIsDeliveredFalse(int recipientId, Pageable pageable);
+
+    List<MessageNotification> findByMessageId(int messageId);
 }

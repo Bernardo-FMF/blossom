@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class NotificationFollowDtoMapper {
     public NotificationFollowDto mapToNotificationFollowDto(FollowNotification message, UserDto userDto) {
         return NotificationFollowDto.builder()
+                .id(message.getId())
                 .follower(userDto)
                 .followedAt(message.getFollowedAt())
                 .build();

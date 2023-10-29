@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class NotificationMessageDtoMapper {
     public NotificationMessageDto mapToNotificationMessageDto(MessageNotification messageNotification, UserDto user) {
         return NotificationMessageDto.builder()
+                .id(messageNotification.getMessageId())
                 .user(user)
                 .chatId(messageNotification.getChatId())
                 .content(messageNotification.getContent())

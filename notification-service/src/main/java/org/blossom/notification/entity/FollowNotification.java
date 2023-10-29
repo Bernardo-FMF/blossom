@@ -15,7 +15,7 @@ import java.util.Date;
 @Document(collection = "Blossom_Notification_Follow")
 public class FollowNotification {
     @Id
-    private int id;
+    private String id;
 
     @Field(name = "recipient_id")
     private int recipientId;

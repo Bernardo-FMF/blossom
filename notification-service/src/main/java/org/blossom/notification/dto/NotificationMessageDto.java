@@ -8,10 +8,10 @@ import java.util.Date;
 @Builder
 @Getter
 public class NotificationMessageDto {
+    private int id;
     private UserDto user;
     private int chatId;
     private String content;
-    private Date updatedAt;
     private boolean isDeleted;
     private Date sentAt;
 }
