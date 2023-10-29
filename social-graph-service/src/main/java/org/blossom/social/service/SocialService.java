@@ -79,6 +79,13 @@ public class SocialService {
 
         socialRepository.deleteFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
 
+        SocialFollow socialFollow = SocialFollow.builder()
+                .initiatingUser(socialRelationDto.getInitiatingUser())
+                .receivingUser(socialRelationDto.getReceivingUser())
+                .isMutualFollow(false)
+                .build();
+        messageService.publishCreation(socialFollow);
+
         return "Relation was deleted successfully";
     }
 
