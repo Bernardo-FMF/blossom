@@ -22,7 +22,7 @@ public class MessageController {
     }
 
     @PatchMapping("/{notificationId}/received")
-    public ResponseEntity<String> confirmUserReceivedMessage(@PathVariable("notificationId") String notificationId, Authentication authentication) {
-        return ResponseEntity.status(HttpStatus.OK).body(messageService.confirmUserReceivedMessage(notificationId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    public ResponseEntity<String> confirmUserReceivedNotification(@PathVariable("notificationId") String notificationId, Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK).body(messageService.confirmUserReceivedNotification(notificationId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

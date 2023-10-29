@@ -39,7 +39,7 @@ public class MessageService {
         return getNotificationMessagesDto(messageNotifications);
     }
 
-    public String confirmUserReceivedMessage(String notificationId, int userId) {
+    public String confirmUserReceivedNotification(String notificationId, int userId) {
         Optional<MessageNotification> optionalNotification = messageNotificationRepository.findById(notificationId);
         if (optionalNotification.isEmpty()) {
             return null;
