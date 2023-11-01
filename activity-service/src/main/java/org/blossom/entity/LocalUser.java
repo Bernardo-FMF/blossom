@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "Blossom_Local_User")
 public class LocalUser {
     @Id
-    @Column(name = "user_id")
+    @Column(name = "id")
     private int id;
 
     @Column(name = "full_name")

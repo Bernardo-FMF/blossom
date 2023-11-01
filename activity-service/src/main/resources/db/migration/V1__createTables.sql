@@ -1,5 +1,5 @@
 CREATE TABLE Blossom_Local_User (
-    user_id INT PRIMARY KEY,
+    id INT PRIMARY KEY,
     username VARCHAR(255) UNIQUE,
     full_name VARCHAR(255),
     image_url VARCHAR(255)
