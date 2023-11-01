@@ -24,6 +24,26 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
+  message-broker:
+    image: stomp-rabbitmq
+    container_name: message-broker
+    ports:
+      - "9093:15672"
+      - "9094:61613"
+    environment:
+      - RABBITMQ_DEFAULT_USER=message
+      - RABBITMQ_DEFAULT_PASS=rootmessage
+
+  notification-broker:
+    image: stomp-rabbitmq
+    container_name: notification-broker
+    ports:
+      - "9095:15672"
+      - "9096:61613"
+    environment:
+      - RABBITMQ_DEFAULT_USER=notification
+      - RABBITMQ_DEFAULT_PASS=rootnotification
+
   activity-service-cache:
     image: redis:latest
     container_name: activity-service-cache
@@ -76,3 +96,17 @@ services:
     container_name: post-service-db
     ports:
       - "6385:27017"
+
+  notification-service-db:
+    image: mongo:latest
+    container_name: notification-service-db
+    ports:
+      - "6386:27017"
+
+  message-service-db:
+    image: postgres:latest
+    container_name: message-service-db
+    ports:
+      - "6387:5432"
+    environment:
+      - POSTGRES_PASSWORD=rootmessage
