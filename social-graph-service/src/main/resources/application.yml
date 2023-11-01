@@ -21,10 +21,10 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
 server:
-  port: 8186
+  port: 8191
 grpc:
   server:
-    port: 0
+    port: 8194
     awaitTerminationInSeconds: 10
 eureka:
   client:

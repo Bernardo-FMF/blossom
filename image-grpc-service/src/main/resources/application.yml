@@ -7,7 +7,7 @@ spring:
     name: Image-Service
 grpc:
   server:
-    port: 0
+    port: 8188
     awaitTerminationInSeconds: 10
 aws:
   region: ${BLOSSOM_S3_REGION}
@@ -17,4 +17,4 @@ aws:
     buckets:
       imageBucket: ${BLOSSOM_S3_BUCKET}
 server:
-  port: 8184
+  port: 8185

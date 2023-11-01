@@ -32,7 +32,7 @@ grpc:
   client:
     awaitTerminationInSeconds: 10
 server:
-  port: 9460
+  port: 8204
 eureka:
   client:
     service-url:
