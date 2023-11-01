@@ -1,6 +1,6 @@
 package org.blossom.notification.kafka;
 
-import org.apache.commons.lang.NotImplementedException;
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaSocialFollowResource;
 import org.blossom.notification.client.UserClient;
@@ -8,7 +8,10 @@ import org.blossom.notification.entity.FollowNotification;
 import org.blossom.notification.repository.FollowNotificationRepository;
 import org.blossom.notification.service.BroadcastService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
+@Log4j2
 public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSocialFollowResource> {
     @Autowired
     private FollowNotificationRepository followNotificationRepository;
@@ -38,11 +41,11 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
     @Override
     public void update(KafkaSocialFollowResource resource) {
-        throw new NotImplementedException("Follow updates are not available");
+        log.info("discarding update message of type: social follow");
     }
 
     @Override
     public void delete(KafkaSocialFollowResource resource) {
-        throw new NotImplementedException("Follow deletes are not available");
+        log.info("discarding delete message of type: social follow");
     }
 }

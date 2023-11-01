@@ -1,15 +1,16 @@
 package org.blossom.notification.kafka;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaMessageResource;
 import org.blossom.notification.entity.MessageNotification;
 import org.blossom.notification.repository.MessageNotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessageResource> {
     @Autowired
     private MessageNotificationRepository messageNotificationRepository;
@@ -37,7 +38,13 @@ public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessage
 
     @Override
     public void update(KafkaMessageResource resource) {
-        throw new NotImplementedException("Follow updates are not available");
+        List<MessageNotification> notifications = messageNotificationRepository.findByMessageId(resource.getId());
+
+        List<MessageNotification> newNotifications = notifications.stream().peek(notification -> {
+            notification.setContent(resource.getContent());
+        }).toList();
+
+        messageNotificationRepository.saveAll(newNotifications);
     }
 
     @Override
