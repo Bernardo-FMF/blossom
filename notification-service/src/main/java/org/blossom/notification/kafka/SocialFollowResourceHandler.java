@@ -3,7 +3,7 @@ package org.blossom.notification.kafka;
 import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaSocialFollowResource;
-import org.blossom.notification.client.UserClient;
+import org.blossom.notification.client.AuthClient;
 import org.blossom.notification.entity.FollowNotification;
 import org.blossom.notification.repository.FollowNotificationRepository;
 import org.blossom.notification.service.BroadcastService;
@@ -20,7 +20,7 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
     private BroadcastService broadcastService;
 
     @Autowired
-    private UserClient userClient;
+    private AuthClient authClient;
 
     @Override
     public void save(KafkaSocialFollowResource resource) {

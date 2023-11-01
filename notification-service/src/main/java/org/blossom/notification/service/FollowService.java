@@ -1,6 +1,6 @@
 package org.blossom.notification.service;
 
-import org.blossom.notification.client.UserClient;
+import org.blossom.notification.client.AuthClient;
 import org.blossom.notification.dto.NotificationFollowDto;
 import org.blossom.notification.dto.NotificationFollowsDto;
 import org.blossom.notification.dto.SearchParametersDto;
@@ -13,18 +13,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class FollowService {
     @Autowired
     private FollowNotificationRepository followNotificationRepository;
 
     @Autowired
-    private UserClient userClient;
+    private AuthClient authClient;
 
     @Autowired
     private NotificationFollowDtoMapper notificationFollowDtoMapper;
@@ -58,7 +60,7 @@ public class FollowService {
     private NotificationFollowsDto getNotificationFollowsDto(Page<FollowNotification> followNotifications) {
         List<Integer> userIds = followNotifications.get().map(FollowNotification::getSenderId).toList();
 
-        Map<Integer, UserDto> users = userIds.stream().map(id -> userClient.getUser(id).getBody())
+        Map<Integer, UserDto> users = userIds.stream().map(id -> authClient.getUser(id).getBody())
                 .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getUserId() : 0, user -> user));
 
         List<NotificationFollowDto> follows = followNotifications.get().map(message -> notificationFollowDtoMapper.mapToNotificationFollowDto(message, users.get(message.getSenderId()))).toList();

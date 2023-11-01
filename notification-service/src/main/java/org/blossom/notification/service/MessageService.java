@@ -1,6 +1,6 @@
 package org.blossom.notification.service;
 
-import org.blossom.notification.client.UserClient;
+import org.blossom.notification.client.AuthClient;
 import org.blossom.notification.dto.NotificationMessageDto;
 import org.blossom.notification.dto.NotificationMessagesDto;
 import org.blossom.notification.dto.SearchParametersDto;
@@ -26,7 +26,7 @@ public class MessageService {
     private MessageNotificationRepository messageNotificationRepository;
 
     @Autowired
-    private UserClient userClient;
+    private AuthClient authClient;
 
     @Autowired
     private NotificationMessageDtoMapper notificationMessageDtoMapper;
@@ -60,7 +60,7 @@ public class MessageService {
     private NotificationMessagesDto getNotificationMessagesDto(Page<MessageNotification> messageNotifications) {
         List<Integer> userIds = messageNotifications.get().map(MessageNotification::getSenderId).toList();
 
-        Map<Integer, UserDto> users = userIds.stream().map(id -> userClient.getUser(id).getBody())
+        Map<Integer, UserDto> users = userIds.stream().map(id -> authClient.getUser(id).getBody())
                 .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getUserId() : 0, user -> user));
 
         List<NotificationMessageDto> messages = messageNotifications.get().map(message -> notificationMessageDtoMapper.mapToNotificationMessageDto(message, users.get(message.getSenderId()))).toList();

@@ -1,4 +1,4 @@
-package org.blossom.message.configuration;
+package org.blossom.notification.configuration;
 
 import org.blossom.filter.CommonUserDetailsFilter;
 import org.blossom.jwt.RoleParser;
@@ -30,11 +30,10 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(HttpMethod.POST, "/api/v1/chat").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/chat/{chatId}/leave").authenticated()
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/chat/{chatId}/user/{userId}").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/chat/{chatId}/user/{userId}").authenticated()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/message/chat/{chatId}").authenticated())
+                                .requestMatchers(HttpMethod.GET, "/api/v1/notification/message").authenticated()
+                                .requestMatchers(HttpMethod.PATCH, "/api/v1/notification/message/{notificationId}/received").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/notification/follow").authenticated()
+                                .requestMatchers(HttpMethod.PATCH, "/api/v1/notification/follow/{notificationId}/received").authenticated())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
