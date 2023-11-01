@@ -15,7 +15,7 @@ import java.util.Date;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<ErrorMessage> commentNotFoundException(CommentNotFoundException exception, WebRequest request) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorMessage message = new ErrorMessage(status, CommentNotFoundException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
@@ -43,7 +43,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InteractionAlreadyExistsException.class)
     public ResponseEntity<ErrorMessage> interactionAlreadyExistsException(InteractionAlreadyExistsException exception, WebRequest request) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
+        HttpStatus status = HttpStatus.CONFLICT;
         ErrorMessage message = new ErrorMessage(status, InteractionAlreadyExistsException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
