@@ -1,0 +1,49 @@
+package org.blossom.post.entity;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.blossom.model.KafkaEntity;
+import org.blossom.model.KafkaPostResource;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.Date;
+
+@Getter
+@Setter
+@Builder
+@Document(collection = "Blossom_Post")
+public class Post implements KafkaEntity {
+    @Id
+    private String id;
+
+    @Field(name = "description")
+    private String description;
+
+    @Field(name = "media")
+    private String[] media;
+
+    @Field(name = "hashtags")
+    private String[] hashtags;
+
+    @Field(name = "user_id")
+    private int userId;
+
+    @CreatedDate
+    @Field(name = "created_at")
+    private Date createdAt;
+
+    @Override
+    public KafkaPostResource mapToResource() {
+        return KafkaPostResource.builder()
+                .id(id)
+                .userId(userId)
+                .media(media)
+                .description(description)
+                .createdAt(createdAt)
+                .build();
+    }
+}
