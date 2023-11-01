@@ -2,7 +2,7 @@ spring:
   application:
     name: Message-Service
   datasource:
-    url: jdbc:postgresql://localhost:6386/postgres
+    url: jdbc:postgresql://localhost:6387/postgres
     username: postgres
     password: rootmessage
   kafka:
@@ -25,9 +25,9 @@ spring:
               mapping: event:org.blossom.model.ResourceEvent
 broker:
   host: localhost
-  port: 61613
-  username: guest
-  password: guest
+  port: 9094
+  username: message
+  password: rootmessage
 server:
   port: 8207
 eureka:

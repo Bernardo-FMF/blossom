@@ -19,9 +19,15 @@ spring:
               packages: "org.blossom.model"
             type:
               mapping: event:org.blossom.model.ResourceEvent
+broker:
+  host: localhost
+  port: 9096
+  username: notification
+  password: rootnotification
 server:
   port: 8210
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+debug: true

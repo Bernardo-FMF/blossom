@@ -56,8 +56,18 @@ spring:
           uri: lb://message-service
           predicates:
             - Path=/api/{version}/message/**, /api/{version}/chat/**
+
+        - id: notification-service-ws
+          uri: lb:ws://notification-service
+          predicates:
+            - Path=/ws-notification/**
           metadata:
             websocket: true
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/{version}/notification/message/**, /api/{version}/notification/follow/**
 
         - id: discovery-server
           uri: http://localhost:8761
