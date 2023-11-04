@@ -24,7 +24,7 @@ jobs:
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
     - name: build docker images
       run: |
-        for module in ${vars.MODULES[@]}; do
+        for module in ${ ${{ vars.MODULES }}[@] }; do
           cd ./$module
           docker build -t blossom-$module .
           docker tag blossom-$module:latest blossom-$module:$(date +"%Y%m%d%H%M%S")
