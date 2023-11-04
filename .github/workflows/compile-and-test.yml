@@ -1,4 +1,4 @@
-name: Package modules and run tests
+name: compile-and-test
 
 on:
   push:
@@ -19,5 +19,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
+    - name: build with maven
       run: mvn -B package
+    - name: log in to docker
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
