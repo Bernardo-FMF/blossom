@@ -18,7 +18,7 @@
         <module>discovery-server</module>
         <module>api-gateway</module>
         <module>common-utilities</module>
-        <module>image-grpc-service</module>
+        <module>image-service</module>
         <module>grpc-interface</module>
         <module>post-service</module>
         <module>social-graph-service</module>

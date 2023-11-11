@@ -58,7 +58,7 @@ jobs:
 
     - name: build docker image [image-service]
       run: |
-        docker build -t bernardofmf/blossom-image-service:$(git log -1 --pretty=%h) -t bernardofmf/blossom-image-service:latest -f ./image-grpc-service/Dockerfile ./image-grpc-service/
+        docker build -t bernardofmf/blossom-image-service:$(git log -1 --pretty=%h) -t bernardofmf/blossom-image-service:latest -f ./image-service/Dockerfile ./image-service/
         docker push bernardofmf/blossom-image-service:$(git log -1 --pretty=%h)
         docker push bernardofmf/blossom-image-service:latest
 
