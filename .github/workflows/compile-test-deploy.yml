@@ -1,0 +1,41 @@
+name: compile-and-test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: build with maven
+      run: mvn -B package
+
+    - name: log in to docker
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: build and Push Docker Images
+      run: |
+        if [ "${{ github.event_name }}" == "push" ]; then
+          image_tag=$(git log -1 --pretty=%h)
+          for service in activity-service api-gateway auth-service discovery-server feed-service image-service message-service notification-service post-service social-graph-service; do
+            echo "building and pushing docker image for $service"
+            docker build -t bernardofmf/blossom-$service:$image_tag -t bernardofmf/blossom-$service:latest -f ./$service/Dockerfile ./$service/
+            docker push bernardofmf/blossom-$service:$image_tag
+            docker push bernardofmf/blossom-$service:latest
+          done
+        else
+          echo "Skipping Docker image build on pull requests."
+        fi
