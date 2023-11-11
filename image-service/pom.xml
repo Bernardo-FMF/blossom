@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.blossom.image</groupId>
-    <artifactId>image-grpc-service</artifactId>
+    <artifactId>image-service</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
