@@ -4,6 +4,8 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
+    ports:
+      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -25,7 +27,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
   message-broker:
-    image: stomp-rabbitmq
+    image: bernardofmf/blossom-custom-rabbitmq-stomp:latest
     container_name: message-broker
     ports:
       - "9093:15672"
@@ -35,7 +37,7 @@ services:
       - RABBITMQ_DEFAULT_PASS=rootmessage
 
   notification-broker:
-    image: stomp-rabbitmq
+    image: bernardofmf/blossom-custom-rabbitmq-stomp:latest
     container_name: notification-broker
     ports:
       - "9095:15672"
@@ -45,68 +47,216 @@ services:
       - RABBITMQ_DEFAULT_PASS=rootnotification
 
   activity-service-cache:
-    image: redis:latest
+    image: redis:7.2.3-bookworm
     container_name: activity-service-cache
     ports:
       - "6377:6379"
+    restart: always
 
   feed-service-cache:
-    image: redis:latest
+    image: redis:7.2.3-bookworm
     container_name: feed-service-cache
     ports:
       - "6378:6379"
+    restart: always
 
   post-service-cache:
-    image: redis:latest
+    image: redis:7.2.3-bookworm
     container_name: post-service-cache
     ports:
       - "6379:6379"
+    restart: always
 
   auth-service-db:
-    image: postgres:latest
+    image: postgres:16.1
     container_name: auth-service-db
     ports:
       - "6380:5432"
     environment:
+      - POSTGRES_DB=auth-service
+      - POSTGRES_USER=bfmfblossom
       - POSTGRES_PASSWORD=rootauth
+      - PGDATA=/data/postgres
+    volumes:
+      - ./auth-service-db:/data/postgres
+    restart: always
 
   activity-service-db:
-    image: postgres:latest
+    image: postgres:16.1
     container_name: activity-service-db
     ports:
       - "6381:5432"
     environment:
+      - POSTGRES_DB=activity-service
+      - POSTGRES_USER=bfmfblossom
       - POSTGRES_PASSWORD=rootactivity
+      - PGDATA=/data/postgres
+    volumes:
+      - ./activity-service-db:/data/postgres
+    restart: always
 
   social-graph-service-db:
-    image: neo4j
+    image: neo4j:5.12.0-community-bullseye
     container_name: social-graph-service-db
     ports:
       - "6382:7474"
       - "6383:7687"
+    volumes:
+      - ./social-graph-service-db:/data
+    restart: always
 
   feed-service-db:
     image: cassandra:latest
     container_name: feed-service-db
     ports:
       - "6384:9042"
+    volumes:
+      - ./feed-service-db:/var/lib/cassandra
+    restart: always
 
   post-service-db:
-    image: mongo:latest
+    image: mongo:7.0
     container_name: post-service-db
     ports:
       - "6385:27017"
+    volumes:
+      - ./post-service-db:/data/db
+    restart: always
 
   notification-service-db:
-    image: mongo:latest
+    image: mongo:7.0
     container_name: notification-service-db
     ports:
       - "6386:27017"
+    volumes:
+      - ./notification-service-db:/data/db
+    restart: always
 
   message-service-db:
-    image: postgres:latest
+    image: postgres:16.1
     container_name: message-service-db
     ports:
       - "6387:5432"
     environment:
+      - POSTGRES_DB=message-service
+      - POSTGRES_USER=bfmfblossom
       - POSTGRES_PASSWORD=rootmessage
+      - PGDATA=/data/postgres
+    volumes:
+      - ./message-service-db:/data/postgres
+    restart: always
+
+  discovery-server:
+    image: bernardofmf/blossom-discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+    image: bernardofmf/blossom-api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8181:8181"
+    expose:
+      - "8181"
+    depends_on:
+      - discovery-server
+
+  image-service:
+    image: bernardofmf/blossom-image-service:latest
+    container_name: image-service
+    ports:
+      - "8185:8185"
+      - "8188:8188"
+    depends_on:
+      - discovery-server
+      - api-gateway
+
+  auth-service:
+    image: bernardofmf/blossom-auth-service:latest
+    container_name: auth-service
+    ports:
+      - "8182:8182"
+    depends_on:
+      - auth-service-db
+      - discovery-server
+      - api-gateway
+      - image-service
+
+  post-service:
+    image: bernardofmf/blossom-post-service:latest
+    container_name: post-service
+    ports:
+      - "8213:8213"
+    depends_on:
+      - post-service-db
+      - post-service-cache
+      - discovery-server
+      - api-gateway
+      - image-service
+
+  activity-service:
+    image: bernardofmf/blossom-activity-service:latest
+    container_name: activity-service
+    ports:
+      - "8197:8197"
+      - "8201:8201"
+    depends_on:
+      - activity-service-db
+      - activity-service-cache
+      - discovery-server
+      - api-gateway
+      - auth-service
+      - post-service
+
+  social-graph-service:
+    image: bernardofmf/blossom-social-graph-service:latest
+    container_name: social-graph-service
+    ports:
+      - "8191:8191"
+      - "8194:8194"
+    depends_on:
+      - social-graph-service-db
+      - discovery-server
+      - api-gateway
+      - auth-service
+
+  feed-service:
+    image: bernardofmf/blossom-feed-service:latest
+    container_name: feed-service
+    ports:
+      - "8204:8204"
+    depends_on:
+      - feed-service-db
+      - feed-service-cache
+      - discovery-server
+      - api-gateway
+      - auth-service
+      - social-graph-service
+      - post-service
+
+  message-service:
+    image: bernardofmf/blossom-message-service:latest
+    container_name: message-service
+    ports:
+      - "8207:8207"
+    depends_on:
+      - message-service-db
+      - message-broker
+      - discovery-server
+      - api-gateway
+      - auth-service
+      - social-graph-service
+
+  notification-service:
+    image: bernardofmf/blossom-notification-service:latest
+    container_name: notification-service
+    ports:
+      - "8210:8210"
+    depends_on:
+      - notification-service-db
+      - notification-broker
+      - discovery-server
+      - api-gateway
+      - auth-service
+      - social-graph-service
