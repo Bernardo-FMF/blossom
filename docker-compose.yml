@@ -33,8 +33,8 @@ services:
       - "9093:15672"
       - "9094:61613"
     environment:
-      - RABBITMQ_DEFAULT_USER=message
-      - RABBITMQ_DEFAULT_PASS=rootmessage
+      - RABBITMQ_DEFAULT_USER=${ROOT_USER_RELAY}
+      - RABBITMQ_DEFAULT_PASS=${ROOT_PASSWORD_RELAY}
 
   notification-broker:
     image: bernardofmf/blossom-custom-rabbitmq-stomp:latest
@@ -43,8 +43,8 @@ services:
       - "9095:15672"
       - "9096:61613"
     environment:
-      - RABBITMQ_DEFAULT_USER=notification
-      - RABBITMQ_DEFAULT_PASS=rootnotification
+      - RABBITMQ_DEFAULT_USER=${ROOT_USER_RELAY}
+      - RABBITMQ_DEFAULT_PASS=${ROOT_PASSWORD_RELAY}
 
   activity-service-cache:
     image: redis:7.2.3-bookworm
@@ -73,9 +73,9 @@ services:
     ports:
       - "6380:5432"
     environment:
-      - POSTGRES_DB=auth-service
-      - POSTGRES_USER=bfmfblossom
-      - POSTGRES_PASSWORD=rootauth
+      - POSTGRES_DB=auth-db
+      - POSTGRES_USER=${ROOT_USER}
+      - POSTGRES_PASSWORD=${ROOT_PASSWORD}
       - PGDATA=/data/postgres
     volumes:
       - ./auth-service-db:/data/postgres
@@ -87,9 +87,9 @@ services:
     ports:
       - "6381:5432"
     environment:
-      - POSTGRES_DB=activity-service
-      - POSTGRES_USER=bfmfblossom
-      - POSTGRES_PASSWORD=rootactivity
+      - POSTGRES_DB=activity-db
+      - POSTGRES_USER=${ROOT_USER}
+      - POSTGRES_PASSWORD=${ROOT_PASSWORD}
       - PGDATA=/data/postgres
     volumes:
       - ./activity-service-db:/data/postgres
@@ -138,9 +138,9 @@ services:
     ports:
       - "6387:5432"
     environment:
-      - POSTGRES_DB=message-service
-      - POSTGRES_USER=bfmfblossom
-      - POSTGRES_PASSWORD=rootmessage
+      - POSTGRES_DB=message-db
+      - POSTGRES_USER=${ROOT_USER}
+      - POSTGRES_PASSWORD=${ROOT_PASSWORD}
       - PGDATA=/data/postgres
     volumes:
       - ./message-service-db:/data/postgres
@@ -151,6 +151,8 @@ services:
     container_name: discovery-server
     ports:
       - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
   api-gateway:
     image: bernardofmf/blossom-api-gateway:latest
@@ -159,6 +161,8 @@ services:
       - "8181:8181"
     expose:
       - "8181"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - discovery-server
 
@@ -168,6 +172,14 @@ services:
     ports:
       - "8185:8185"
       - "8188:8188"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_IMAGE_PORT=8185
+      - BLOSSOM_IMAGE_GRPC_PORT=8188
+      - BLOSSOM_S3_MOCK=true
+      - BLOSSOM_S3_REGION=${S3_REGION}
+      - BLOSSOM_S3_BUCKET=${S3_BUCKET}
+      - BLOSSOM_S3_PATH=/
     depends_on:
       - discovery-server
       - api-gateway
@@ -177,6 +189,18 @@ services:
     container_name: auth-service
     ports:
       - "8182:8182"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_AUTH_DB=jdbc:postgresql://auth-service-db:5432/auth-db
+      - BLOSSOM_AUTH_DB_USERNAME=${ROOT_USER}
+      - BLOSSOM_AUTH_DB_PASSWORD=${ROOT_PASSWORD}
+      - BLOSSOM_EMAIL_USERNAME=${EMAIL_USERNAME}
+      - BLOSSOM_EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - BLOSSOM_KAFKA=broker:9092
+      - BLOSSOM_CALLBACK=http://localhost:100/callbackUrl
+      - BLOSSOM_JWT_SECRET=${JWT_SECRET}
+      - BLOSSOM_JWT_REFRESH=${JWT_REFRESH}
+      - BLOSSOM_AUTH_PORT=8182
     depends_on:
       - auth-service-db
       - discovery-server
@@ -188,6 +212,15 @@ services:
     container_name: post-service
     ports:
       - "8213:8213"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_NOTIFICATION_DB_HOST=post-service-db
+      - BLOSSOM_NOTIFICATION_DB_PORT=27017
+      - BLOSSOM_NOTIFICATION_DB_NAME=post-db
+      - BLOSSOM_KAFKA=broker:9092
+      - BLOSSOM_POST_CACHE_HOST=post-service-cache
+      - BLOSSOM_POST_CACHE_PORT=6379
+      - BLOSSOM_POST_PORT=8213
     depends_on:
       - post-service-db
       - post-service-cache
@@ -201,6 +234,16 @@ services:
     ports:
       - "8197:8197"
       - "8201:8201"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_ACTIVITY_DB=jdbc:postgresql://activity-service-db:5432/activity-db
+      - BLOSSOM_ACTIVITY_DB_USERNAME=${ROOT_USER}
+      - BLOSSOM_ACTIVITY_DB_PASSWORD=${ROOT_PASSWORD}
+      - BLOSSOM_ACTIVITY_CACHE_HOST=activity-service-cache
+      - BLOSSOM_ACTIVITY_CACHE_PORT=6379
+      - BLOSSOM_KAFKA=broker:9092
+      - BLOSSOM_ACTIVITY_GRPC_PORT=8201
+      - BLOSSOM_ACTIVITY_PORT=8197
     depends_on:
       - activity-service-db
       - activity-service-cache
@@ -215,6 +258,14 @@ services:
     ports:
       - "8191:8191"
       - "8194:8194"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_SOCIAL_DB=bolt://social-graph-service-db:7687
+      - BLOSSOM_SOCIAL_DB_USERNAME=${ROOT_USER}
+      - BLOSSOM_SOCIAL_DB_PASSWORD=${ROOT_PASSWORD}
+      - BLOSSOM_KAFKA=broker:9092
+      - BLOSSOM_SOCIAL_PORT=8191
+      - BLOSSOM_SOCIAL_GRPC_PORT=8194
     depends_on:
       - social-graph-service-db
       - discovery-server
@@ -226,6 +277,16 @@ services:
     container_name: feed-service
     ports:
       - "8204:8204"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_ACTIVITY_SPACE=feedSpace
+      - BLOSSOM_ACTIVITY_HOST=feed-service-db
+      - BLOSSOM_ACTIVITY_PORT=6384
+      - BLOSSOM_ACTIVITY_DATACENTER=datacenter1
+      - BLOSSOM_KAFKA=broker:9092
+      - BLOSSOM_FEED_CACHE_HOST=feed-service-cache
+      - BLOSSOM_FEED_CACHE_PORT=6379
+      - BLOSSOM_FEED_PORT=8204
     depends_on:
       - feed-service-db
       - feed-service-cache
@@ -240,6 +301,17 @@ services:
     container_name: message-service
     ports:
       - "8207:8207"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_MESSAGE_DB=jdbc:postgresql://message-service-db:5432/message-db
+      - BLOSSOM_MESSAGE_DB_USERNAME=${ROOT_USER}
+      - BLOSSOM_MESSAGE_DB_PASSWORD=${ROOT_PASSWORD}
+      - BLOSSOM_KAFKA=broker:9092
+      - BLOSSOM_MESSAGE_BROKER_HOST=message-broker
+      - BLOSSOM_MESSAGE_BROKER_PORT=27017
+      - BLOSSOM_MESSAGE_BROKER_USERNAME=${ROOT_USER_RELAY}
+      - BLOSSOM_MESSAGE_BROKER_PASSWORD=${ROOT_PASSWORD_RELAY}
+      - BLOSSOM_MESSAGE_PORT=8207
     depends_on:
       - message-service-db
       - message-broker
@@ -253,6 +325,17 @@ services:
     container_name: notification-service
     ports:
       - "8210:8210"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - BLOSSOM_NOTIFICATION_DB_HOST=notification-service-db
+      - BLOSSOM_NOTIFICATION_DB_PORT=27017
+      - BLOSSOM_NOTIFICATION_DB_NAME=notification-db
+      - BLOSSOM_KAFKA=broker:9092
+      - BLOSSOM_NOTIFICATION_BROKER_HOST=notification-broker
+      - BLOSSOM_NOTIFICATION_BROKER_PORT=27017
+      - BLOSSOM_NOTIFICATION_BROKER_USERNAME=${ROOT_USER_RELAY}
+      - BLOSSOM_NOTIFICATION_BROKER_PASSWORD=${ROOT_PASSWORD_RELAY}
+      - BLOSSOM_NOTIFICATION_PORT=8210
     depends_on:
       - notification-service-db
       - notification-broker

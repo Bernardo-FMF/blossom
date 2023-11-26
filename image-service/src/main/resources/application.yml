@@ -8,7 +8,7 @@ grpc:
 aws:
   region: ${BLOSSOM_S3_REGION}
   s3:
-    mock: true
+    mock: ${BLOSSOM_S3_MOCK}
     path: ${BLOSSOM_S3_PATH}
     buckets:
       imageBucket: ${BLOSSOM_S3_BUCKET}
