@@ -3,11 +3,11 @@ spring:
     name: Notification-Service
   data:
     mongodb:
-      host: localhost
-      port: 6386
-      database: notification-db
+      host: ${BLOSSOM_NOTIFICATION_DB_HOST}
+      port: ${BLOSSOM_NOTIFICATION_DB_PORT}
+      database: ${BLOSSOM_NOTIFICATION_DB_NAME}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${BLOSSOM_KAFKA}
     consumer:
       group-id: notificationListenerId
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -20,14 +20,13 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
 broker:
-  host: localhost
-  port: 9096
-  username: notification
-  password: rootnotification
+  host: ${BLOSSOM_NOTIFICATION_BROKER_HOST}
+  port: ${BLOSSOM_NOTIFICATION_BROKER_PORT}
+  username: ${BLOSSOM_NOTIFICATION_BROKER_USERNAME}
+  password: ${BLOSSOM_NOTIFICATION_BROKER_PASSWORD}
 server:
-  port: 8210
+  port: ${BLOSSOM_NOTIFICATION_PORT}
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-debug: true

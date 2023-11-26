@@ -1,13 +1,9 @@
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
 spring:
   application:
     name: Image-Service
 grpc:
   server:
-    port: 8188
+    port: ${BLOSSOM_IMAGE_GRPC_PORT}
     awaitTerminationInSeconds: 10
 aws:
   region: ${BLOSSOM_S3_REGION}
@@ -17,4 +13,8 @@ aws:
     buckets:
       imageBucket: ${BLOSSOM_S3_BUCKET}
 server:
-  port: 8185
+  port: ${BLOSSOM_IMAGE_PORT}
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

@@ -2,9 +2,9 @@ spring:
   application:
     name: Auth-Service
   datasource:
-    url: jdbc:postgresql://localhost:6380/postgres
-    username: postgres
-    password: rootauth
+    url: ${BLOSSOM_AUTH_DB}
+    username: ${BLOSSOM_AUTH_DB_USERNAME}
+    password: ${BLOSSOM_AUTH_DB_PASSWORD}
   flyway:
     baseline-on-migrate: true
   mail:
@@ -19,7 +19,7 @@ spring:
           starttls:
             enable: true
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${BLOSSOM_KAFKA}
     topics: user-resource-event-post, user-resource-event-social, user-resource-event-activity, user-resource-event-feed, user-resource-event-message
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -32,7 +32,7 @@ jwt:
   secret: ${BLOSSOM_JWT_SECRET}
   refresh: ${BLOSSOM_JWT_REFRESH}
 server:
-  port: 8182
+  port: ${BLOSSOM_AUTH_PORT}
 grpc:
   server:
     name: Image-Service

@@ -2,12 +2,12 @@ spring:
   application:
     name: Social-Graph-Service
   neo4j:
-    uri: bolt://localhost:6383
+    uri: ${BLOSSOM_SOCIAL_DB}
     authentication:
-      username: neo4j
-      password: social-graph-service
+      username: ${BLOSSOM_SOCIAL_DB_USERNAME}
+      password: ${BLOSSOM_SOCIAL_DB_PASSWORD}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${BLOSSOM_KAFKA}
     topic: social-follow-resource-event-message
     consumer:
       group-id: socialListenerId
@@ -21,10 +21,10 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
 server:
-  port: 8191
+  port: ${BLOSSOM_SOCIAL_PORT}
 grpc:
   server:
-    port: 8194
+    port: ${BLOSSOM_SOCIAL_GRPC_PORT}
     awaitTerminationInSeconds: 10
 eureka:
   client:

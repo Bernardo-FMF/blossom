@@ -3,13 +3,13 @@ spring:
     name: Feed-Service
   data:
     cassandra:
-      keyspace-name: feedSpace
-      contact-points: localhost
-      port: 6384
-      local-datacenter: datacenter1
+      keyspace-name: ${BLOSSOM_ACTIVITY_SPACE}
+      contact-points: ${BLOSSOM_ACTIVITY_HOST}
+      port: ${BLOSSOM_ACTIVITY_PORT}
+      local-datacenter: ${BLOSSOM_ACTIVITY_DATACENTER}
       schema-action: CREATE_IF_NOT_EXISTS
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${BLOSSOM_KAFKA}
     consumer:
       group-id: feedListenerId
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -22,8 +22,8 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
   redis:
-    host: localhost
-    port: 6378
+    host: ${BLOSSOM_FEED_CACHE_HOST}
+    port: ${BLOSSOM_FEED_CACHE_PORT}
 grpc:
   server:
     names:
@@ -32,7 +32,7 @@ grpc:
   client:
     awaitTerminationInSeconds: 10
 server:
-  port: 8204
+  port: ${BLOSSOM_FEED_PORT}
 eureka:
   client:
     service-url:

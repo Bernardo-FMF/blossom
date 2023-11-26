@@ -2,11 +2,11 @@ spring:
   application:
     name: Message-Service
   datasource:
-    url: jdbc:postgresql://localhost:6387/postgres
-    username: postgres
-    password: rootmessage
+    url: ${BLOSSOM_MESSAGE_DB}
+    username: ${BLOSSOM_MESSAGE_DB_USERNAME}
+    password: ${BLOSSOM_MESSAGE_DB_PASSWORD}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${BLOSSOM_KAFKA}
     topic: message-resource-event-notification
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -24,12 +24,12 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
 broker:
-  host: localhost
-  port: 9094
-  username: message
-  password: rootmessage
+  host: ${BLOSSOM_MESSAGE_BROKER_HOST}
+  port: ${BLOSSOM_MESSAGE_BROKER_PORT}
+  username: ${BLOSSOM_MESSAGE_BROKER_USERNAME}
+  password: ${BLOSSOM_MESSAGE_BROKER_PASSWORD}
 server:
-  port: 8207
+  port: ${BLOSSOM_MESSAGE_PORT}
 eureka:
   client:
     service-url:

@@ -3,11 +3,11 @@ spring:
     name: Post-Service
   data:
     mongodb:
-      host: localhost
-      port: 6385
-      database: post-db
+      host: ${BLOSSOM_NOTIFICATION_DB_HOST}
+      port: ${BLOSSOM_NOTIFICATION_DB_PORT}
+      database: ${BLOSSOM_NOTIFICATION_DB_NAME}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${BLOSSOM_KAFKA}
     topics: post-resource-event-feed, post-resource-event-activity
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -25,10 +25,10 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
   redis:
-    host: localhost
-    port: 6379
+    host: ${BLOSSOM_POST_CACHE_HOST}
+    port: ${BLOSSOM_POST_CACHE_PORT}
 server:
-  port: 8213
+  port: ${BLOSSOM_POST_PORT}
 grpc:
   server:
     name: Image-Service
