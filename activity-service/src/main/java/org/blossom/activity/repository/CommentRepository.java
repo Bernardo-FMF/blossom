@@ -19,7 +19,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     Page<Comment> findByUserId(int userId, Pageable pageable);
 
-    @Query(value = "SELECT NEW org.blossom.projection.CommentProjection(c.id, c.user.id, c.postId, c.commentContent, c.parentComment.id, c.createdAt, c.updatedAt, c.isDeleted, SUM(CASE WHEN r.id IS NOT NULL THEN 1 ELSE 0 END)) " +
+    @Query(value = "SELECT NEW org.blossom.projection.activity.CommentProjection(c.id, c.user.id, c.postId, c.commentContent, c.parentComment.id, c.createdAt, c.updatedAt, c.isDeleted, SUM(CASE WHEN r.id IS NOT NULL THEN 1 ELSE 0 END)) " +
             "FROM Comment c LEFT JOIN Comment r ON c.id = r.topLevelComment.id " +
             "WHERE c.postId = :postId AND c.parentComment IS NULL " +
             "GROUP BY c.id",
@@ -29,13 +29,13 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     @Query("SELECT c FROM Comment c WHERE c.topLevelComment.id = :topLevelCommentId")
     Page<Comment> findByTopLevelCommentId(@Param("topLevelCommentId") Integer topLevelCommentId, Pageable pageable);
 
-    @Query("SELECT NEW org.blossom.projection.CommentCountProjection(" +
+    @Query("SELECT NEW org.blossom.activity.projection.CommentCountProjection(" +
             "COALESCE(SUM(1), 0)) " +
             "FROM Comment c " +
             "WHERE c.postId = :postId")
     CommentCountProjection getCommentCountWithNoUser(@Param("postId") String postId);
 
-    @Query("SELECT NEW org.blossom.projection.CommentCountProjection(" +
+    @Query("SELECT NEW org.blossom.activity.projection.CommentCountProjection(" +
             "COALESCE(SUM(1), 0)," +
             "COUNT(CASE WHEN c.user.id = :userId THEN 1 END) > 0) " +
             "FROM Comment c " +
