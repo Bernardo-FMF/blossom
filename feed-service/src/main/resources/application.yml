@@ -3,10 +3,10 @@ spring:
     name: Feed-Service
   data:
     cassandra:
-      keyspace-name: ${BLOSSOM_ACTIVITY_SPACE}
-      contact-points: ${BLOSSOM_ACTIVITY_HOST}
-      port: ${BLOSSOM_ACTIVITY_PORT}
-      local-datacenter: ${BLOSSOM_ACTIVITY_DATACENTER}
+      keyspace-name: ${BLOSSOM_FEED_DB_SPACE}
+      contact-points: ${BLOSSOM_FEED_DB_HOST}
+      port: ${BLOSSOM_FEED_DB_PORT}
+      local-datacenter: ${BLOSSOM_FEED_DB_DATACENTER}
       schema-action: CREATE_IF_NOT_EXISTS
   kafka:
     bootstrap-servers: ${BLOSSOM_KAFKA}
