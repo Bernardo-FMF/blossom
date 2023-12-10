@@ -215,9 +215,9 @@ services:
       - "8213:8213"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - BLOSSOM_NOTIFICATION_DB_HOST=post-service-db
-      - BLOSSOM_NOTIFICATION_DB_PORT=27017
-      - BLOSSOM_NOTIFICATION_DB_NAME=post-db
+      - BLOSSOM_POST_DB_HOST=post-service-db
+      - BLOSSOM_POST_DB_PORT=27017
+      - BLOSSOM_POST_DB_NAME=post-db
       - BLOSSOM_KAFKA=broker:29092
       - BLOSSOM_POST_CACHE_HOST=post-service-cache
       - BLOSSOM_POST_CACHE_PORT=6379
