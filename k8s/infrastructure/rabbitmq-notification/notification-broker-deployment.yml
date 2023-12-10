@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose-windows-amd64.exe convert
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: notification-broker
+  name: notification-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: notification-broker
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose-windows-amd64.exe convert
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/compose-test-default: "true"
+        io.kompose.service: notification-broker
+    spec:
+      containers:
+        - env:
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: ROOT_PASSWORD_RELAY
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: ROOT_USER_RELAY
+          image: bernardofmf/blossom-custom-rabbitmq-stomp:latest
+          name: notification-broker
+          ports:
+            - containerPort: 15672
+              hostPort: 9095
+              protocol: TCP
+            - containerPort: 61613
+              hostPort: 9096
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}

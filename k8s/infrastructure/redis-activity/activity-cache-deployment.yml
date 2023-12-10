@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose-windows-amd64.exe convert
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: activity-service-cache
+  name: activity-service-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: activity-service-cache
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose-windows-amd64.exe convert
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/compose-test-default: "true"
+        io.kompose.service: activity-service-cache
+    spec:
+      containers:
+        - image: redis:7.2.3-bookworm
+          name: activity-service-cache
+          ports:
+            - containerPort: 6379
+              hostPort: 6377
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
