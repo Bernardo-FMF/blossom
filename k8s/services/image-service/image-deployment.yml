@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose-windows-amd64.exe convert
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: image-service
+  name: image-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: image-service
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose-windows-amd64.exe convert
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/compose-test-default: "true"
+        io.kompose.service: image-service
+    spec:
+      containers:
+        - env:
+            - name: BLOSSOM_IMAGE_GRPC_PORT
+              value: "8188"
+            - name: BLOSSOM_IMAGE_PORT
+              value: "8185"
+            - name: BLOSSOM_S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: S3_BUCKET
+            - name: BLOSSOM_S3_MOCK
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: S3_MOCK
+            - name: BLOSSOM_S3_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_S3_PATH
+            - name: BLOSSOM_S3_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: S3_REGION
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+          image: bernardofmf/blossom-image-service:latest
+          name: image-service
+          ports:
+            - containerPort: 8185
+              hostPort: 8185
+              protocol: TCP
+            - containerPort: 8188
+              hostPort: 8188
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}

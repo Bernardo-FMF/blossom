@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose-windows-amd64.exe convert
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: message-service
+  name: message-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: message-service
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose-windows-amd64.exe convert
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/compose-test-default: "true"
+        io.kompose.service: message-service
+    spec:
+      containers:
+        - env:
+            - name: BLOSSOM_KAFKA
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_KAFKA
+            - name: BLOSSOM_MESSAGE_BROKER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_MESSAGE_BROKER_HOST
+            - name: BLOSSOM_MESSAGE_BROKER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: ROOT_PASSWORD_RELAY
+            - name: BLOSSOM_MESSAGE_BROKER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_MESSAGE_BROKER_PORT
+            - name: BLOSSOM_MESSAGE_BROKER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: ROOT_USER_RELAY
+            - name: BLOSSOM_MESSAGE_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_MESSAGE_DB
+            - name: BLOSSOM_MESSAGE_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: ROOT_PASSWORD
+            - name: BLOSSOM_MESSAGE_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: ROOT_USER
+            - name: BLOSSOM_MESSAGE_PORT
+              value: "8207"
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+          image: bernardofmf/blossom-message-service:latest
+          name: message-service
+          ports:
+            - containerPort: 8207
+              hostPort: 8207
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}

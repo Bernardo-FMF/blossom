@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose-windows-amd64.exe convert
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: post-service
+  name: post-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: post-service
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose-windows-amd64.exe convert
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/compose-test-default: "true"
+        io.kompose.service: post-service
+    spec:
+      containers:
+        - env:
+            - name: BLOSSOM_KAFKA
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_KAFKA
+            - name: BLOSSOM_POST_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_POST_DB_HOST
+            - name: BLOSSOM_POST_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_POST_DB_NAME
+            - name: BLOSSOM_POST_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_POST_DB_PORT
+            - name: BLOSSOM_POST_CACHE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_POST_CACHE_HOST
+            - name: BLOSSOM_POST_CACHE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-config
+                  key: BLOSSOM_POST_CACHE_PORT
+            - name: BLOSSOM_POST_PORT
+              value: "8213"
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+          image: bernardofmf/blossom-post-service:latest
+          name: post-service
+          ports:
+            - containerPort: 8213
+              hostPort: 8213
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
