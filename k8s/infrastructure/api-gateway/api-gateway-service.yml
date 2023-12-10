@@ -9,13 +9,12 @@ metadata:
     io.kompose.service: api-gateway
   name: api-gateway
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - name: "8181"
       protocol: TCP
       port: 8181
       targetPort: 8181
-      nodePort: 30100
   selector:
     io.kompose.service: api-gateway
 status:
