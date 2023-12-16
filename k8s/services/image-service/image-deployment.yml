@@ -51,9 +51,10 @@ spec:
                   name: blossom-secret
                   key: S3_REGION
             - name: SPRING_PROFILES_ACTIVE
-              value: docker
+              value: kubernetes
           image: bernardofmf/blossom-image-service:latest
           name: image-service
+          imagePullPolicy: Always
           ports:
             - containerPort: 8185
               hostPort: 8185

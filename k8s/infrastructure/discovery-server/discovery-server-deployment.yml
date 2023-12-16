@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     kompose.cmd: kompose-windows-amd64.exe convert
@@ -13,7 +13,6 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: discovery-server
-  strategy: {}
   template:
     metadata:
       annotations:
@@ -27,9 +26,12 @@ spec:
       containers:
         - env:
             - name: SPRING_PROFILES_ACTIVE
-              value: docker
+              value: kubernetes
+            - name: EUREKA_SERVER_ADDRESS
+              value: http://discovery-server:8761/eureka
           image: bernardofmf/blossom-discovery-server:latest
           name: discovery-server
+          imagePullPolicy: Always
           ports:
             - containerPort: 8761
               hostPort: 8761

@@ -29,9 +29,10 @@ spec:
             - name: BLOSSOM_GATEWAY_PORT
               value: "8181"
             - name: SPRING_PROFILES_ACTIVE
-              value: docker
+              value: kubernetes
           image: bernardofmf/blossom-api-gateway:latest
           name: api-gateway
+          imagePullPolicy: Always
           ports:
             - containerPort: 8181
               hostPort: 8181

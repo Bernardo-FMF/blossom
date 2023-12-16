@@ -64,9 +64,10 @@ spec:
                   name: blossom-config
                   key: BLOSSOM_KAFKA
             - name: SPRING_PROFILES_ACTIVE
-              value: docker
+              value: kubernetes
           image: bernardofmf/blossom-feed-service:latest
           name: feed-service
+          imagePullPolicy: Always
           ports:
             - containerPort: 8204
               hostPort: 8204

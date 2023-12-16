@@ -38,6 +38,7 @@ spec:
                   key: ROOT_USER_RELAY
           image: bernardofmf/blossom-custom-rabbitmq-stomp:latest
           name: message-broker
+          imagePullPolicy: Always
           ports:
             - containerPort: 15672
               hostPort: 9093

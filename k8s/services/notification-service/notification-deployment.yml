@@ -69,9 +69,10 @@ spec:
             - name: BLOSSOM_NOTIFICATION_PORT
               value: "8210"
             - name: SPRING_PROFILES_ACTIVE
-              value: docker
+              value: kubernetes
           image: bernardofmf/blossom-notification-service:latest
           name: notification-service
+          imagePullPolicy: Always
           ports:
             - containerPort: 8210
               hostPort: 8210

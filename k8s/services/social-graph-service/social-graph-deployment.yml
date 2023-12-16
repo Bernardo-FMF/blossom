@@ -51,9 +51,10 @@ spec:
             - name: BLOSSOM_SOCIAL_PORT
               value: "8191"
             - name: SPRING_PROFILES_ACTIVE
-              value: docker
+              value: kubernetes
           image: bernardofmf/blossom-social-graph-service:latest
           name: social-graph-service
+          imagePullPolicy: Always
           ports:
             - containerPort: 8191
               hostPort: 8191
