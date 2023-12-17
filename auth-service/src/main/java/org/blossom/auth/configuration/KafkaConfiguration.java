@@ -1,4 +1,4 @@
-package org.blossom.auth.kafka;
+package org.blossom.auth.configuration;
 
 import jakarta.annotation.PostConstruct;
 import org.blossom.model.ResourceEvent;

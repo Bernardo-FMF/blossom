@@ -21,8 +21,4 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleEnum name;
-
-    public static Role.RoleBuilder buildRole() {
-        return builder();
-    }
 }

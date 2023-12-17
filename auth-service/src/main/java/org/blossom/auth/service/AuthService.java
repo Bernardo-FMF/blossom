@@ -1,23 +1,18 @@
 package org.blossom.auth.service;
 
-import org.blossom.auth.delta.DeltaEngine;
-import org.blossom.auth.delta.markable.UserMarkable;
 import org.blossom.auth.dto.PasswordChangeDto;
 import org.blossom.auth.dto.PasswordRecoveryDto;
 import org.blossom.auth.dto.RegisterDto;
 import org.blossom.auth.dto.UserDto;
 import org.blossom.auth.email.EmailService;
 import org.blossom.auth.entity.PasswordReset;
-import org.blossom.auth.entity.Role;
 import org.blossom.auth.entity.User;
-import org.blossom.auth.enums.RoleEnum;
 import org.blossom.auth.exception.*;
+import org.blossom.auth.factory.impl.UserFactory;
 import org.blossom.auth.kafka.KafkaMessageService;
-import org.blossom.auth.mapper.UserDtoMapper;
-import org.blossom.auth.repository.RoleRepository;
 import org.blossom.auth.repository.TokenRepository;
 import org.blossom.auth.repository.UserRepository;
-import org.blossom.auth.security.TokenGenerator;
+import org.blossom.auth.strategy.impl.JwtTokenStrategy;
 import org.blossom.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,16 +32,13 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private UserFactory userFactory;
 
     @Autowired
     private TokenRepository tokenRepository;
 
     @Autowired
-    private UserDtoMapper userDtoMapper;
-
-    @Autowired
-    private TokenGenerator tokenGenerator;
+    private JwtTokenStrategy jwtTokenStrategy;
 
     @Autowired
     private EmailService emailService;
@@ -64,13 +57,12 @@ public class AuthService {
             throw new EmailInUseException("Email is already in use");
         }
 
-        Optional<Role> role = roleRepository.findByName(RoleEnum.USER);
-
-        if (role.isEmpty()) {
+        User factoryUser = userFactory.buildEntity(registerDto);
+        if (Objects.isNull(factoryUser)) {
             throw new NoRoleFoundException("User role is not present");
         }
 
-        User newUser = userRepository.save(userDtoMapper.mapToUser(registerDto, role.get()));
+        User newUser = userRepository.save(factoryUser);
 
         messageService.publishCreation(newUser);
         return "User registered successfully";
@@ -86,11 +78,11 @@ public class AuthService {
             throw new UsernameNotFoundException("User is not active");
         }
 
-        return tokenGenerator.generateToken(user.get());
+        return jwtTokenStrategy.generateToken(user.get());
     }
 
     public TokenDto validateToken(String token) throws UserNotFoundException {
-        TokenDto tokenDto = tokenGenerator.validateToken(token);
+        TokenDto tokenDto = jwtTokenStrategy.validateToken(token);
         if (!userRepository.existsById(tokenDto.getUserId())) {
             throw new UserNotFoundException("User does not exist");
         }
@@ -103,26 +95,18 @@ public class AuthService {
             throw new EmailNotInUseException("Email not in use");
         }
 
-        String token = tokenGenerator.generateUuidToken();
+        String token = jwtTokenStrategy.generateGenericToken();
 
         User user = optionalUser.get();
 
-        UserMarkable userMarkable = new UserMarkable()
-                .markResetPasswordToken(
-                        PasswordReset.builder()
-                                .user(user)
-                                .id(user.getId())
-                                .token(token)
-                                .expirationDate(LocalDateTime.now().plusHours(1))
-                                .build());
+        PasswordReset passwordReset = PasswordReset.builder()
+                .user(user)
+                .id(user.getId())
+                .token(token)
+                .expirationDate(LocalDateTime.now().plusHours(1))
+                .build();
 
-        DeltaEngine<UserMarkable, User> deltaEngine = new DeltaEngine<>((markable, entity) -> {
-            if (markable.isMarkedResetPasswordToken()) {
-                entity.setPasswordResetToken(markable.getDelegate().getPasswordResetToken());
-            }
-        });
-
-        deltaEngine.applyDelta(userMarkable, user);
+        user.setPasswordResetToken(passwordReset);
 
         userRepository.save(user);
 
@@ -154,16 +138,7 @@ public class AuthService {
             throw new InvalidTokenException("Token has expired");
         }
 
-        UserMarkable userMarkable = new UserMarkable()
-                .markPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
-
-        DeltaEngine<UserMarkable, User> deltaEngine = new DeltaEngine<>((markable, entity) -> {
-            if (markable.isMarkedPassword()) {
-                entity.setPassword(markable.getDelegate().getPassword());
-            }
-        });
-
-        deltaEngine.applyDelta(userMarkable, user);
+        user.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
 
         PasswordReset passwordReset = user.getPasswordResetToken();
 

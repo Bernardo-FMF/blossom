@@ -1,4 +1,4 @@
-package org.blossom.auth.email;
+package org.blossom.auth.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

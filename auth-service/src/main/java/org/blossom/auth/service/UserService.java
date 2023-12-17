@@ -1,7 +1,5 @@
 package org.blossom.auth.service;
 
-import org.blossom.auth.delta.DeltaEngine;
-import org.blossom.auth.delta.markable.UserMarkable;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.UserNotFoundException;
@@ -44,16 +42,7 @@ public class UserService {
 
         String url = imageService.uploadImage(file);
 
-        UserMarkable userMarkable = new UserMarkable()
-                .markImageUrl(url);
-
-        DeltaEngine<UserMarkable, User> deltaEngine = new DeltaEngine<>((markable, entity) -> {
-            if (markable.isMarkedImageUrl()) {
-                entity.setImageUrl(markable.getDelegate().getImageUrl());
-            }
-        });
-
-        deltaEngine.applyDelta(userMarkable, user);
+        user.setImageUrl(url);
 
         userRepository.save(user);
 

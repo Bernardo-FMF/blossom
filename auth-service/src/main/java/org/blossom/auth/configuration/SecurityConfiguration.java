@@ -1,5 +1,6 @@
 package org.blossom.auth.configuration;
 
+import org.blossom.auth.service.CustomUserDetailsService;
 import org.blossom.filter.CommonUserDetailsFilter;
 import org.blossom.jwt.RoleParser;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +39,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());

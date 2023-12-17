@@ -1,4 +1,4 @@
-package org.blossom.auth.grpc.client;
+package org.blossom.auth.configuration;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

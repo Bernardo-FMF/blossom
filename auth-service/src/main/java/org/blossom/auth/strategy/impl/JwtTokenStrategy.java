@@ -1,4 +1,4 @@
-package org.blossom.auth.security;
+package org.blossom.auth.strategy.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.blossom.auth.entity.User;
+import org.blossom.auth.strategy.interfac.ITokenStrategy;
 import org.blossom.jwt.RoleParser;
 import org.blossom.model.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-public class TokenGenerator {
+public class JwtTokenStrategy implements ITokenStrategy {
     @Autowired
     private RoleParser roleParser;
 
@@ -31,10 +32,21 @@ public class TokenGenerator {
     @Value("${jwt.refresh}")
     private int refresh;
 
-    public String generateUuidToken() {
+    @Override
+    public String generateGenericToken() {
         return UUID.randomUUID().toString();
     }
 
+    @Override
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        String userRoles = StringUtils.collectionToCommaDelimitedString(user.getAuthorities());
+        claims.put("roles", userRoles);
+        claims.put("username", user.getUsername());
+        return createToken(claims, user.getId());
+    }
+
+    @Override
     public TokenDto validateToken(final String token) {
         Claims claims = extractClaims(token);
 
@@ -57,14 +69,6 @@ public class TokenGenerator {
     private boolean isTokenExpired(String token) {
         Date expirationDate = extractClaims(token).getExpiration();
         return expirationDate.before(new Date());
-    }
-
-    public String generateToken(User user) {
-        Map<String, Object> claims = new HashMap<>();
-        String userRoles = StringUtils.collectionToCommaDelimitedString(user.getAuthorities());
-        claims.put("roles", userRoles);
-        claims.put("username", user.getUsername());
-        return createToken(claims, user.getId());
     }
 
     private String createToken(Map<String, Object> claims, int userId) {
