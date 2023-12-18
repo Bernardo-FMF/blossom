@@ -27,7 +27,7 @@ public abstract class AbstractContextBeans extends AbstractTestContainers {
     private ManagedChannel managedChannel;
 
     @MockBean
-    private static EmailService emailService;
+    protected EmailService emailService;
 
     @PostConstruct
     void setup() {
