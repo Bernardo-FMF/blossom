@@ -45,7 +45,7 @@ public class EmailService {
             helper.setText(thymeleafService.createContent("password-recovery.html", variables), true);
             helper.setSubject("Blossom: Password Recovery");
             mailSender.send(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

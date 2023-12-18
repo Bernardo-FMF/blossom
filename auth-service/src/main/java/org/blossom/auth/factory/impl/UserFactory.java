@@ -27,7 +27,7 @@ public class UserFactory implements IEntityFactory<User, RegisterDto> {
 
     @PostConstruct
     void memoizeDefaultRole() {
-        if (memoizedRole.get() != null) {
+        if (memoizedRole != null && memoizedRole.get() != null) {
             return;
         }
 
