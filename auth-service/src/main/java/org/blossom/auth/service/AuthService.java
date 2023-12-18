@@ -1,9 +1,6 @@
 package org.blossom.auth.service;
 
-import org.blossom.auth.dto.PasswordChangeDto;
-import org.blossom.auth.dto.PasswordRecoveryDto;
-import org.blossom.auth.dto.RegisterDto;
-import org.blossom.auth.dto.UserDto;
+import org.blossom.auth.dto.*;
 import org.blossom.auth.email.EmailService;
 import org.blossom.auth.entity.PasswordReset;
 import org.blossom.auth.entity.User;
@@ -46,7 +43,7 @@ public class AuthService {
     @Autowired
     private KafkaMessageService messageService;
 
-    public String saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
+    public GenericResponseDto saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
         registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
         if (userRepository.existsByUsername(registerDto.getUsername())) {
@@ -65,7 +62,11 @@ public class AuthService {
         User newUser = userRepository.save(factoryUser);
 
         messageService.publishCreation(newUser);
-        return "User registered successfully";
+
+        return GenericResponseDto.builder()
+                .responseMessage("User registered successfully")
+                .resourceId(newUser.getId())
+                .build();
     }
 
     public String generateToken(String username) {
@@ -89,7 +90,7 @@ public class AuthService {
         return tokenDto;
     }
 
-    public String requestPasswordRecovery(PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
+    public GenericResponseDto requestPasswordRecovery(PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
         Optional<User> optionalUser = userRepository.findByEmail(passwordRecoveryDto.getEmail());
         if (optionalUser.isEmpty()) {
             throw new EmailNotInUseException("Email not in use");
@@ -119,10 +120,13 @@ public class AuthService {
                         .expirationDate(user.getPasswordResetToken().getExpirationDate())
                         .build());
 
-        return "Password recovery request completed successfully";
+        return GenericResponseDto.builder()
+                .responseMessage("Password recovery request completed successfully")
+                .resourceId(user.getId())
+                .build();
     }
 
-    public String changePassword(PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
+    public GenericResponseDto changePassword(PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
         Optional<User> optionalUser = userRepository.findById(passwordChangeDto.getUserId());
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
@@ -147,6 +151,9 @@ public class AuthService {
         userRepository.save(user);
         tokenRepository.delete(passwordReset);
 
-        return "Password changed successfully";
+        return GenericResponseDto.builder()
+                .responseMessage("Password changed successfully")
+                .resourceId(user.getId())
+                .build();
     }
 }

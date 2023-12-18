@@ -10,4 +10,13 @@ public class RegisterDto {
     private String fullName;
     private String username;
     private String password;
+
+    @Override
+    public String toString() {
+        return "RegisterDto{" +
+                "email='" + email + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

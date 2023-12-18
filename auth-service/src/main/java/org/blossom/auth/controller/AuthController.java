@@ -1,5 +1,6 @@
 package org.blossom.auth.controller;
 
+import lombok.extern.log4j.Log4j2;
 import org.blossom.auth.dto.*;
 import org.blossom.auth.exception.*;
 import org.blossom.auth.service.AuthService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Log4j2
 public class AuthController {
     @Autowired
     private AuthService authService;
@@ -27,12 +29,14 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
+    public ResponseEntity<GenericResponseDto> register(@RequestBody RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
+        log.info("Received request on endpoint /register: Creating user with username: {}; email: {}; name: {}", registerDto.getUsername(), registerDto.getEmail(), registerDto.getFullName());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.saveUser(registerDto));
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) throws LoginCredentialsException {
+        log.info("Received request on endpoint /login: Login user {}", loginDto.getUsername());
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
         if (authenticate.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(authService.generateToken(loginDto.getUsername()));
@@ -43,21 +47,25 @@ public class AuthController {
 
     @GetMapping("/validate")
     public ResponseEntity<TokenDto> validate(@RequestParam("token") String token) throws UserNotFoundException {
+        log.info("Received request on endpoint /validate: Validating token {}", token);
         return ResponseEntity.status(HttpStatus.OK).body(authService.validateToken(token));
     }
 
     @PostMapping("/password-recovery-request")
-    public ResponseEntity<String> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
+    public ResponseEntity<GenericResponseDto> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
+        log.info("Received request on endpoint /password-recovery-request: Recovering password for user {}", passwordRecoveryDto.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.requestPasswordRecovery(passwordRecoveryDto));
     }
 
     @PostMapping("/password-recovery")
-    public ResponseEntity<String> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
+    public ResponseEntity<GenericResponseDto> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
+        log.info("Received request on endpoint /password-recovery: Recovering password for user {}", passwordChangeDto.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.changePassword(passwordChangeDto));
     }
 
     @GetMapping("/self")
     public ResponseEntity<SimplifiedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
+        log.info("Received request on endpoint /self: Getting logged in user {}", ((CommonUserDetails) authentication.getPrincipal()).getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

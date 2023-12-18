@@ -1,5 +1,6 @@
 package org.blossom.auth.service;
 
+import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.UserNotFoundException;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -28,7 +30,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public String updateUserImage(int userId, MultipartFile file)
+    public GenericResponseDto updateUserImage(int userId, MultipartFile file)
             throws UserNotFoundException, IOException, InterruptedException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
@@ -48,7 +50,11 @@ public class UserService {
 
         messageService.publishUpdate(user);
 
-        return url;
+        return GenericResponseDto.builder()
+                .responseMessage("Password changed successfully")
+                .resourceId(user.getId())
+                .metadata(Map.of("url", url))
+                .build();
     }
 
     public SimplifiedUserDto getUserById(Integer userId) throws UserNotFoundException {

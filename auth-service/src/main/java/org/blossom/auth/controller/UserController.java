@@ -1,5 +1,6 @@
 package org.blossom.auth.controller;
 
+import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.service.UserService;
@@ -21,7 +22,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateProfileImage(@RequestParam("file") MultipartFile file, Authentication authentication)
+    public ResponseEntity<GenericResponseDto> updateProfileImage(@RequestParam("file") MultipartFile file, Authentication authentication)
             throws IOException, InterruptedException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserImage(((CommonUserDetails) authentication.getPrincipal()).getUserId(), file));
     }
