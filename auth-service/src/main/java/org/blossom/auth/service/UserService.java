@@ -51,7 +51,7 @@ public class UserService {
         messageService.publishUpdate(user);
 
         return GenericResponseDto.builder()
-                .responseMessage("Password changed successfully")
+                .responseMessage("Image changed successfully")
                 .resourceId(user.getId())
                 .metadata(Map.of("url", url))
                 .build();

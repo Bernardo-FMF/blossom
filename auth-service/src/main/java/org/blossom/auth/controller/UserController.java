@@ -1,5 +1,6 @@
 package org.blossom.auth.controller;
 
+import lombok.extern.log4j.Log4j2;
 import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.exception.UserNotFoundException;
@@ -17,6 +18,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@Log4j2
 public class UserController {
     @Autowired
     private UserService userService;
@@ -24,11 +26,14 @@ public class UserController {
     @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GenericResponseDto> updateProfileImage(@RequestParam("file") MultipartFile file, Authentication authentication)
             throws IOException, InterruptedException, UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserImage(((CommonUserDetails) authentication.getPrincipal()).getUserId(), file));
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /user/profile-image: Updating profile image for user with id {}", userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserImage(userId, file));
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<SimplifiedUserDto> getUserById(@PathVariable("userId") Integer userId) throws UserNotFoundException {
+        log.info("Received request on endpoint /user/{userId}: Fetching user with id {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
     }
 }

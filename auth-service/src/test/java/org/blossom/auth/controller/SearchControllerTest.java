@@ -23,12 +23,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SearchControllerTest extends CommonRequestHelper {
-    public static final String USERNAME_1 = "default";
-    public static final String EMAIL_1 = "default@test.pt";
-    public static final String NAME_1 = "Default";
-    public static final String PASSWORD_1 = "password";
+    private static final String USERNAME_1 = "default";
+    private static final String EMAIL_1 = "default@test.pt";
+    private static final String NAME_1 = "Default";
+    private static final String PASSWORD_1 = "password";
 
-    static HashMap<String, Set<Integer>> patternMap = new HashMap<>();
+    private static final HashMap<String, Set<Integer>> patternMap = new HashMap<>();
 
     @Order(1)
     @Test

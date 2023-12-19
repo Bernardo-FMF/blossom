@@ -6,6 +6,7 @@ import org.flywaydb.core.api.output.ValidateResult;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -13,6 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Log4j2
 public abstract class AbstractTestContainers {
     @Container
@@ -68,5 +70,8 @@ public abstract class AbstractTestContainers {
 
             Assertions.assertFalse(postgreSQLContainer.isRunning());
         }
+
+        kafkaContainer.stop();
+        Assertions.assertFalse(kafkaContainer.isRunning());
     }
 }

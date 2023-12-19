@@ -26,10 +26,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AuthControllerTest extends CommonRequestHelper {
-    public static final String USERNAME_1 = "johnDoe01";
-    public static final String EMAIL_1 = "john.doe@test.pt";
-    public static final String NAME_1 = "John Doe";
-    public static final String PASSWORD_1 = "password";
+    private static final String USERNAME_1 = "johnDoe01";
+    private static final String EMAIL_1 = "john.doe@test.pt";
+    private static final String NAME_1 = "John Doe";
+    private static final String PASSWORD_1 = "password";
 
     @Order(1)
     @Test

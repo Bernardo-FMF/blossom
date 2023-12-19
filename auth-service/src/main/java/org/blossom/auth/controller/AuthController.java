@@ -30,38 +30,39 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<GenericResponseDto> register(@RequestBody RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
-        log.info("Received request on endpoint /register: Creating user with username: {}; email: {}; name: {}", registerDto.getUsername(), registerDto.getEmail(), registerDto.getFullName());
+        log.info("Received request on endpoint /auth/register: Creating user with username: {}; email: {}; name: {}", registerDto.getUsername(), registerDto.getEmail(), registerDto.getFullName());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.saveUser(registerDto));
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) throws LoginCredentialsException {
-        log.info("Received request on endpoint /login: Login user {}", loginDto.getUsername());
+        log.info("Received request on endpoint /auth/login: Login user {}", loginDto.getUsername());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.generateToken(loginDto.getUsername()));
     }
 
     @GetMapping("/validate")
     public ResponseEntity<TokenDto> validate(@RequestParam("token") String token) throws UserNotFoundException {
-        log.info("Received request on endpoint /validate: Validating token {}", token);
+        log.info("Received request on endpoint /auth/validate: Validating token {}", token);
         return ResponseEntity.status(HttpStatus.OK).body(authService.validateToken(token));
     }
 
     @PostMapping("/password-recovery-request")
     public ResponseEntity<GenericResponseDto> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
-        log.info("Received request on endpoint /password-recovery-request: Recovering password for user {}", passwordRecoveryDto.getEmail());
+        log.info("Received request on endpoint /auth/password-recovery-request: Recovering password for user {}", passwordRecoveryDto.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.requestPasswordRecovery(passwordRecoveryDto));
     }
 
     @PostMapping("/password-recovery")
     public ResponseEntity<GenericResponseDto> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
-        log.info("Received request on endpoint /password-recovery: Recovering password for user {}", passwordChangeDto.getUserId());
+        log.info("Received request on endpoint /auth/password-recovery: Recovering password for user {}", passwordChangeDto.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.changePassword(passwordChangeDto));
     }
 
     @GetMapping("/self")
     public ResponseEntity<SimplifiedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
-        log.info("Received request on endpoint /self: Getting logged in user {}", ((CommonUserDetails) authentication.getPrincipal()).getUserId());
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/self: Getting logged in user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
     }
 }
