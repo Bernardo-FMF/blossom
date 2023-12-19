@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -38,12 +37,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDto loginDto) throws LoginCredentialsException {
         log.info("Received request on endpoint /login: Login user {}", loginDto.getUsername());
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-            return ResponseEntity.status(HttpStatus.CREATED).body(authService.generateToken(loginDto.getUsername()));
-        } catch (BadCredentialsException ex) {
-            throw new LoginCredentialsException("Bad credentials");
-        }
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.generateToken(loginDto.getUsername()));
     }
 
     @GetMapping("/validate")
@@ -59,7 +54,7 @@ public class AuthController {
     }
 
     @PostMapping("/password-recovery")
-    public ResponseEntity<GenericResponseDto> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
+    public ResponseEntity<GenericResponseDto> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
         log.info("Received request on endpoint /password-recovery: Recovering password for user {}", passwordChangeDto.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.changePassword(passwordChangeDto));
     }

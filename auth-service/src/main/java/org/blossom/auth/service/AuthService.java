@@ -93,7 +93,7 @@ public class AuthService {
     public GenericResponseDto requestPasswordRecovery(PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
         Optional<User> optionalUser = userRepository.findByEmail(passwordRecoveryDto.getEmail());
         if (optionalUser.isEmpty()) {
-            throw new EmailNotInUseException("Email not in use");
+            throw new EmailNotInUseException("User with that email does not exist");
         }
 
         String token = jwtTokenStrategy.generateGenericToken();
@@ -126,13 +126,17 @@ public class AuthService {
                 .build();
     }
 
-    public GenericResponseDto changePassword(PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException {
+    public GenericResponseDto changePassword(PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
         Optional<User> optionalUser = userRepository.findById(passwordChangeDto.getUserId());
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
         }
 
         User user = optionalUser.get();
+
+        if (Objects.isNull(user.getPasswordResetToken())) {
+            throw new TokenNotFoundException("Token was not requested for this user");
+        }
 
         if (!user.getPasswordResetToken().getToken().equals(passwordChangeDto.getToken())) {
             throw new InvalidTokenException("Token is invalid");
