@@ -7,6 +7,8 @@ import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.*;
 import org.blossom.auth.factory.impl.UserFactory;
 import org.blossom.auth.kafka.KafkaMessageService;
+import org.blossom.auth.mapper.impl.GenericDtoMapper;
+import org.blossom.auth.mapper.impl.UserDtoMapper;
 import org.blossom.auth.repository.TokenRepository;
 import org.blossom.auth.repository.UserRepository;
 import org.blossom.auth.strategy.impl.JwtTokenStrategy;
@@ -43,6 +45,12 @@ public class AuthService {
     @Autowired
     private KafkaMessageService messageService;
 
+    @Autowired
+    private GenericDtoMapper genericDtoMapper;
+
+    @Autowired
+    private UserDtoMapper userDtoMapper;
+
     public GenericResponseDto saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
         registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
@@ -63,10 +71,7 @@ public class AuthService {
 
         messageService.publishCreation(newUser);
 
-        return GenericResponseDto.builder()
-                .responseMessage("User registered successfully")
-                .resourceId(newUser.getId())
-                .build();
+        return genericDtoMapper.toDto("User registered successfully", newUser.getId(), null);
     }
 
     public String generateToken(String username) {
@@ -87,6 +92,7 @@ public class AuthService {
         if (!userRepository.existsById(tokenDto.getUserId())) {
             throw new UserNotFoundException("User does not exist");
         }
+
         return tokenDto;
     }
 
@@ -111,19 +117,9 @@ public class AuthService {
 
         userRepository.save(user);
 
-        emailService.sendPasswordRecoveryEmail(
-                UserDto.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .username(user.getUsername())
-                        .token(user.getPasswordResetToken().getToken())
-                        .expirationDate(user.getPasswordResetToken().getExpirationDate())
-                        .build());
+        emailService.sendPasswordRecoveryEmail(userDtoMapper.toDto(user));
 
-        return GenericResponseDto.builder()
-                .responseMessage("Password recovery request completed successfully")
-                .resourceId(user.getId())
-                .build();
+        return genericDtoMapper.toDto("Password recovery request completed successfully", user.getId(), null);
     }
 
     public GenericResponseDto changePassword(PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
@@ -155,9 +151,6 @@ public class AuthService {
         userRepository.save(user);
         tokenRepository.delete(passwordReset);
 
-        return GenericResponseDto.builder()
-                .responseMessage("Password changed successfully")
-                .resourceId(user.getId())
-                .build();
+        return genericDtoMapper.toDto("Password changed successfully", user.getId(), null);
     }
 }

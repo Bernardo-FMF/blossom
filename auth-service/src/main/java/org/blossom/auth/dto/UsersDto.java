@@ -9,8 +9,5 @@ import java.util.Set;
 @Builder
 public class UsersDto {
     Set<SimplifiedUserDto> users;
-    long totalPages;
-    long currentPage;
-    long totalElements;
-    boolean eof;
+    PaginationInfoDto paginationInfo;
 }

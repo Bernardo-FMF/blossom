@@ -6,7 +6,8 @@ import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.grpc.GrpcClientImageService;
 import org.blossom.auth.kafka.KafkaMessageService;
-import org.blossom.auth.mapper.UserMapper;
+import org.blossom.auth.mapper.impl.GenericDtoMapper;
+import org.blossom.auth.mapper.impl.UsersDtoMapper;
 import org.blossom.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,10 @@ public class UserService {
     private KafkaMessageService messageService;
 
     @Autowired
-    private UserMapper userMapper;
+    private UsersDtoMapper usersDtoMapper;
+
+    @Autowired
+    private GenericDtoMapper genericDtoMapper;
 
     public GenericResponseDto updateUserImage(int userId, MultipartFile file)
             throws UserNotFoundException, IOException, InterruptedException {
@@ -50,11 +54,7 @@ public class UserService {
 
         messageService.publishUpdate(user);
 
-        return GenericResponseDto.builder()
-                .responseMessage("Image changed successfully")
-                .resourceId(user.getId())
-                .metadata(Map.of("url", url))
-                .build();
+        return genericDtoMapper.toDto("Image changed successfully", user.getId(), Map.of("url", url));
     }
 
     public SimplifiedUserDto getUserById(Integer userId) throws UserNotFoundException {
@@ -64,6 +64,6 @@ public class UserService {
         }
         User user = optionalUser.get();
 
-        return userMapper.mapToSimplifiedUser(user);
+        return usersDtoMapper.toDto(user);
     }
 }
