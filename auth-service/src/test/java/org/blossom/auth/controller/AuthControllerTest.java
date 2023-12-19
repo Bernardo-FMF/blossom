@@ -1,15 +1,13 @@
 package org.blossom.auth.controller;
 
-import org.blossom.auth.AbstractContextBeans;
+import org.blossom.auth.CommonRequestHelper;
 import org.blossom.auth.dto.*;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.model.ErrorMessage;
-import org.blossom.auth.repository.UserRepository;
 import org.blossom.model.dto.TokenDto;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -27,30 +25,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AuthControllerTest extends AbstractContextBeans {
+class AuthControllerTest extends CommonRequestHelper {
     public static final String USERNAME_1 = "johnDoe01";
     public static final String EMAIL_1 = "john.doe@test.pt";
     public static final String NAME_1 = "John Doe";
     public static final String PASSWORD_1 = "password";
 
-    @Autowired
-    private UserRepository userRepository;
-
     @Order(1)
     @Test
     void registerUser_successfulRegistration() throws Exception {
-        RegisterDto registerDto = new RegisterDto();
-        registerDto.setUsername(USERNAME_1);
-        registerDto.setEmail(EMAIL_1);
-        registerDto.setFullName(NAME_1);
-        registerDto.setPassword(PASSWORD_1);
-
-        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registerDto)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+        MvcResult registerResult = registerUser(USERNAME_1, EMAIL_1, NAME_1, PASSWORD_1, MockMvcResultMatchers.status().isCreated());
 
         GenericResponseDto responseDto = objectMapper.readValue(registerResult.getResponse().getContentAsString(), GenericResponseDto.class);
 
@@ -71,18 +55,7 @@ class AuthControllerTest extends AbstractContextBeans {
     @Order(2)
     @Test
     void registerUser_errorUsernameAlreadyExists() throws Exception {
-        RegisterDto registerDto = new RegisterDto();
-        registerDto.setUsername(USERNAME_1);
-        registerDto.setEmail(EMAIL_1);
-        registerDto.setFullName(NAME_1);
-        registerDto.setPassword(PASSWORD_1);
-
-        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registerDto)))
-                .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+        MvcResult registerResult = registerUser(USERNAME_1, EMAIL_1, NAME_1, PASSWORD_1, MockMvcResultMatchers.status().isConflict());
 
         ErrorMessage errorDto = objectMapper.readValue(registerResult.getResponse().getContentAsString(), ErrorMessage.class);
         Assertions.assertEquals("Username is already in use", errorDto.getMessage());
@@ -92,18 +65,7 @@ class AuthControllerTest extends AbstractContextBeans {
     @Order(3)
     @Test
     void registerUser_errorEmailAlreadyExists() throws Exception {
-        RegisterDto registerDto = new RegisterDto();
-        registerDto.setUsername(USERNAME_1 + "Mock");
-        registerDto.setEmail(EMAIL_1);
-        registerDto.setFullName(NAME_1);
-        registerDto.setPassword(PASSWORD_1);
-
-        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registerDto)))
-                .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+        MvcResult registerResult = registerUser(USERNAME_1 + "Mock", EMAIL_1, NAME_1, PASSWORD_1, MockMvcResultMatchers.status().isConflict());
 
         ErrorMessage errorDto = objectMapper.readValue(registerResult.getResponse().getContentAsString(), ErrorMessage.class);
         Assertions.assertEquals("Email is already in use", errorDto.getMessage());
