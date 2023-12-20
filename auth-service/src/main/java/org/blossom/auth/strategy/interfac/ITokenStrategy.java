@@ -7,5 +7,4 @@ import org.springframework.security.oauth2.jwt.BadJwtException;
 public interface ITokenStrategy {
     String generateToken(User user);
     TokenDto validateToken(String token) throws BadJwtException;
-    String generateGenericToken();
 }

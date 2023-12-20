@@ -5,6 +5,7 @@ import org.blossom.auth.email.EmailService;
 import org.blossom.auth.entity.PasswordReset;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.*;
+import org.blossom.auth.factory.impl.PasswordResetFactory;
 import org.blossom.auth.factory.impl.UserFactory;
 import org.blossom.auth.kafka.KafkaMessageService;
 import org.blossom.auth.mapper.impl.GenericDtoMapper;
@@ -32,6 +33,9 @@ public class AuthService {
 
     @Autowired
     private UserFactory userFactory;
+
+    @Autowired
+    private PasswordResetFactory passwordResetFactory;
 
     @Autowired
     private TokenRepository tokenRepository;
@@ -102,16 +106,9 @@ public class AuthService {
             throw new EmailNotInUseException("User with that email does not exist");
         }
 
-        String token = jwtTokenStrategy.generateGenericToken();
-
         User user = optionalUser.get();
 
-        PasswordReset passwordReset = PasswordReset.builder()
-                .user(user)
-                .id(user.getId())
-                .token(token)
-                .expirationDate(LocalDateTime.now().plusHours(1))
-                .build();
+        PasswordReset passwordReset = passwordResetFactory.buildEntity(user);
 
         user.setPasswordResetToken(passwordReset);
 
@@ -139,6 +136,13 @@ public class AuthService {
         }
 
         if (LocalDateTime.now().isAfter(user.getPasswordResetToken().getExpirationDate())) {
+            PasswordReset passwordReset = user.getPasswordResetToken();
+
+            user.setPasswordResetToken(null);
+
+            userRepository.save(user);
+            tokenRepository.delete(passwordReset);
+
             throw new InvalidTokenException("Token has expired");
         }
 

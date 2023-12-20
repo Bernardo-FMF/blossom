@@ -19,7 +19,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Component
 public class JwtTokenStrategy implements ITokenStrategy {
@@ -31,11 +30,6 @@ public class JwtTokenStrategy implements ITokenStrategy {
 
     @Value("${jwt.refresh}")
     private int refresh;
-
-    @Override
-    public String generateGenericToken() {
-        return UUID.randomUUID().toString();
-    }
 
     @Override
     public String generateToken(User user) {
