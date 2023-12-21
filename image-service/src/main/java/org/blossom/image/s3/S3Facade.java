@@ -52,13 +52,12 @@ public class S3Facade implements S3Client {
                 throw new RuntimeException("Failed to delete file: " + fileToDelete.getAbsolutePath());
             }
         } else {
-            // File doesn't exist
             throw new RuntimeException("File not found: " + fileToDelete.getAbsolutePath());
         }
     }
 
     private String extractKey(String key) {
-        return key.substring(key.indexOf("amazonaws.com/") + "amazonaws.com/".length());
+        return key.substring(key.indexOf(KEY_PREFIX) + KEY_PREFIX.length());
     }
 
     @Override

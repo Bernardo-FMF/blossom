@@ -2,11 +2,12 @@ package org.blossom.image.s3;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 public class S3Service {
@@ -19,7 +20,7 @@ public class S3Service {
     @Autowired
     private S3Bucket s3Buckets;
 
-    public String putObject(String key, byte[] byteContent) {
+    public String putObject(String key, byte[] byteContent) throws AwsServiceException, SdkClientException {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(s3Buckets.getImageBucket())
                 .key(key)
@@ -29,17 +30,13 @@ public class S3Service {
         return s3Configuration.buildUrl(s3Buckets.getImageBucket(), key);
     }
 
-    public boolean deleteObject(String key) {
-        try {
-            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                    .bucket(s3Buckets.getImageBucket())
-                    .key(key)
-                    .build();
+    public boolean deleteObject(String key) throws AwsServiceException, SdkClientException {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(s3Buckets.getImageBucket())
+                .key(key)
+                .build();
 
-            s3Client.deleteObject(deleteObjectRequest);
-            return true;
-        } catch (S3Exception | UnsupportedOperationException e) {
-            return false;
-        }
+        s3Client.deleteObject(deleteObjectRequest);
+        return true;
     }
 }

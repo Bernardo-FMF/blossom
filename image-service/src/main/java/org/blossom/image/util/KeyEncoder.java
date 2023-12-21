@@ -3,7 +3,6 @@ package org.blossom.image.util;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -18,17 +17,11 @@ public class KeyEncoder {
     }
 
     private String append(Appender appender) {
-        if (Objects.requireNonNull(appender) == Appender.TIMESTAMP) {
-            return Appender.TIMESTAMP.append();
-        }
-        return "";
+        return appender.append();
     }
 
     private String encode(Encoder encoder, String value) {
-        if (Objects.requireNonNull(encoder) == Encoder.BASE64) {
-            return Encoder.BASE64.encode(value.getBytes());
-        }
-        return value;
+        return encoder.encode(value.getBytes());
     }
 
 
