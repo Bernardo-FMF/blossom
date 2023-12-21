@@ -3,6 +3,7 @@ package org.blossom.auth.service;
 import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.entity.User;
+import org.blossom.auth.exception.FileUploadException;
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.grpc.GrpcClientImageService;
 import org.blossom.auth.kafka.KafkaMessageService;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ public class UserService {
     private GenericDtoMapper genericDtoMapper;
 
     public GenericResponseDto updateUserImage(int userId, MultipartFile file)
-            throws UserNotFoundException, IOException, InterruptedException {
+            throws UserNotFoundException, InterruptedException, FileUploadException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User not found");

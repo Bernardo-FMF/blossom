@@ -84,4 +84,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorMessage message = new ErrorMessage(status, UsernameNotFoundException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
+
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ErrorMessage> fileUploadException(FileUploadException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorMessage message = new ErrorMessage(status, FileUploadException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
 }

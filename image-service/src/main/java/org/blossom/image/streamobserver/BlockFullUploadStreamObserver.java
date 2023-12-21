@@ -54,6 +54,7 @@ public class BlockFullUploadStreamObserver implements StreamObserver<Block>, Blo
         log.info("Error uploading blob {}", originalName);
         try {
             contentStream.close();
+            responseStreamObserver.onCompleted();
         } catch (IOException ex) {
             log.error("Error closing content stream for blob {}", originalName, ex);
         }
