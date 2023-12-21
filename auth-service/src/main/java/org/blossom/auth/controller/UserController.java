@@ -3,6 +3,7 @@ package org.blossom.auth.controller;
 import lombok.extern.log4j.Log4j2;
 import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
+import org.blossom.auth.exception.FileDeleteException;
 import org.blossom.auth.exception.FileUploadException;
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.service.UserService;
@@ -26,7 +27,7 @@ public class UserController {
 
     @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GenericResponseDto> updateProfileImage(@RequestParam("file") MultipartFile file, Authentication authentication)
-            throws IOException, InterruptedException, UserNotFoundException, FileUploadException {
+            throws IOException, InterruptedException, UserNotFoundException, FileUploadException, FileDeleteException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /user/profile-image: Updating profile image for user with id {}", userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserImage(userId, file));

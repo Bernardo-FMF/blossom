@@ -3,6 +3,7 @@ package org.blossom.auth.service;
 import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.entity.User;
+import org.blossom.auth.exception.FileDeleteException;
 import org.blossom.auth.exception.FileUploadException;
 import org.blossom.auth.exception.UserNotFoundException;
 import org.blossom.auth.grpc.GrpcClientImageService;
@@ -35,7 +36,7 @@ public class UserService {
     private GenericDtoMapper genericDtoMapper;
 
     public GenericResponseDto updateUserImage(int userId, MultipartFile file)
-            throws UserNotFoundException, InterruptedException, FileUploadException {
+            throws UserNotFoundException, InterruptedException, FileUploadException, FileDeleteException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User not found");

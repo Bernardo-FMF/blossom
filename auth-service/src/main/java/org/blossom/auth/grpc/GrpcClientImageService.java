@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.log4j.Log4j2;
+import org.blossom.auth.exception.FileDeleteException;
 import org.blossom.auth.exception.FileUploadException;
 import org.blossom.auth.grpc.client.ImageContractGrpcClientFacade;
 import org.blossom.auth.grpc.streamobserver.IdentifierStreamObserver;
@@ -77,7 +78,7 @@ public class GrpcClientImageService {
         throw new FileUploadException("Blob upload failed");
     }
 
-    public void deleteImage(String imageUrl) {
+    public void deleteImage(String imageUrl) throws FileDeleteException {
         try {
             BoolValue deleteResult = grpcClient.getBlockingStub().deleteImage(Identifier.newBuilder().setUrl(imageUrl).build());
             if (deleteResult.getValue()) {
@@ -87,6 +88,7 @@ public class GrpcClientImageService {
             }
         } catch (StatusRuntimeException ex) {
             log.error("Error on the grpc server, terminating upload of blob {}", imageUrl, ex);
+            throw new FileDeleteException("Blob delete failed");
         }
     }
 }
