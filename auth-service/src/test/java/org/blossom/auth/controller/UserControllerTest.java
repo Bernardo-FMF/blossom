@@ -91,6 +91,4 @@ public class UserControllerTest extends CommonRequestHelper {
         Assertions.assertEquals(USERNAME_1, simplifiedUserDto.getUsername());
         Assertions.assertEquals(NAME_1, simplifiedUserDto.getFullName());
     }
-
-    // get user by id -> does not exist
 }
