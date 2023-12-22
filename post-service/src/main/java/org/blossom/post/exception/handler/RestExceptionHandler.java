@@ -1,9 +1,7 @@
 package org.blossom.post.exception.handler;
 
 
-import org.blossom.post.exception.PostNotFoundException;
-import org.blossom.post.exception.PostNotValidException;
-import org.blossom.post.exception.UserNotFoundException;
+import org.blossom.post.exception.*;
 import org.blossom.post.exception.model.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +32,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorMessage> postNotFoundException(PostNotFoundException exception, WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorMessage message = new ErrorMessage(status, PostNotFoundException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ErrorMessage> fileUploadException(FileUploadException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        ErrorMessage message = new ErrorMessage(status, FileUploadException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(FileDeleteException.class)
+    public ResponseEntity<ErrorMessage> fileDeleteException(FileDeleteException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        ErrorMessage message = new ErrorMessage(status, FileDeleteException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
 }

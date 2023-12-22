@@ -1,4 +1,4 @@
-package org.blossom.post.grpc.client;
+package org.blossom.post.configuration;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

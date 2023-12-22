@@ -1,4 +1,4 @@
-package org.blossom.post.kafka.outbound;
+package org.blossom.post.configuration;
 
 import jakarta.annotation.PostConstruct;
 import org.blossom.model.ResourceEvent;

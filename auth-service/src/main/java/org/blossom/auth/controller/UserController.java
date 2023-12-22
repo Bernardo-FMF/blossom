@@ -16,8 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/v1/user")
 @Log4j2
@@ -27,7 +25,7 @@ public class UserController {
 
     @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GenericResponseDto> updateProfileImage(@RequestParam("file") MultipartFile file, Authentication authentication)
-            throws IOException, InterruptedException, UserNotFoundException, FileUploadException, FileDeleteException {
+            throws InterruptedException, UserNotFoundException, FileUploadException, FileDeleteException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /user/profile-image: Updating profile image for user with id {}", userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUserImage(userId, file));

@@ -4,10 +4,7 @@ import com.google.common.base.Strings;
 import org.blossom.post.cache.LocalUserCacheService;
 import org.blossom.post.dto.*;
 import org.blossom.post.entity.Post;
-import org.blossom.post.exception.OperationNotAllowedException;
-import org.blossom.post.exception.PostNotFoundException;
-import org.blossom.post.exception.PostNotValidException;
-import org.blossom.post.exception.UserNotFoundException;
+import org.blossom.post.exception.*;
 import org.blossom.post.grpc.GrpcClientImageService;
 import org.blossom.post.kafka.inbound.model.LocalUser;
 import org.blossom.post.kafka.outbound.KafkaMessageService;
@@ -44,7 +41,7 @@ public class PostService {
     @Autowired
     private KafkaMessageService messageService;
 
-    public String createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException {
+    public String createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException {
         if (postInfoDto.getMediaFiles().length == 0 && postInfoDto.getText().isEmpty()) {
             throw new PostNotValidException("Post has no content");
         }
@@ -68,7 +65,7 @@ public class PostService {
         return newPost.getId();
     }
 
-    public String deletePost(String postId, int userId) throws PostNotFoundException, OperationNotAllowedException {
+    public String deletePost(String postId, int userId) throws PostNotFoundException, OperationNotAllowedException, FileDeleteException {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
             throw new PostNotFoundException("Post does not exist");
