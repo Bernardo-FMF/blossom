@@ -28,8 +28,8 @@ public class SocialController {
     }
 
     @GetMapping("/follow-count")
-    public ResponseEntity<FollowCountDto> getFollowCount(Authentication authentication) throws UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(socialService.getFollowCount(((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    public ResponseEntity<FollowCountDto> getFollowCount(@RequestParam("id") Integer id) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(socialService.getFollowCount(id));
     }
 
     @GetMapping("/follower")
