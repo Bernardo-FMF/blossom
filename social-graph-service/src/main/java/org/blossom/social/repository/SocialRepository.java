@@ -60,4 +60,14 @@ public interface SocialRepository extends Neo4jRepository<GraphUser, Integer> {
             + "LIMIT $limit "
             + "RETURN followed.userId")
     List<Integer> findMostFollowedUsers(@Param("limit") Integer limit);
+
+    @Query("MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser)" +
+                    "WHERE follower.userId = $followerId " +
+                    "RETURN DISTINCT COUNT(followed)")
+    long findFollowCount(@Param("followerId") Integer followerId);
+
+    @Query("MATCH (follower:GraphUser)-[r:FOLLOWS]->(followed:GraphUser)" +
+                    "WHERE followed.userId = $followedId " +
+                    "RETURN DISTINCT COUNT(follower)")
+    long findFollowerCount(@Param("followedId") Integer followedId);
 }

@@ -1,9 +1,6 @@
 package org.blossom.social.controller;
 
-import org.blossom.social.dto.GraphUserDto;
-import org.blossom.social.dto.RecommendationsDto;
-import org.blossom.social.dto.SearchParametersDto;
-import org.blossom.social.dto.SocialRelationDto;
+import org.blossom.social.dto.*;
 import org.blossom.social.exception.FollowNotValidException;
 import org.blossom.social.exception.UserNotFoundException;
 import org.blossom.model.CommonUserDetails;
@@ -28,6 +25,11 @@ public class SocialController {
     @DeleteMapping
     public ResponseEntity<String> deleteSocialRelation(SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(socialService.deleteSocialRelation(socialRelationDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @GetMapping("/follow-count")
+    public ResponseEntity<FollowCountDto> getFollowCount(Authentication authentication) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(socialService.getFollowCount(((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @GetMapping("/follower")

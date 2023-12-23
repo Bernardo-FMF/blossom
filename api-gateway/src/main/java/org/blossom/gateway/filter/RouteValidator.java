@@ -30,6 +30,7 @@ public class RouteValidator {
         openApiEndpoints.put("/api/v1/post/{postId}", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/post/{postId}/identifier", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/post-search/simple-hashtag-lookup", Collections.singletonList(HttpMethod.GET));
+        openApiEndpoints.put("/api/v1/social/follow-count", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/comment/{postId}", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/comment/{commentId}/replies", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/eureka", Collections.singletonList(HttpMethod.GET));

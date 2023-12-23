@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 public class RecommendationsDto {
     private int userId;
-    private List<LocalUserDto> recommendations;
+    private List<UserDto> recommendations;
     private boolean eof;
     private long currentPage;
     private long totalPages;

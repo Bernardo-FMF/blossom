@@ -1,9 +1,6 @@
 package org.blossom.social.service;
 
-import org.blossom.social.dto.GraphUserDto;
-import org.blossom.social.dto.RecommendationsDto;
-import org.blossom.social.dto.SearchParametersDto;
-import org.blossom.social.dto.SocialRelationDto;
+import org.blossom.social.dto.*;
 import org.blossom.social.entity.GraphUser;
 import org.blossom.social.exception.FollowNotValidException;
 import org.blossom.social.exception.UserNotFoundException;
@@ -146,6 +143,21 @@ public class SocialService {
                 .currentPage(searchParameters.getPage())
                 .totalElements(followers.getTotalElements())
                 .eof(!followers.hasNext())
+                .build();
+    }
+
+    public FollowCountDto getFollowCount(int userId) throws UserNotFoundException {
+        if (!socialRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        long followCount = socialRepository.findFollowCount(userId);
+        long followerCount = socialRepository.findFollowerCount(userId);
+
+        return FollowCountDto.builder()
+                .id(userId)
+                .totalFollows(followCount)
+                .totalFollowers(followerCount)
                 .build();
     }
 }
