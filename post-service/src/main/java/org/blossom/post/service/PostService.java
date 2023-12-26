@@ -14,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,15 +61,15 @@ public class PostService {
     private AggregateUserPostsMapper aggregateUserPostsMapper;
 
     public GenericResponseDto createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException {
-        if (postInfoDto.getMediaFiles().length == 0 && postInfoDto.getText().isEmpty()) {
+        if (Objects.isNull(postInfoDto.getMediaFiles()) && Strings.isNullOrEmpty(postInfoDto.getText())) {
             throw new PostNotValidException("Post has no content");
         }
 
-        if (postInfoDto.getMediaFiles().length != 0) {
+        if (!Objects.isNull(postInfoDto.getMediaFiles()) && postInfoDto.getMediaFiles().length != 0) {
             postInfoDto.setMediaUrls(imageService.uploadImages(postInfoDto.getMediaFiles()));
         }
 
-        if (Strings.isNullOrEmpty(postInfoDto.getText())) {
+        if (!Strings.isNullOrEmpty(postInfoDto.getText())) {
             postInfoDto.setHashtags(parseDescription(postInfoDto.getText()));
         }
 
@@ -106,7 +108,7 @@ public class PostService {
     }
 
     public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) {
-        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : null;
 
         Page<Post> posts = postRepository.findByUserId(userId, page);
 

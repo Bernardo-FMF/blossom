@@ -1,6 +1,7 @@
 package org.blossom.post.kafka.inbound;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaConsumerFacade;
 import org.blossom.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Component
+@Log4j2
 public class KafkaResourceListener implements KafkaConsumerFacade {
     @Autowired
     private UserResourceHandler userResourceHandler;

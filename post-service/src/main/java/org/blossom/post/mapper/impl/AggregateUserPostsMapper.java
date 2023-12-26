@@ -30,7 +30,7 @@ public class AggregateUserPostsMapper implements IPaginatedDtoMapper<Post, Aggre
     @Override
     public AggregateUserPostsDto toPaginatedDto(Collection<Post> entities, PaginationInfoDto paginationInfo) {
         return AggregateUserPostsDto.builder()
-                .posts(entities.stream().map(this::toDto).collect(Collectors.toSet()))
+                .posts(entities.stream().map(this::toDto).collect(Collectors.toList()))
                 .paginationInfo(paginationInfo)
                 .build();
     }

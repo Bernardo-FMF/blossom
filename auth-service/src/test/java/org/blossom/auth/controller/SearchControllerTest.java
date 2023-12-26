@@ -54,7 +54,8 @@ public class SearchControllerTest extends CommonRequestHelper {
     @Order(2)
     @Test
     void searchSpecificUser_userExists() throws Exception {
-        MvcResult searchResult = mockMvc.perform(get("/api/v1/user-search/username-lookup?username=" + USERNAME_1 + "xpto")
+        MvcResult searchResult = mockMvc.perform(get("/api/v1/user-search/username-lookup")
+                        .queryParam("username", USERNAME_1 + "xpto")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
@@ -69,7 +70,8 @@ public class SearchControllerTest extends CommonRequestHelper {
     @Order(3)
     @Test
     void searchSpecificUser_userDoesNotExist() throws Exception {
-        MvcResult searchResult = mockMvc.perform(get("/api/v1/user-search/username-lookup?username=" + USERNAME_1 + "xpto2")
+        MvcResult searchResult = mockMvc.perform(get("/api/v1/user-search/username-lookup?")
+                        .queryParam("username", USERNAME_1 + "xpto2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
@@ -90,7 +92,10 @@ public class SearchControllerTest extends CommonRequestHelper {
     }
 
     private void searchUserByPattern(String pattern) throws Exception {
-        MvcResult searchResult = mockMvc.perform(get("/api/v1/user-search/simple-lookup?pageLimit=100&page=0&contains=" + pattern)
+        MvcResult searchResult = mockMvc.perform(get("/api/v1/user-search/simple-lookup")
+                        .queryParam("pageLimit", "100")
+                        .queryParam("page", "0")
+                        .queryParam("contains", pattern)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
