@@ -1,7 +1,6 @@
 package org.blossom.feed.service;
 
 import jakarta.annotation.Nullable;
-import org.blossom.feed.cache.FeedCacheService;
 import org.blossom.feed.dto.*;
 import org.blossom.feed.entity.*;
 import org.blossom.feed.exception.UserNotFoundException;
@@ -49,9 +48,6 @@ public class FeedService {
     @Autowired
     private GrpcClientActivityService grpcClientActivityService;
 
-    @Autowired
-    private FeedCacheService feedCacheService;
-
     public FeedDto getUserFeed(int userId, SearchParametersDto searchParameters) throws UserNotFoundException, InterruptedException {
         Optional<LocalUser> optionalUser = localUserRepository.findById(userId);
         if (optionalUser.isEmpty()) {
@@ -80,11 +76,6 @@ public class FeedService {
     }
 
     public FeedDto getGenericFeed(SearchParametersDto searchParameters) throws InterruptedException {
-        List<String> cachedPostIds = feedCacheService.getFromCache();
-        if (!cachedPostIds.isEmpty()) {
-            return fetchFeedFromCachedIds(cachedPostIds, searchParameters);
-        }
-
         List<Integer> mostFollowed = grpcClientSocialService.getMostFollowed();
         if (mostFollowed.isEmpty()) {
             return getFeedDto(null, null, 0, null, null, searchParameters);
@@ -104,8 +95,6 @@ public class FeedService {
 
         Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(null, posts.get().map(LocalPost::getId).distinct().collect(Collectors.toList()));
 
-        feedCacheService.addToCache(allPostsByUser.stream().map(LocalPostByUser::getPostId).collect(Collectors.toList()));
-
         return getFeedDto(null, posts, totalElements, allUsersMap, metadata, searchParameters);
     }
 
@@ -117,32 +106,6 @@ public class FeedService {
     private long computeTotalElements(Set<Integer> userIds) {
         List<LocalUserPostCount> allUsersCount = localUserPostCountRepository.findAllById(userIds);
         return allUsersCount.stream().map(LocalUserPostCount::getPostCount).reduce(0L, Long::sum);
-    }
-
-    private FeedDto fetchFeedFromCachedIds(List<String> cachedPostIds, SearchParametersDto searchParameters) throws InterruptedException {
-        List<String> currentPageIds = getPageIdsFromCache(cachedPostIds, searchParameters);
-
-        Slice<LocalPost> posts = localPostRepository.findByIdIn(currentPageIds);
-
-        Map<Integer, LocalUser> allUsersMap = localUserRepository.findAllById(
-                        posts.get().map(LocalPost::getUserId).toList()).stream()
-                .collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
-
-        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(null,
-                posts.get().map(LocalPost::getId).distinct().collect(Collectors.toList()));
-
-        return getFeedDto(null, posts, cachedPostIds.size(), allUsersMap, metadata, searchParameters);
-    }
-
-    private List<String> getPageIdsFromCache(List<String> cachedPostIds, SearchParametersDto searchParameters) {
-        if (!searchParameters.hasPagination()) {
-            return new ArrayList<>(cachedPostIds);
-        }
-
-        int startIdx = (searchParameters.getPage() - 1) * searchParameters.getPageLimit();
-        int endIdx = Math.min(startIdx + searchParameters.getPageLimit(), cachedPostIds.size());
-
-        return new ArrayList<>(cachedPostIds.subList(startIdx, endIdx));
     }
 
     private FeedDto getFeedDto(@Nullable LocalUserDto user, @Nullable Slice<LocalPost> posts, long totalElements, Map<Integer, LocalUser> allUsers, Map<String, MetadataDto> metadata, SearchParametersDto searchParameters) {

@@ -1,4 +1,4 @@
-package org.blossom.feed.grpc.configuration;
+package org.blossom.feed.configuration;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

@@ -21,9 +21,6 @@ spring:
               packages: "org.blossom.model"
             type:
               mapping: event:org.blossom.model.ResourceEvent
-  redis:
-    host: ${BLOSSOM_FEED_CACHE_HOST}
-    port: ${BLOSSOM_FEED_CACHE_PORT}
 grpc:
   server:
     names:

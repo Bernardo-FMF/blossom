@@ -2,7 +2,7 @@ package org.blossom.feed.grpc.client;
 
 import io.grpc.ManagedChannel;
 import org.blossom.facade.BaseGrpcClientFacade;
-import org.blossom.feed.grpc.configuration.GrpcSocialConfiguration;
+import org.blossom.feed.configuration.GrpcSocialConfiguration;
 import org.blossom.socialcontract.SocialContractGrpc;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
