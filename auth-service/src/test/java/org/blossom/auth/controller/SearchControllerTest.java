@@ -99,5 +99,9 @@ public class SearchControllerTest extends CommonRequestHelper {
         UsersDto usersDto = objectMapper.readValue(searchResult.getResponse().getContentAsString(), UsersDto.class);
         Assertions.assertEquals(patternMap.get(pattern).size(), usersDto.getUsers().size());
         Assertions.assertEquals(patternMap.get(pattern), usersDto.getUsers().stream().map(SimplifiedUserDto::getId).collect(Collectors.toSet()));
+        Assertions.assertEquals(patternMap.get(pattern).size(), usersDto.getPaginationInfo().getTotalElements());
+        Assertions.assertEquals(0, usersDto.getPaginationInfo().getCurrentPage());
+        Assertions.assertEquals(1, usersDto.getPaginationInfo().getTotalPages());
+        Assertions.assertTrue(usersDto.getPaginationInfo().isEof());
     }
 }
