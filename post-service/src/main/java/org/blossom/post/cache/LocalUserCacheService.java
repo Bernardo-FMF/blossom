@@ -1,7 +1,7 @@
 package org.blossom.post.cache;
 
 import org.blossom.post.client.UserClient;
-import org.blossom.post.kafka.inbound.model.LocalUser;
+import org.blossom.post.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -13,29 +13,29 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class LocalUserCacheService {
     @Autowired
-    private RedisTemplate<String, LocalUser> redisTemplate;
+    private RedisTemplate<String, UserDto> redisTemplate;
 
     @Autowired
     private UserClient userClient;
 
-    public LocalUser getFromCache(Integer key) {
-        LocalUser localUser = redisTemplate.opsForValue().get(String.valueOf(key));
-        if (localUser == null) {
-            ResponseEntity<LocalUser> userResponse = userClient.getUserById(key);
+    public UserDto getFromCache(Integer key) {
+        UserDto userDto = redisTemplate.opsForValue().get(String.valueOf(key));
+        if (userDto == null) {
+            ResponseEntity<UserDto> userResponse = userClient.getUserById(key);
             if (userResponse.getStatusCode().is2xxSuccessful()) {
-                localUser = userResponse.getBody();
-                addToCache(String.valueOf(key), localUser);
+                userDto = userResponse.getBody();
+                addToCache(String.valueOf(key), userDto);
             }
         }
-        return localUser;
+        return userDto;
     }
 
 
-    public void addToCache(String key, LocalUser value) {
+    public void addToCache(String key, UserDto value) {
         redisTemplate.opsForValue().set(key, value, Duration.of(1, ChronoUnit.DAYS));
     }
 
-    public void updateCacheEntry(String key, LocalUser newValue) {
+    public void updateCacheEntry(String key, UserDto newValue) {
         redisTemplate.opsForValue().set(key, newValue, Duration.of(1, ChronoUnit.DAYS));
     }
 

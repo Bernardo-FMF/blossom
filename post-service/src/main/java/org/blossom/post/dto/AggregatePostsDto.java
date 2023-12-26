@@ -11,8 +11,5 @@ import java.util.List;
 @Builder
 public class AggregatePostsDto {
     private List<PostWithUserDto> posts;
-    boolean eof;
-    long currentPage;
-    long totalPages;
-    long totalElements;
+    private PaginationInfoDto paginationInfo;
 }

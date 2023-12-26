@@ -2,16 +2,15 @@ package org.blossom.post.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
+@Setter
 @Builder
 public class AggregateUserPostsDto {
     private int userId;
-    private List<PostDto> posts;
-    private boolean eof;
-    private long currentPage;
-    private long totalPages;
-    private long totalElements;
+    private Set<PostDto> posts;
+    private PaginationInfoDto paginationInfo;
 }

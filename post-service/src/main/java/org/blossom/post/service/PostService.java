@@ -5,10 +5,10 @@ import org.blossom.post.cache.LocalUserCacheService;
 import org.blossom.post.dto.*;
 import org.blossom.post.entity.Post;
 import org.blossom.post.exception.*;
+import org.blossom.post.factory.impl.PostFactory;
 import org.blossom.post.grpc.GrpcClientImageService;
-import org.blossom.post.kafka.inbound.model.LocalUser;
 import org.blossom.post.kafka.outbound.KafkaMessageService;
-import org.blossom.post.mapper.PostDtoMapper;
+import org.blossom.post.mapper.impl.*;
 import org.blossom.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -36,36 +35,54 @@ public class PostService {
     private GrpcClientImageService imageService;
 
     @Autowired
-    private PostDtoMapper postDtoMapper;
+    private PostFactory postFactory;
 
     @Autowired
     private KafkaMessageService messageService;
 
-    public String createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException {
+    @Autowired
+    private PostMapper postMapper;
+
+    @Autowired
+    private PostUserMapper postUserMapper;
+
+    @Autowired
+    private GenericDtoMapper genericDtoMapper;
+
+    @Autowired
+    private AggregatePostsMapper aggregatePostsMapper;
+
+    @Autowired
+    private PostIdentifierMapper postIdentifierMapper;
+
+    @Autowired
+    private AggregateUserPostsMapper aggregateUserPostsMapper;
+
+    public GenericResponseDto createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException {
         if (postInfoDto.getMediaFiles().length == 0 && postInfoDto.getText().isEmpty()) {
             throw new PostNotValidException("Post has no content");
         }
 
-        String[] mediaUrls = null;
         if (postInfoDto.getMediaFiles().length != 0) {
-            mediaUrls = imageService.uploadImages(postInfoDto.getMediaFiles());
+            postInfoDto.setMediaUrls(imageService.uploadImages(postInfoDto.getMediaFiles()));
         }
 
-        String[] hashtags = null;
         if (Strings.isNullOrEmpty(postInfoDto.getText())) {
-            hashtags = parseDescription(postInfoDto.getText());
+            postInfoDto.setHashtags(parseDescription(postInfoDto.getText()));
         }
 
-        Post post = postDtoMapper.mapToPost(postInfoDto, userId, mediaUrls, hashtags);
+        postInfoDto.setUserId(userId);
+
+        Post post = postFactory.buildEntity(postInfoDto);
 
         Post newPost = postRepository.save(post);
 
         messageService.publishCreation(newPost);
 
-        return newPost.getId();
+        return genericDtoMapper.toDto("Post created successfully", newPost.getId(), null);
     }
 
-    public String deletePost(String postId, int userId) throws PostNotFoundException, OperationNotAllowedException, FileDeleteException {
+    public GenericResponseDto deletePost(String postId, int userId) throws PostNotFoundException, OperationNotAllowedException, FileDeleteException {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
             throw new PostNotFoundException("Post does not exist");
@@ -85,7 +102,7 @@ public class PostService {
 
         messageService.publishDelete(post);
 
-        return "Post was deleted successfully";
+        return genericDtoMapper.toDto("Post deleted successfully", postId, null);
     }
 
     public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) {
@@ -93,14 +110,7 @@ public class PostService {
 
         Page<Post> posts = postRepository.findByUserId(userId, page);
 
-        return AggregateUserPostsDto.builder()
-                .posts(posts.get().map(post -> postDtoMapper.mapToPostDto(post)).collect(Collectors.toList()))
-                .userId(userId)
-                .currentPage(posts.getNumber())
-                .totalPages(posts.getTotalPages())
-                .totalElements(posts.getTotalElements())
-                .eof(!posts.hasNext())
-                .build();
+        return aggregateUserPostsMapper.toPaginatedDto(posts.getContent(), userId, aggregateUserPostsMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
     }
 
     public PostIdentifierDto getPostIdentifier(String postId) throws PostNotFoundException {
@@ -111,10 +121,7 @@ public class PostService {
 
         Post post = optionalPost.get();
 
-        return PostIdentifierDto.builder()
-                .postId(post.getId())
-                .userId(post.getUserId())
-                .build();
+        return postIdentifierMapper.toDto(post);
     }
 
     public PostWithUserDto getPost(String postId) throws PostNotFoundException, UserNotFoundException {
@@ -125,12 +132,12 @@ public class PostService {
 
         Post post = optionalPost.get();
 
-        LocalUser user = localUserCache.getFromCache(post.getUserId());
+        UserDto user = localUserCache.getFromCache(post.getUserId());
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }
 
-        return postDtoMapper.mapToPostWithUserDto(post, user);
+        return postUserMapper.setUser(postUserMapper.toDto(post), user);
     }
 
     private String[] parseDescription(String text) {

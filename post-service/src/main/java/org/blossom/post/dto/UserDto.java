@@ -1,4 +1,4 @@
-package org.blossom.post.kafka.inbound.model;
+package org.blossom.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @Getter
-public class LocalUser implements Serializable {
+public class UserDto implements Serializable {
     private int id;
     private String fullName;
     private String username;

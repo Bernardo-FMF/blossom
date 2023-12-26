@@ -20,12 +20,12 @@ public class PostController {
     private PostService postService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createPost(PostInfoDto postInfoDto, Authentication authentication) throws IOException, InterruptedException, PostNotValidException, FileUploadException {
+    public ResponseEntity<GenericResponseDto> createPost(PostInfoDto postInfoDto, Authentication authentication) throws IOException, InterruptedException, PostNotValidException, FileUploadException {
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(postInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, OperationNotAllowedException, FileDeleteException {
+    public ResponseEntity<GenericResponseDto> deletePost(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, OperationNotAllowedException, FileDeleteException {
         return ResponseEntity.status(HttpStatus.OK).body(postService.deletePost(postId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 

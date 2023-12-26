@@ -1,6 +1,6 @@
 package org.blossom.post.configuration;
 
-import org.blossom.post.kafka.inbound.model.LocalUser;
+import org.blossom.post.dto.UserDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,8 +15,8 @@ public class CacheConfiguration {
     }
 
     @Bean
-    RedisTemplate<String, LocalUser> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, LocalUser> template = new RedisTemplate<>();
+    RedisTemplate<String, UserDto> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, UserDto> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }

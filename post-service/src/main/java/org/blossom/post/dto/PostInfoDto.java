@@ -9,4 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostInfoDto {
     private String text;
     private MultipartFile[] mediaFiles;
+    private String[] hashtags;
+    private String[] mediaUrls;
+    private Integer userId;
 }
