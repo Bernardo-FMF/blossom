@@ -1,6 +1,7 @@
 package org.blossom.post;
 
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.GenericContainer;
@@ -63,5 +64,20 @@ public abstract class AbstractTestContainers {
             Assertions.assertTrue(container.isRunning());
             return container;
         }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        if (mongoDbContainer != null) {
+            mongoDbContainer.stop();
+
+            Assertions.assertFalse(mongoDbContainer.isRunning());
+        }
+
+        kafkaContainer.stop();
+        Assertions.assertFalse(kafkaContainer.isRunning());
+
+        zookeeperContainer.stop();
+        Assertions.assertFalse(zookeeperContainer.isRunning());
     }
 }

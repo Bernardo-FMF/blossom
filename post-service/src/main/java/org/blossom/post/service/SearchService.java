@@ -38,7 +38,7 @@ public class SearchService {
 
         List<Integer> userIds = posts.getContent().stream().map(Post::getUserId).toList();
 
-        Map<Integer, UserDto> allUsers = userIds.stream().map(id -> localUserCache.getFromCache(id))
+        Map<Integer, UserDto> allUsers = userIds.stream().distinct().map(id -> localUserCache.getFromCache(id))
                 .collect(Collectors.toMap(UserDto::getId, user -> user));
 
         return aggregatePostsMapper.toPaginatedDto(posts.getContent(), allUsers, aggregatePostsMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));

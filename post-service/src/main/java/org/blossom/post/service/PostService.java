@@ -60,7 +60,12 @@ public class PostService {
     @Autowired
     private AggregateUserPostsMapper aggregateUserPostsMapper;
 
-    public GenericResponseDto createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException {
+    public GenericResponseDto createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException, UserNotFoundException {
+        UserDto user = localUserCache.getFromCache(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+
         if (Objects.isNull(postInfoDto.getMediaFiles()) && Strings.isNullOrEmpty(postInfoDto.getText())) {
             throw new PostNotValidException("Post has no content");
         }
@@ -84,7 +89,12 @@ public class PostService {
         return genericDtoMapper.toDto("Post created successfully", newPost.getId(), null);
     }
 
-    public GenericResponseDto deletePost(String postId, int userId) throws PostNotFoundException, OperationNotAllowedException, FileDeleteException {
+    public GenericResponseDto deletePost(String postId, int userId) throws PostNotFoundException, OperationNotAllowedException, FileDeleteException, UserNotFoundException {
+        UserDto user = localUserCache.getFromCache(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
             throw new PostNotFoundException("Post does not exist");
