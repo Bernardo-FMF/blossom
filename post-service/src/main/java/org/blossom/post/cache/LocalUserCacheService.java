@@ -39,4 +39,7 @@ public class LocalUserCacheService {
         redisTemplate.opsForValue().set(key, newValue, Duration.of(1, ChronoUnit.DAYS));
     }
 
+    public void deleteFromCache(String key) {
+        redisTemplate.delete(key);
+    }
 }

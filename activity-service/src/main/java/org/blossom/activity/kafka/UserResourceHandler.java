@@ -1,11 +1,10 @@
 package org.blossom.activity.kafka;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.blossom.activity.entity.LocalUser;
-import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.activity.mapper.LocalUserMapper;
-import org.blossom.model.KafkaUserResource;
 import org.blossom.activity.repository.LocalUserRepository;
+import org.blossom.facade.KafkaResourceHandler;
+import org.blossom.model.KafkaUserResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +41,6 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void delete(KafkaUserResource resource) {
-        throw new NotImplementedException("User deletes are not available");
+        localUserRepository.deleteById(resource.getId());
     }
 }

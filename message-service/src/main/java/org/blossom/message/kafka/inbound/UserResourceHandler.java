@@ -1,6 +1,5 @@
 package org.blossom.message.kafka.inbound;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.message.entity.User;
 import org.blossom.message.mapper.UserMapper;
@@ -42,6 +41,6 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void delete(KafkaUserResource resource) {
-        throw new NotImplementedException("User deletes are not available");
+        userRepository.deleteById(resource.getId());
     }
 }
