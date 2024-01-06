@@ -53,7 +53,7 @@ public class UserFactory implements IEntityFactory<User, RegisterDto> {
                 .username(data.getUsername())
                 .password(data.getPassword())
                 .roles(Set.of(memoizedRole.get()))
-                .active(true)
+                .verified(false)
                 .build();
     }
 }

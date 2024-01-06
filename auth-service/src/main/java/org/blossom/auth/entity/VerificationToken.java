@@ -13,8 +13,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "Blossom_Password_Reset")
-public class PasswordReset {
+@Table(name = "Blossom_Verification_Token")
+public class VerificationToken {
     @Id
     @Column(name = "user_id")
     private int id;
@@ -24,7 +24,7 @@ public class PasswordReset {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "token")
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
     @Column(name = "expiration_date", nullable = false)

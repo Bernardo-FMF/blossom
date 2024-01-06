@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -14,5 +14,5 @@ public class UserDto {
     private String email;
     private String username;
     private String token;
-    private LocalDateTime expirationDate;
+    private Instant expirationDate;
 }

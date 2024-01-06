@@ -98,4 +98,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorMessage message = new ErrorMessage(status, FileDeleteException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
+
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<ErrorMessage> invalidOperationException(InvalidOperationException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        ErrorMessage message = new ErrorMessage(status, InvalidOperationException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
 }

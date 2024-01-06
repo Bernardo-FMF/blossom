@@ -8,7 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.strategy.interfac.ITokenStrategy;
 import org.blossom.jwt.RoleParser;
-import org.blossom.model.dto.TokenDto;
+import org.blossom.model.dto.ValidatedUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.BadJwtException;
@@ -41,19 +41,19 @@ public class JwtTokenStrategy implements ITokenStrategy {
     }
 
     @Override
-    public TokenDto validateToken(final String token) {
+    public ValidatedUserDto validateToken(final String token) {
         Claims claims = extractClaims(token);
 
         if (isTokenExpired(token)) {
             throw new BadJwtException("Token is expired");
         }
 
-        TokenDto tokenDto = new TokenDto();
-        tokenDto.setUserId(Integer.parseInt(claims.getSubject()));
-        tokenDto.setUsername(claims.get("username", String.class));
-        tokenDto.setAuthorities(roleParser.parseStringToRoles(claims.get("roles", String.class)));
+        ValidatedUserDto validatedUserDto = new ValidatedUserDto();
+        validatedUserDto.setUserId(Integer.parseInt(claims.getSubject()));
+        validatedUserDto.setUsername(claims.get("username", String.class));
+        validatedUserDto.setAuthorities(roleParser.parseStringToRoles(claims.get("roles", String.class)));
 
-        return tokenDto;
+        return validatedUserDto;
     }
 
     private Claims extractClaims(String token) {

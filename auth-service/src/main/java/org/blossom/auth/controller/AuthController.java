@@ -6,13 +6,14 @@ import org.blossom.auth.exception.*;
 import org.blossom.auth.service.AuthService;
 import org.blossom.auth.service.UserService;
 import org.blossom.model.CommonUserDetails;
-import org.blossom.model.dto.TokenDto;
+import org.blossom.model.dto.ValidatedUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,20 +36,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) throws LoginCredentialsException {
-        log.info("Received request on endpoint /auth/login: Login user {}", loginDto.getUsername());
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.generateToken(loginDto.getUsername()));
+    public ResponseEntity<UserTokenDto> login(@RequestBody LoginDto loginDto) throws UsernameNotFoundException, UserNotFoundException, EmailNotInUseException {
+        log.info("Received request on endpoint /auth/login: Login user {}", loginDto.getEmail());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.generateToken(loginDto.getEmail()));
+    }
+
+    @PostMapping("/email-verify")
+    public ResponseEntity<GenericResponseDto> verifyEmail(@RequestBody EmailVerificationDto emailVerificationDto) throws UserNotFoundException, InvalidTokenException, InvalidOperationException {
+        log.info("Received request on endpoint /auth/email-verify: Verifying user {}", emailVerificationDto.getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.verifyUser(emailVerificationDto));
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<TokenDto> validate(@RequestParam("token") String token) throws UserNotFoundException {
+    public ResponseEntity<ValidatedUserDto> validate(@RequestParam("token") String token) throws UserNotFoundException {
         log.info("Received request on endpoint /auth/validate: Validating token {}", token);
         return ResponseEntity.status(HttpStatus.OK).body(authService.validateToken(token));
     }
 
     @PostMapping("/password-recovery-request")
-    public ResponseEntity<GenericResponseDto> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
+    public ResponseEntity<GenericResponseDto> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException, UserNotFoundException {
         log.info("Received request on endpoint /auth/password-recovery-request: Recovering password for user {}", passwordRecoveryDto.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.requestPasswordRecovery(passwordRecoveryDto));
     }

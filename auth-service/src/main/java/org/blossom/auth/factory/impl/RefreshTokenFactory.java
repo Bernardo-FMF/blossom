@@ -1,22 +1,24 @@
 package org.blossom.auth.factory.impl;
 
-import org.blossom.auth.entity.PasswordReset;
+import org.blossom.auth.entity.RefreshToken;
 import org.blossom.auth.entity.User;
 import org.blossom.auth.factory.interfac.IEntityFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Component
-public class PasswordResetFactory implements IEntityFactory<PasswordReset, User> {
-    @Override
-    public PasswordReset buildEntity(User data) {
-        return PasswordReset.builder()
+public class RefreshTokenFactory implements IEntityFactory<RefreshToken, User> {
+    @Value("${jwt.refresh.duration}")
+    private long refreshDuration;
+
+    public RefreshToken buildEntity(User data) {
+        return RefreshToken.builder()
                 .user(data)
                 .token(generateUniqueToken())
-                .expirationDate(Instant.now().plus(Duration.ofHours(1)))
+                .expirationDate(Instant.now().plusMillis(refreshDuration))
                 .build();
     }
 

@@ -37,7 +37,7 @@ public class UserService {
 
     public GenericResponseDto updateUserImage(int userId, MultipartFile file)
             throws UserNotFoundException, InterruptedException, FileUploadException, FileDeleteException {
-        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User not found");
         }
@@ -59,7 +59,7 @@ public class UserService {
     }
 
     public SimplifiedUserDto getUserById(Integer userId) throws UserNotFoundException {
-        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User not found");
         }

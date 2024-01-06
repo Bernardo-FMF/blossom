@@ -53,11 +53,7 @@ public class User implements UserDetails, KafkaEntity {
     private String imageUrl;
 
     @Column(name = "active")
-    private boolean active;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private PasswordReset passwordResetToken;
+    private boolean verified;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -70,22 +66,22 @@ public class User implements UserDetails, KafkaEntity {
 
     @Override
     public boolean isAccountNonExpired() {
-        return active;
+        return verified;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return active;
+        return verified;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return active;
+        return verified;
     }
 
     @Override
     public boolean isEnabled() {
-        return active;
+        return verified;
     }
 
     @Override

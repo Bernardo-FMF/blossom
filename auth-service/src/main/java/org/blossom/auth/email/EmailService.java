@@ -50,7 +50,11 @@ public class EmailService {
         }
     }
 
+    public void sendVerificationEmail(UserDto dto) {
+
+    }
+
     private Object buildCallbackUrl(String token, int id) {
-        return String.format(callbackUrl + "?token=%s&id=%s", token, id);
+        return String.format(callbackUrl + "?token=%s&userId=%s", token, id);
     }
 }

@@ -26,7 +26,7 @@ public class SearchService {
 
     public UsersDto userLookup(SearchParametersDto searchParameters) {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
-        Page<User> localUsers = userRepository.findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCase(searchParameters.getContains(), searchParameters.getContains(), page);
+        Page<User> localUsers = userRepository.findByUsernameContainingIgnoreCaseAndVerifiedIsTrueOrFullNameContainingIgnoreCaseAndVerifiedIsTrue(searchParameters.getContains(), searchParameters.getContains(), page);
 
         return usersDtoMapper.toPaginatedDto(localUsers.getContent(), PaginationInfoDto.builder()
                 .totalPages(localUsers.getTotalPages())
@@ -37,7 +37,7 @@ public class SearchService {
     }
 
     public SimplifiedUserDto userLookupByUsername(String username) {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
+        Optional<User> optionalUser = userRepository.findByUsernameAndVerifiedIsTrue(username);
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }

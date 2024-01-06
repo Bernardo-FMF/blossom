@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class TokenDto {
+public class ValidatedUserDto {
     int userId;
     String username;
     Set<SimpleGrantedAuthority> authorities;

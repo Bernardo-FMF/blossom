@@ -16,9 +16,10 @@ import org.blossom.auth.enums.RoleEnum;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private RoleEnum name;
 }

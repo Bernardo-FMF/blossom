@@ -8,9 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findByUsername(String username);
-    Optional<User> findByEmail(String email);
+    Optional<User> findByUsernameAndVerifiedIsTrue(String username);
+    Optional<User> findByIdAndVerifiedIsTrue(Integer id);
+    Optional<User> findByEmailAndVerifiedIsTrue(String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
-    Page<User> findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCase(String usernameQuery, String fullNameQuery, Pageable pageable);
+    Page<User> findByUsernameContainingIgnoreCaseAndVerifiedIsTrueOrFullNameContainingIgnoreCaseAndVerifiedIsTrue(String usernameQuery, String fullNameQuery, Pageable pageable);
 }

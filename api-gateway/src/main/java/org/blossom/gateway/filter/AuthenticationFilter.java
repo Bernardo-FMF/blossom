@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.blossom.gateway.exception.MissingHeaderException;
 import org.blossom.gateway.exception.UnauthorizedAccessException;
 import org.blossom.gateway.exception.model.ErrorMessage;
-import org.blossom.model.dto.TokenDto;
+import org.blossom.model.dto.ValidatedUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -68,7 +68,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Config> {
                                         return chain.filter(exchange);
                                     }
 
-                                    return response.bodyToMono(TokenDto.class)
+                                    return response.bodyToMono(ValidatedUserDto.class)
                                             .flatMap(tokenDto -> {
                                                 ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                                                         .header(USER_ID, String.valueOf(tokenDto.getUserId()))
