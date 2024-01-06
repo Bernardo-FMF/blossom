@@ -108,7 +108,7 @@ public class AuthService {
         return genericDtoMapper.toDto("User registered successfully", newUser.getId(), null);
     }
 
-    public UserTokenDto generateToken(String email) throws UserNotFoundException, EmailNotInUseException {
+    public UserTokenDto login(String email) throws EmailNotInUseException {
         Optional<User> optionalUser = userRepository.findByEmailAndVerifiedIsTrue(email);
         if (optionalUser.isEmpty()) {
             throw new EmailNotInUseException("User not found");
@@ -227,5 +227,95 @@ public class AuthService {
         messageService.publishCreation(user);
 
         return genericDtoMapper.toDto("Email verified successfully", user.getId(), null);
+    }
+
+    public GenericResponseDto deleteTokens(int userId) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        refreshTokenRepository.deleteByUserId(userId);
+
+        return genericDtoMapper.toDto("Logged out all active sessions successfully", userId, null);
+    }
+
+    public GenericResponseDto deleteToken(int userId, String token) throws UserNotFoundException, InvalidTokenException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByTokenAndUserId(token, userId);
+        if (optionalRefreshToken.isEmpty()) {
+            throw new InvalidTokenException("Token does not exist");
+        }
+
+        RefreshToken refreshToken = optionalRefreshToken.get();
+
+        if (refreshToken.getUser().getId() != userId) {
+            throw new InvalidTokenException("Invalid token for user");
+        }
+
+        refreshTokenRepository.deleteByUserId(userId);
+
+        return genericDtoMapper.toDto("Logged out all active sessions successfully", userId, null);
+    }
+
+    public GenericResponseDto updateEmail(EmailUpdateDto emailUpdateDto, int userId) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        User user = optionalUser.get();
+
+        if (!user.getEmail().equals(emailUpdateDto.getOldEmail())) {
+            throw new UserNotFoundException("Email does not match");
+        }
+
+        user.setEmail(emailUpdateDto.getNewEmail());
+        userRepository.save(user);
+
+        return genericDtoMapper.toDto("Email updated successfully", userId, null);
+    }
+
+    public GenericResponseDto deleteAccount(int userId) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        User user = optionalUser.get();
+
+        userRepository.delete(user);
+
+        messageService.publishDelete(user);
+
+        return genericDtoMapper.toDto("Deleted user successfully", userId, null);
+    }
+
+    public TokenDto refreshToken(String token, int userId) throws InvalidTokenException, UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByTokenAndUserId(token, userId);
+        if (optionalRefreshToken.isEmpty()) {
+            throw new InvalidTokenException("Token does not exist");
+        }
+
+        RefreshToken refreshToken = optionalRefreshToken.get();
+
+        if (Instant.now().isAfter(refreshToken.getExpirationDate())) {
+            refreshTokenRepository.delete(refreshToken);
+
+            throw new InvalidTokenException("Token has expired");
+        }
+
+        User user = optionalUser.get();
+
+        return tokenDtoMapper.toDto(jwtTokenStrategy.generateToken(user), refreshToken.getToken());
     }
 }

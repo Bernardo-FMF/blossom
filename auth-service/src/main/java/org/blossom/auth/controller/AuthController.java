@@ -36,10 +36,31 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserTokenDto> login(@RequestBody LoginDto loginDto) throws UsernameNotFoundException, UserNotFoundException, EmailNotInUseException {
+    public ResponseEntity<UserTokenDto> login(@RequestBody LoginDto loginDto) throws UsernameNotFoundException, EmailNotInUseException {
         log.info("Received request on endpoint /auth/login: Login user {}", loginDto.getEmail());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.generateToken(loginDto.getEmail()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.login(loginDto.getEmail()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<GenericResponseDto> logout(@RequestParam("token") String token, Authentication authentication) throws UsernameNotFoundException, UserNotFoundException, InvalidTokenException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/logout: Logout user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.deleteToken(userId, token));
+    }
+
+    @PostMapping("/logout-all")
+    public ResponseEntity<GenericResponseDto> logoutAll(Authentication authentication) throws UsernameNotFoundException, UserNotFoundException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/logout: Logout all sessions for user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.deleteTokens(userId));
+    }
+
+    @PutMapping("/email")
+    public ResponseEntity<GenericResponseDto> updateEmail(@RequestBody EmailUpdateDto emailUpdateDto, Authentication authentication) throws UserNotFoundException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/email: Updating email of user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.updateEmail(emailUpdateDto, userId));
     }
 
     @PostMapping("/email-verify")
@@ -54,6 +75,13 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(authService.validateToken(token));
     }
 
+    @GetMapping("/refresh")
+    public ResponseEntity<TokenDto> refresh(@RequestParam("refreshToken") String refreshToken, Authentication authentication) throws UserNotFoundException, InvalidTokenException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/refresh: Refreshing token for user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(refreshToken, userId));
+    }
+
     @PostMapping("/password-recovery-request")
     public ResponseEntity<GenericResponseDto> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException, UserNotFoundException {
         log.info("Received request on endpoint /auth/password-recovery-request: Recovering password for user {}", passwordRecoveryDto.getEmail());
@@ -66,10 +94,17 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.changePassword(passwordChangeDto));
     }
 
-    @GetMapping("/self")
+    @GetMapping("/logged-user")
     public ResponseEntity<SimplifiedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
-        log.info("Received request on endpoint /auth/self: Getting logged in user {}", userId);
+        log.info("Received request on endpoint /auth/logged-user: Getting logged in user {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
+    }
+
+    @DeleteMapping("/")
+    public ResponseEntity<GenericResponseDto> deleteAccount(Authentication authentication) throws UserNotFoundException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth: Deleting user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.deleteAccount(userId));
     }
 }

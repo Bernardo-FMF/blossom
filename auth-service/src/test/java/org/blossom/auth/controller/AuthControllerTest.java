@@ -339,8 +339,8 @@ class AuthControllerTest extends CommonRequestHelper {
 
     @Order(12)
     @Test
-    void getSelf_successful() throws Exception {
-        MvcResult validateResult = mockMvc.perform(get("/api/v1/auth/self")
+    void getLoggedUser_successful() throws Exception {
+        MvcResult validateResult = mockMvc.perform(get("/api/v1/auth/logged-user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("username", USERNAME_1)
                         .header("userId", "1")

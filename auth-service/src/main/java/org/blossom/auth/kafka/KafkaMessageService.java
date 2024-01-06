@@ -1,6 +1,5 @@
 package org.blossom.auth.kafka;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.blossom.auth.entity.User;
 import org.blossom.facade.KafkaPublisherFacade;
 import org.blossom.model.EventType;
@@ -40,6 +39,9 @@ public class KafkaMessageService implements KafkaPublisherFacade<User> {
 
     @Override
     public void publishDelete(User entity) {
-        throw new NotImplementedException("User deletes are not available");
+        KafkaUserResource resource = entity.mapToResource();
+        ResourceEvent resourceEvent = new ResourceEvent(EventType.DELETE, ResourceType.USER, resource);
+
+        Arrays.stream(topics).forEach(topic -> kafkaTemplate.send(topic, resourceEvent));
     }
 }
