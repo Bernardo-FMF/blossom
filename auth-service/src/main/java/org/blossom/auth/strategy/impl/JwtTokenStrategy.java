@@ -28,8 +28,8 @@ public class JwtTokenStrategy implements ITokenStrategy {
     @Value("${jwt.secret}")
     String secret;
 
-    @Value("${jwt.refresh}")
-    private int refresh;
+    @Value("${jwt.duration}")
+    private int duration;
 
     @Override
     public String generateToken(User user) {
@@ -67,7 +67,7 @@ public class JwtTokenStrategy implements ITokenStrategy {
 
     private String createToken(Map<String, Object> claims, int userId) {
         long now = System.currentTimeMillis();
-        Date validity = new Date(now + refresh);
+        Date validity = new Date(now + duration);
 
         return Jwts.builder()
                 .setClaims(claims)

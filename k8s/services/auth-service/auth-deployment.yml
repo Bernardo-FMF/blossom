@@ -58,11 +58,16 @@ spec:
                 secretKeyRef:
                   name: blossom-secret
                   key: EMAIL_USERNAME
-            - name: BLOSSOM_JWT_REFRESH
+            - name: BLOSSOM_JWT_DURATION
               valueFrom:
                 secretKeyRef:
                   name: blossom-secret
-                  key: JWT_REFRESH
+                  key: JWT_DURATION
+            - name: BLOSSOM_JWT_REFRESH_DURATION
+              valueFrom:
+                secretKeyRef:
+                  name: blossom-secret
+                  key: JWT_REFRESH_DURATION
             - name: BLOSSOM_JWT_SECRET
               valueFrom:
                 secretKeyRef:

@@ -193,7 +193,8 @@ services:
       - BLOSSOM_KAFKA=broker:29092
       - BLOSSOM_CALLBACK=http://localhost:100/callbackUrl
       - BLOSSOM_JWT_SECRET=${JWT_SECRET}
-      - BLOSSOM_JWT_REFRESH=${JWT_REFRESH}
+      - BLOSSOM_JWT_DURATION=${JWT_DURATION}
+      - BLOSSOM_JWT_REFRESH_DURATION=${JWT_REFRESH_DURATION}
       - BLOSSOM_AUTH_PORT=8182
     depends_on:
       - auth-service-db

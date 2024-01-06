@@ -30,7 +30,9 @@ vendor:
     callback-url: ${BLOSSOM_CALLBACK}
 jwt:
   secret: ${BLOSSOM_JWT_SECRET}
-  refresh: ${BLOSSOM_JWT_REFRESH}
+  duration: ${BLOSSOM_JWT_DURATION}
+  refresh:
+    duration: ${BLOSSOM_JWT_REFRESH_DURATION}
 server:
   port: ${BLOSSOM_AUTH_PORT}
 grpc:
