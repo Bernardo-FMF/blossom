@@ -18,7 +18,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,6 +40,16 @@ public class UserControllerTest extends CommonRequestHelper {
         MvcResult registerUser = registerUser(USERNAME_1, EMAIL_1, NAME_1, PASSWORD_1, MockMvcResultMatchers.status().isCreated());
 
         GenericResponseDto responseDto = objectMapper.readValue(registerUser.getResponse().getContentAsString(), GenericResponseDto.class);
+
+
+        Optional<User> optionalUser = userRepository.findById(responseDto.getResourceId());
+        Assertions.assertTrue(optionalUser.isPresent());
+
+        User user = optionalUser.get();
+        user.setVerified(true);
+
+        userRepository.save(user);
+
         Assertions.assertEquals(1, responseDto.getResourceId());
         Assertions.assertEquals("User registered successfully", responseDto.getResponseMessage());
     }

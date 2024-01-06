@@ -46,6 +46,7 @@ public abstract class AbstractContextBeans extends AbstractTestContainers {
                     "server.port=" + 8080,
                     "jwt.secret=" + "5361266B59705673367639792F423F4599482B4D6251655568576D5A71347437",
                     "jwt.refresh=" + 86400000,
+                    "jwt.refresh.duration=" + 86400000,
                     "spring.kafka.bootstrap-servers=" + kafkaContainer.getBootstrapServers(),
                     "eureka.client.enabled=false"
             ).applyTo(configurableApplicationContext.getEnvironment());

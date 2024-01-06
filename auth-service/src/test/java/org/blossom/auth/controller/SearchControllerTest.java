@@ -4,6 +4,7 @@ import org.blossom.auth.CommonRequestHelper;
 import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.dto.UsersDto;
+import org.blossom.auth.entity.User;
 import org.blossom.auth.exception.model.ErrorMessage;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,13 @@ public class SearchControllerTest extends CommonRequestHelper {
         MvcResult registerUser3 = registerUser(USERNAME_1 + "dfg", "c" + EMAIL_1, NAME_1 + "xyz", PASSWORD_1, MockMvcResultMatchers.status().isCreated());
         MvcResult registerUser4 = registerUser(USERNAME_1 + "foo", "d" + EMAIL_1, NAME_1 + "dfg", PASSWORD_1, MockMvcResultMatchers.status().isCreated());
         MvcResult registerUser5 = registerUser(USERNAME_1 + "abc", "e" + EMAIL_1, NAME_1 + "abc", PASSWORD_1, MockMvcResultMatchers.status().isCreated());
+
+        List<User> users = userRepository.findAll();
+        for (User user: users) {
+            user.setVerified(true);
+        }
+
+        userRepository.saveAll(users);
 
         GenericResponseDto responseDto1 = objectMapper.readValue(registerUser1.getResponse().getContentAsString(), GenericResponseDto.class);
         GenericResponseDto responseDto2 = objectMapper.readValue(registerUser2.getResponse().getContentAsString(), GenericResponseDto.class);
