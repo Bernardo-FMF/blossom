@@ -62,7 +62,7 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/user/profile-image").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/user/profile-image").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/auth/logged-user").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/auth/validate").permitAll()
