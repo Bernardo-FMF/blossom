@@ -54,6 +54,7 @@ public class UserFactory implements IEntityFactory<User, RegisterDto> {
                 .password(data.getPassword())
                 .roles(Set.of(memoizedRole.get()))
                 .verified(false)
+                .mfaEnabled(false)
                 .build();
     }
 }

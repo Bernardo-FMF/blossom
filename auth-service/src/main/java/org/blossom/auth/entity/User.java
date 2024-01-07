@@ -7,11 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.blossom.model.KafkaEntity;
 import org.blossom.model.KafkaUserResource;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -52,11 +50,17 @@ public class User implements UserDetails, KafkaEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "active")
+    @Column(name = "verified")
     private boolean verified;
 
+    @Column(name = "mfa_enabled")
+    private boolean mfaEnabled;
+
+    @Column(name = "secret")
+    private String secret;
+
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Set<SimpleGrantedAuthority> getAuthorities() {
         return Optional.ofNullable(roles)
                 .map(rList -> rList.stream()
                         .map(r -> new SimpleGrantedAuthority(r.getName().toString()))

@@ -3,6 +3,7 @@ package org.blossom.jwt;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -15,5 +16,9 @@ public class RoleParser {
         return Arrays.stream(roles.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
+    }
+
+    public String parseRolesToString(Set<SimpleGrantedAuthority> roles) {
+        return StringUtils.collectionToCommaDelimitedString(roles);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -95,10 +96,10 @@ public class AuthController {
     }
 
     @GetMapping("/logged-user")
-    public ResponseEntity<SimplifiedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
+    public ResponseEntity<LoggedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /auth/logged-user: Getting logged in user {}", userId);
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(authService.getLoggedUser(userId));
     }
 
     @DeleteMapping("/")
@@ -106,5 +107,25 @@ public class AuthController {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /auth: Deleting user {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body(authService.deleteAccount(userId));
+    }
+
+    @PostMapping("/mfa")
+    public ResponseEntity<GenericResponseDto> enableMfa(Authentication authentication) throws UserNotFoundException, InvalidOperationException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/mfa: Enabling mfa for user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.enableMfa(userId));
+    }
+
+    @DeleteMapping("/mfa")
+    public ResponseEntity<GenericResponseDto> disableMfa(Authentication authentication) throws UserNotFoundException, InvalidOperationException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/mfa: Disabling mfa for user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.disableMfa(userId));
+    }
+
+    @PostMapping("/verify-mfa")
+    public ResponseEntity<UserTokenDto> verifyMfa(@RequestBody MfaVerificationDto mfaVerificationDto) throws UserNotFoundException, BadCredentialsException {
+        log.info("Received request on endpoint /auth/verify-mfa: Verifying mfa for user {}", mfaVerificationDto.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(authService.validateMfa(mfaVerificationDto));
     }
 }

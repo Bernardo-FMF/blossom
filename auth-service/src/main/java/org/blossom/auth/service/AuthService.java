@@ -20,6 +20,7 @@ import org.blossom.auth.repository.VerificationTokenRepository;
 import org.blossom.auth.strategy.impl.JwtTokenStrategy;
 import org.blossom.model.dto.ValidatedUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -80,6 +81,12 @@ public class AuthService {
     @Autowired
     private VerificationTokenFactory verificationTokenFactory;
 
+    @Autowired
+    private MultiFactorAuthService multiFactorAuthService;
+
+    @Autowired
+    private LoggedUserDtoMapper loggedUserDtoMapper;
+
     public GenericResponseDto saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
         registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
@@ -116,17 +123,21 @@ public class AuthService {
 
         User user = optionalUser.get();
 
+        LoggedUserDto loggedUserDto = loggedUserDtoMapper.toDto(user);
+
+        if (user.isMfaEnabled()) {
+            return userTokenDtoMapper.toDto(loggedUserDto);
+        }
+
         String token = jwtTokenStrategy.generateToken(user);
 
         RefreshToken refreshToken = refreshTokenFactory.buildEntity(user);
 
         refreshTokenRepository.save(refreshToken);
 
-        SimplifiedUserDto simplifiedUserDto = usersDtoMapper.toDto(user);
-
         TokenDto tokenDto = tokenDtoMapper.toDto(token, refreshToken.getToken());
 
-        return userTokenDtoMapper.toDto(simplifiedUserDto, tokenDto);
+        return userTokenDtoMapper.toDto(loggedUserDto, tokenDto);
     }
 
     public ValidatedUserDto validateToken(String token) throws UserNotFoundException {
@@ -136,10 +147,13 @@ public class AuthService {
             throw new UserNotFoundException("User does not exist");
         }
 
+        User user = optionalUser.get();
+        validatedUserDto.setAuthorities(user.getAuthorities());
+
         return validatedUserDto;
     }
 
-    public GenericResponseDto requestPasswordRecovery(PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException, UserNotFoundException {
+    public GenericResponseDto requestPasswordRecovery(PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
         Optional<User> optionalUser = userRepository.findByEmailAndVerifiedIsTrue(passwordRecoveryDto.getEmail());
         if (optionalUser.isEmpty()) {
             throw new EmailNotInUseException("User with that email does not exist");
@@ -317,5 +331,79 @@ public class AuthService {
         User user = optionalUser.get();
 
         return tokenDtoMapper.toDto(jwtTokenStrategy.generateToken(user), refreshToken.getToken());
+    }
+
+    public GenericResponseDto enableMfa(int userId) throws UserNotFoundException, InvalidOperationException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        User user = optionalUser.get();
+
+        if (user.isMfaEnabled()) {
+            throw new InvalidOperationException("Multi-factor authentication already enabled");
+        }
+
+        user.setMfaEnabled(true);
+        user.setSecret(multiFactorAuthService.generateNewSecret());
+
+        userRepository.save(user);
+
+        return null;
+    }
+
+    public GenericResponseDto disableMfa(int userId) throws UserNotFoundException, InvalidOperationException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        User user = optionalUser.get();
+
+        if (!user.isMfaEnabled()) {
+            throw new InvalidOperationException("Multi-factor authentication already enabled");
+        }
+
+        user.setMfaEnabled(false);
+        user.setSecret(null);
+
+        userRepository.save(user);
+
+        return null;
+    }
+
+    public UserTokenDto validateMfa(MfaVerificationDto mfaVerificationDto) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByEmailAndVerifiedIsTrue(mfaVerificationDto.getEmail());
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        User user = optionalUser.get();
+        if (multiFactorAuthService.isOtpValid(user.getSecret(), mfaVerificationDto.getCode())) {
+            throw new BadCredentialsException("Incorrect multi-factor authentication code");
+        }
+
+        String token = jwtTokenStrategy.generateToken(user);
+
+        RefreshToken refreshToken = refreshTokenFactory.buildEntity(user);
+
+        refreshTokenRepository.save(refreshToken);
+
+        LoggedUserDto loggedUserDto = loggedUserDtoMapper.toDto(user);
+
+        TokenDto tokenDto = tokenDtoMapper.toDto(token, refreshToken.getToken());
+
+        return userTokenDtoMapper.toDto(loggedUserDto, tokenDto);
+    }
+
+    public LoggedUserDto getLoggedUser(Integer userId) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+        User user = optionalUser.get();
+
+        return loggedUserDtoMapper.toDto(user);
     }
 }

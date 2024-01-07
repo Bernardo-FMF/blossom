@@ -4,7 +4,7 @@ CREATE TABLE Blossom_User (
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255),
     image_url VARCHAR(255),
-    active BOOLEAN DEFAULT TRUE
+    verified BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE Blossom_Role (

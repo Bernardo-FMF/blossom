@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Date;
@@ -34,8 +33,6 @@ public class JwtTokenStrategy implements ITokenStrategy {
     @Override
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        String userRoles = StringUtils.collectionToCommaDelimitedString(user.getAuthorities());
-        claims.put("roles", userRoles);
         claims.put("username", user.getUsername());
         return createToken(claims, user.getId());
     }
@@ -51,7 +48,6 @@ public class JwtTokenStrategy implements ITokenStrategy {
         ValidatedUserDto validatedUserDto = new ValidatedUserDto();
         validatedUserDto.setUserId(Integer.parseInt(claims.getSubject()));
         validatedUserDto.setUsername(claims.get("username", String.class));
-        validatedUserDto.setAuthorities(roleParser.parseStringToRoles(claims.get("roles", String.class)));
 
         return validatedUserDto;
     }
