@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <title>Password Recovery Email</title>
-        <style>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Password Recovery Email</title>
+    <style>
                 body {
                     margin: 0;
                     padding: 0;
@@ -45,21 +45,21 @@
                     padding: 20px;
                 }
             </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>Blossom</h1>
-        </div>
-        <div class="content">
-            <p>Someone requested a password recovery for the Blossom account to which this email belongs to. If this is not your account, ignore this email.</p>
-            <p><strong><span th:text="${username}"></span></strong>, click on the link below to recover your password:</p>
-            <p class="code">
-                <a class="button" th:href="@{${callbackUrl}}">Recover password</a>
-            </p>
-            <p>This link expires in 1 hour.</p>
-        </div>
-        <div class="footer">
-            <p>&copy; 2023 Blossom. All rights reserved.</p>
-        </div>
-    </body>
+</head>
+<body>
+<div class="header">
+    <h1>Blossom</h1>
+</div>
+<div class="content">
+    <p>Welcome to Blossom, your new account is ready for you. If you did not create a new account, ignore this email.</p>
+    <p><strong><span th:text="${username}"></span></strong>, click on the link below to activate your account:</p>
+    <p class="code">
+        <a class="button" th:href="@{${callbackUrl}}">Activate account</a>
+    </p>
+    <p>This link expires in 1 hour.</p>
+</div>
+<div class="footer">
+    <p>&copy; 2023 Blossom. All rights reserved.</p>
+</div>
+</body>
 </html>
