@@ -5,8 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PasswordRecoveryDto {
-    int userId;
-    String newPassword;
-    String token;
+public class MfaValidationDto {
+    private String code;
 }

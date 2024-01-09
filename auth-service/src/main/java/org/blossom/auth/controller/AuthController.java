@@ -57,10 +57,10 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(authService.deleteTokens(userId));
     }
 
-    @PutMapping("/email")
+    @PutMapping("/update-email")
     public ResponseEntity<GenericResponseDto> updateEmail(@RequestBody EmailUpdateDto emailUpdateDto, Authentication authentication) throws UserNotFoundException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
-        log.info("Received request on endpoint /auth/email: Updating email of user {}", userId);
+        log.info("Received request on endpoint /auth/update-email: Updating email of user {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body(authService.updateEmail(emailUpdateDto, userId));
     }
 
@@ -84,16 +84,24 @@ public class AuthController {
     }
 
     @PostMapping("/password-recovery-request")
-    public ResponseEntity<GenericResponseDto> requestPasswordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException, UserNotFoundException {
-        log.info("Received request on endpoint /auth/password-recovery-request: Recovering password for user {}", passwordRecoveryDto.getEmail());
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.requestPasswordRecovery(passwordRecoveryDto));
+    public ResponseEntity<GenericResponseDto> requestPasswordRecovery(@RequestBody PasswordRecoveryRequestDto passwordRecoveryRequestDto) throws EmailNotInUseException, UserNotFoundException {
+        log.info("Received request on endpoint /auth/password-recovery-request: Recovering password for user {}", passwordRecoveryRequestDto.getEmail());
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.requestPasswordRecovery(passwordRecoveryRequestDto));
     }
 
     @PostMapping("/password-recovery")
-    public ResponseEntity<GenericResponseDto> passwordRecovery(@RequestBody PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
-        log.info("Received request on endpoint /auth/password-recovery: Recovering password for user {}", passwordChangeDto.getUserId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.changePassword(passwordChangeDto));
+    public ResponseEntity<GenericResponseDto> passwordRecovery(@RequestBody PasswordRecoveryDto passwordRecoveryDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
+        log.info("Received request on endpoint /auth/password-recovery: Recovering password for user {}", passwordRecoveryDto.getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.recoverPassword(passwordRecoveryDto));
     }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<GenericResponseDto> updatePassword(@RequestBody PasswordChangeDto passwordChangeDto, Authentication authentication) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/update-password: Changing password for user {}", userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.updatePassword(passwordChangeDto, userId));
+    }
+
 
     @GetMapping("/logged-user")
     public ResponseEntity<LoggedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
@@ -109,11 +117,18 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(authService.deleteAccount(userId));
     }
 
+    @PostMapping("/mfa-qr-code")
+    public ResponseEntity<GenericResponseDto> createMfaQrcode(Authentication authentication) throws UserNotFoundException, InvalidOperationException {
+        int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
+        log.info("Received request on endpoint /auth/mfa-qr-code: Creating mfa qr code for user {}", userId);
+        return ResponseEntity.status(HttpStatus.OK).body(authService.generateMfaQrCode(userId));
+    }
+
     @PostMapping("/mfa")
-    public ResponseEntity<GenericResponseDto> enableMfa(Authentication authentication) throws UserNotFoundException, InvalidOperationException {
+    public ResponseEntity<GenericResponseDto> enableMfa(@RequestBody MfaValidationDto mfaValidationDto, Authentication authentication) throws UserNotFoundException, InvalidOperationException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /auth/mfa: Enabling mfa for user {}", userId);
-        return ResponseEntity.status(HttpStatus.OK).body(authService.enableMfa(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(authService.enableMfa(mfaValidationDto, userId));
     }
 
     @DeleteMapping("/mfa")

@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -153,8 +154,8 @@ public class AuthService {
         return validatedUserDto;
     }
 
-    public GenericResponseDto requestPasswordRecovery(PasswordRecoveryDto passwordRecoveryDto) throws EmailNotInUseException {
-        Optional<User> optionalUser = userRepository.findByEmailAndVerifiedIsTrue(passwordRecoveryDto.getEmail());
+    public GenericResponseDto requestPasswordRecovery(PasswordRecoveryRequestDto passwordRecoveryRequestDto) throws EmailNotInUseException {
+        Optional<User> optionalUser = userRepository.findByEmailAndVerifiedIsTrue(passwordRecoveryRequestDto.getEmail());
         if (optionalUser.isEmpty()) {
             throw new EmailNotInUseException("User with that email does not exist");
         }
@@ -171,22 +172,22 @@ public class AuthService {
         return genericDtoMapper.toDto("Password recovery request completed successfully", user.getId(), null);
     }
 
-    public GenericResponseDto changePassword(PasswordChangeDto passwordChangeDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
-        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(passwordChangeDto.getUserId());
+    public GenericResponseDto recoverPassword(PasswordRecoveryDto passwordRecoveryDto) throws UserNotFoundException, InvalidTokenException, TokenNotFoundException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(passwordRecoveryDto.getUserId());
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
         }
 
         User user = optionalUser.get();
 
-        Optional<PasswordReset> optionalPasswordReset = passwordResetRepository.findById(passwordChangeDto.getUserId());
+        Optional<PasswordReset> optionalPasswordReset = passwordResetRepository.findById(passwordRecoveryDto.getUserId());
         if (optionalPasswordReset.isEmpty()) {
             throw new TokenNotFoundException("Token was not requested for this user");
         }
 
         PasswordReset passwordReset = optionalPasswordReset.get();
 
-        if (!passwordReset.getToken().equals(passwordChangeDto.getToken())) {
+        if (!passwordReset.getToken().equals(passwordRecoveryDto.getToken())) {
             throw new InvalidTokenException("Token is invalid");
         }
 
@@ -196,7 +197,7 @@ public class AuthService {
             throw new InvalidTokenException("Token has expired");
         }
 
-        user.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(passwordRecoveryDto.getNewPassword()));
         userRepository.save(user);
 
         passwordResetRepository.delete(passwordReset);
@@ -288,6 +289,10 @@ public class AuthService {
             throw new UserNotFoundException("Email does not match");
         }
 
+        if (!passwordEncoder.matches(emailUpdateDto.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Incorrect credentials");
+        }
+
         user.setEmail(emailUpdateDto.getNewEmail());
         userRepository.save(user);
 
@@ -333,7 +338,7 @@ public class AuthService {
         return tokenDtoMapper.toDto(jwtTokenStrategy.generateToken(user), refreshToken.getToken());
     }
 
-    public GenericResponseDto enableMfa(int userId) throws UserNotFoundException, InvalidOperationException {
+    public GenericResponseDto generateMfaQrCode(int userId) throws InvalidOperationException, UserNotFoundException {
         Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
@@ -345,12 +350,42 @@ public class AuthService {
             throw new InvalidOperationException("Multi-factor authentication already enabled");
         }
 
+        if (Objects.isNull(user.getSecret())) {
+            user.setSecret(multiFactorAuthService.generateNewSecret());
+
+            userRepository.save(user);
+        }
+
+        String qrCode = multiFactorAuthService.generateQrCodeImageUri(user.getSecret());
+
+        return genericDtoMapper.toDto("Qr code generated successfully", userId, Map.of("qrCode", qrCode));
+    }
+
+    public GenericResponseDto enableMfa(MfaValidationDto mfaValidationDto, int userId) throws UserNotFoundException, InvalidOperationException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+
+        User user = optionalUser.get();
+
+        if (user.isMfaEnabled()) {
+            throw new InvalidOperationException("Multi-factor authentication already enabled");
+        }
+
+        if (Objects.isNull(user.getSecret())) {
+            throw new InvalidOperationException("Multi-factor authentication enabling failed");
+        }
+
+        if (multiFactorAuthService.isOtpValid(user.getSecret(), mfaValidationDto.getCode())) {
+            throw new BadCredentialsException("Incorrect multi-factor authentication code");
+        }
+
         user.setMfaEnabled(true);
-        user.setSecret(multiFactorAuthService.generateNewSecret());
 
         userRepository.save(user);
 
-        return null;
+        return genericDtoMapper.toDto("Multi-factor authentication successfully enabled", userId, null);
     }
 
     public GenericResponseDto disableMfa(int userId) throws UserNotFoundException, InvalidOperationException {
@@ -370,7 +405,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        return null;
+        return genericDtoMapper.toDto("Multi-factor authentication successfully disabled", userId, null);
     }
 
     public UserTokenDto validateMfa(MfaVerificationDto mfaVerificationDto) throws UserNotFoundException {
@@ -405,5 +440,28 @@ public class AuthService {
         User user = optionalUser.get();
 
         return loggedUserDtoMapper.toDto(user);
+    }
+
+    public GenericResponseDto updatePassword(PasswordChangeDto passwordChangeDto, int userId) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        User user = optionalUser.get();
+
+        if (!passwordEncoder.matches(passwordChangeDto.getOldPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Incorrect credentials");
+        }
+
+        if (!passwordChangeDto.getNewPassword().equals(passwordChangeDto.getNewPasswordConfirmation())) {
+            throw new BadCredentialsException("Incorrect credentials");
+        }
+
+        user.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
+
+        userRepository.save(user);
+
+        return genericDtoMapper.toDto("Password updated successfully", userId, null);
     }
 }

@@ -169,14 +169,14 @@ class AuthControllerTest extends CommonRequestHelper {
     @Order(7)
     @Test
     void recoverPassword_recoverSuccessful() throws Exception {
-        PasswordRecoveryDto passwordRecoveryDto = new PasswordRecoveryDto();
-        passwordRecoveryDto.setEmail(EMAIL_1);
+        PasswordRecoveryRequestDto passwordRecoveryRequestDto = new PasswordRecoveryRequestDto();
+        passwordRecoveryRequestDto.setEmail(EMAIL_1);
 
         ArgumentCaptor<UserDto> userDtoArgumentCaptor = ArgumentCaptor.forClass(UserDto.class);
 
         MvcResult recoveryRequestResult = mockMvc.perform(post("/api/v1/auth/password-recovery-request")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(passwordRecoveryDto)))
+                        .content(objectMapper.writeValueAsString(passwordRecoveryRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -205,14 +205,14 @@ class AuthControllerTest extends CommonRequestHelper {
         PasswordReset passwordReset = optionalPasswordReset.get();
         Assertions.assertEquals(passwordReset.getToken(), recoveryToken);
 
-        PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
-        passwordChangeDto.setUserId(requestResponseDto.getResourceId());
-        passwordChangeDto.setToken(recoveryToken);
-        passwordChangeDto.setNewPassword(PASSWORD_1 + "1");
+        PasswordRecoveryDto passwordRecoveryDto = new PasswordRecoveryDto();
+        passwordRecoveryDto.setUserId(requestResponseDto.getResourceId());
+        passwordRecoveryDto.setToken(recoveryToken);
+        passwordRecoveryDto.setNewPassword(PASSWORD_1 + "1");
 
         MvcResult recoveryResult = mockMvc.perform(post("/api/v1/auth/password-recovery")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(passwordChangeDto)))
+                        .content(objectMapper.writeValueAsString(passwordRecoveryDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -239,12 +239,12 @@ class AuthControllerTest extends CommonRequestHelper {
     @Order(8)
     @Test
     void recoverPassword_errorEmailNotFound() throws Exception {
-        PasswordRecoveryDto passwordRecoveryDto = new PasswordRecoveryDto();
-        passwordRecoveryDto.setEmail("Mock" + EMAIL_1);
+        PasswordRecoveryRequestDto passwordRecoveryRequestDto = new PasswordRecoveryRequestDto();
+        passwordRecoveryRequestDto.setEmail("Mock" + EMAIL_1);
 
         MvcResult recoveryRequestResult = mockMvc.perform(post("/api/v1/auth/password-recovery-request")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(passwordRecoveryDto)))
+                        .content(objectMapper.writeValueAsString(passwordRecoveryRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -257,14 +257,14 @@ class AuthControllerTest extends CommonRequestHelper {
     @Order(9)
     @Test
     void recoverPassword_errorUserNotFound() throws Exception {
-        PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
-        passwordChangeDto.setUserId(2);
-        passwordChangeDto.setToken("fakeToken");
-        passwordChangeDto.setNewPassword(PASSWORD_1 + "2");
+        PasswordRecoveryDto passwordRecoveryDto = new PasswordRecoveryDto();
+        passwordRecoveryDto.setUserId(2);
+        passwordRecoveryDto.setToken("fakeToken");
+        passwordRecoveryDto.setNewPassword(PASSWORD_1 + "2");
 
         MvcResult recoveryRequestResult = mockMvc.perform(post("/api/v1/auth/password-recovery")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(passwordChangeDto)))
+                        .content(objectMapper.writeValueAsString(passwordRecoveryDto)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -277,14 +277,14 @@ class AuthControllerTest extends CommonRequestHelper {
     @Order(10)
     @Test
     void recoverPassword_errorTokenNotRequested() throws Exception {
-        PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
-        passwordChangeDto.setUserId(1);
-        passwordChangeDto.setToken("fakeToken");
-        passwordChangeDto.setNewPassword(PASSWORD_1 + "2");
+        PasswordRecoveryDto passwordRecoveryDto = new PasswordRecoveryDto();
+        passwordRecoveryDto.setUserId(1);
+        passwordRecoveryDto.setToken("fakeToken");
+        passwordRecoveryDto.setNewPassword(PASSWORD_1 + "2");
 
         MvcResult recoveryRequestResult = mockMvc.perform(post("/api/v1/auth/password-recovery")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(passwordChangeDto)))
+                        .content(objectMapper.writeValueAsString(passwordRecoveryDto)))
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -297,12 +297,12 @@ class AuthControllerTest extends CommonRequestHelper {
     @Order(11)
     @Test
     void recoverPassword_errorWrongToken() throws Exception {
-        PasswordRecoveryDto passwordRecoveryDto = new PasswordRecoveryDto();
-        passwordRecoveryDto.setEmail(EMAIL_1);
+        PasswordRecoveryRequestDto passwordRecoveryRequestDto = new PasswordRecoveryRequestDto();
+        passwordRecoveryRequestDto.setEmail(EMAIL_1);
 
         MvcResult recoveryRequestResult = mockMvc.perform(post("/api/v1/auth/password-recovery-request")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(passwordRecoveryDto)))
+                        .content(objectMapper.writeValueAsString(passwordRecoveryRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -312,17 +312,17 @@ class AuthControllerTest extends CommonRequestHelper {
         Assertions.assertEquals(1, requestResponseDto.getResourceId());
         Assertions.assertEquals("Password recovery request completed successfully", requestResponseDto.getResponseMessage());
 
-        PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
-        passwordChangeDto.setUserId(requestResponseDto.getResourceId());
-        passwordChangeDto.setToken("fakeToken");
-        passwordChangeDto.setNewPassword(PASSWORD_1 + "1");
+        PasswordRecoveryDto passwordRecoveryDto = new PasswordRecoveryDto();
+        passwordRecoveryDto.setUserId(requestResponseDto.getResourceId());
+        passwordRecoveryDto.setToken("fakeToken");
+        passwordRecoveryDto.setNewPassword(PASSWORD_1 + "1");
 
         Optional<User> optionalUser = userRepository.findById(requestResponseDto.getResourceId());
         Assertions.assertTrue(optionalUser.isPresent());
 
         MvcResult recoveryResult = mockMvc.perform(post("/api/v1/auth/password-recovery")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(passwordChangeDto)))
+                        .content(objectMapper.writeValueAsString(passwordRecoveryDto)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

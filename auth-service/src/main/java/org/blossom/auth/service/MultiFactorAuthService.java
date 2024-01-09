@@ -25,7 +25,7 @@ public class MultiFactorAuthService {
                 .label("Blossom")
                 .secret(secret)
                 .issuer("Blossom")
-                .algorithm(HashingAlgorithm.SHA1)
+                .algorithm(HashingAlgorithm.SHA256)
                 .digits(6)
                 .period(30)
                 .build();

@@ -73,7 +73,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/password-recovery-request").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/password-recovery").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/email-verify").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/auth/email").authenticated()
+                                .requestMatchers(HttpMethod.PUT, "/api/v1/auth/update-email").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/user/{userId}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/user-search/username-lookup").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/user-search/simple-lookup").permitAll())

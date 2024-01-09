@@ -8,4 +8,5 @@ import lombok.Setter;
 public class EmailUpdateDto {
     String newEmail;
     String oldEmail;
+    String password;
 }
