@@ -40,7 +40,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostWithUserDto> getPost(@PathVariable("postId") String postId) throws PostNotFoundException, UserNotFoundException {
+    public ResponseEntity<PostDto> getPost(@PathVariable("postId") String postId) throws PostNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(postService.getPost(postId));
     }
 }

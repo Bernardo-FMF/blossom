@@ -6,7 +6,7 @@ import org.blossom.post.dto.*;
 import org.blossom.post.entity.Post;
 import org.blossom.post.exception.*;
 import org.blossom.post.factory.impl.PostFactory;
-import org.blossom.post.grpc.GrpcClientImageService;
+import org.blossom.post.grpc.service.GrpcClientImageService;
 import org.blossom.post.kafka.outbound.KafkaMessageService;
 import org.blossom.post.mapper.impl.*;
 import org.blossom.post.repository.PostRepository;
@@ -136,7 +136,7 @@ public class PostService {
         return postIdentifierMapper.toDto(post);
     }
 
-    public PostWithUserDto getPost(String postId) throws PostNotFoundException, UserNotFoundException {
+    public PostDto getPost(String postId) throws PostNotFoundException, UserNotFoundException {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
             throw new PostNotFoundException("Post does not exist");
@@ -149,7 +149,7 @@ public class PostService {
             throw new UserNotFoundException("User not found");
         }
 
-        return postUserMapper.setUser(postUserMapper.toDto(post), user);
+        return postMapper.toDto(post);
     }
 
     private String[] parseDescription(String text) {

@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class GrpcConfiguration implements IGrpcConfiguration {
+public class GrpcImageConfiguration implements IGrpcConfiguration {
     @Value("${grpc.client.awaitTerminationInSeconds}")
     private int clientAwaitTerminationInSeconds;
 
-    @Value("${grpc.server.name}")
+    @Value("${grpc.server.names.image}")
     private String serverName;
 
     @Override
@@ -29,7 +29,7 @@ public class GrpcConfiguration implements IGrpcConfiguration {
         return clientAwaitTerminationInSeconds;
     }
 
-    @Bean
+    @Bean(name = "image-grpc-channel")
     public ManagedChannel grpcChannel(DiscoveryClient discoveryClient) {
         List<ServiceInstance> instances = discoveryClient.getInstances(serverName);
         ServiceInstance instance = instances.get(0);

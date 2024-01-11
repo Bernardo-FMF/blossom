@@ -1,4 +1,4 @@
-package org.blossom.post.grpc;
+package org.blossom.post.grpc.service;
 
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.ByteString;

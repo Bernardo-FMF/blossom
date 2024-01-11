@@ -8,10 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class GrpcClientRunner implements ApplicationRunner {
     @Autowired
-    private ImageContractGrpcClientFacade grpcClient;
+    private ImageContractGrpcClientFacade imageGrpcClient;
+
+    @Autowired
+    private ActivityContractGrpcClientFacade activityGrpcClient;
 
     @Override
     public void run(ApplicationArguments args) {
-        grpcClient.start();
+        imageGrpcClient.start();
+        activityGrpcClient.start();
     }
 }

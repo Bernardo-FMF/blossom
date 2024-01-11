@@ -2,7 +2,7 @@ package org.blossom.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.grpc.ManagedChannel;
-import org.blossom.post.grpc.GrpcClientImageService;
+import org.blossom.post.grpc.service.GrpcClientImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.util.TestPropertyValues;

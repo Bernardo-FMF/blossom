@@ -110,7 +110,6 @@ public class AuthService {
 
         verificationTokenRepository.save(verificationToken);
 
-        //TODO: do this asynchronously
         emailService.sendVerificationEmail(userDtoMapper.toDto(newUser, verificationToken));
 
         return genericDtoMapper.toDto("User registered successfully", newUser.getId(), null);
@@ -166,7 +165,6 @@ public class AuthService {
 
         passwordResetRepository.save(passwordReset);
 
-        //TODO: do this asynchronously
         emailService.sendPasswordRecoveryEmail(userDtoMapper.toDto(user, passwordReset));
 
         return genericDtoMapper.toDto("Password recovery request completed successfully", user.getId(), null);

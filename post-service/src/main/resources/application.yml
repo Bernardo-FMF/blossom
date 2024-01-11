@@ -31,7 +31,9 @@ server:
   port: ${BLOSSOM_POST_PORT}
 grpc:
   server:
-    name: Image-Service
+    names:
+      image: Image-Service
+      activity: Activity-Service
   client:
     awaitTerminationInSeconds: 10
 eureka:
