@@ -4,6 +4,7 @@ import io.grpc.ManagedChannel;
 import org.blossom.facade.BaseGrpcClientFacade;
 import org.blossom.facade.IGrpcConfiguration;
 import org.blossom.imagecontract.ImageContractGrpc;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,7 +12,7 @@ public class ImageContractGrpcClientFacade extends BaseGrpcClientFacade {
     private final ImageContractGrpc.ImageContractStub nonBlockStub;
     private final ImageContractGrpc.ImageContractBlockingStub blockStub;
 
-    public ImageContractGrpcClientFacade(IGrpcConfiguration grpcConfiguration, ManagedChannel managedChannel) {
+    public ImageContractGrpcClientFacade(IGrpcConfiguration grpcConfiguration, @Qualifier("image-grpc-channel") ManagedChannel managedChannel) {
         super(grpcConfiguration, managedChannel);
         this.nonBlockStub = buildNonBlockingStub();
         this.blockStub = buildBlockingStub();
