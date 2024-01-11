@@ -6,6 +6,7 @@ import org.blossom.post.dto.*;
 import org.blossom.post.entity.Post;
 import org.blossom.post.exception.*;
 import org.blossom.post.factory.impl.PostFactory;
+import org.blossom.post.grpc.service.GrpcClientActivityService;
 import org.blossom.post.grpc.service.GrpcClientImageService;
 import org.blossom.post.kafka.outbound.KafkaMessageService;
 import org.blossom.post.mapper.impl.*;
@@ -18,12 +19,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -43,10 +42,10 @@ public class PostService {
     private KafkaMessageService messageService;
 
     @Autowired
-    private PostMapper postMapper;
+    private PostDtoMapper postDtoMapper;
 
     @Autowired
-    private PostUserMapper postUserMapper;
+    private PostUserDtoMapper postUserDtoMapper;
 
     @Autowired
     private GenericDtoMapper genericDtoMapper;
@@ -55,10 +54,13 @@ public class PostService {
     private AggregatePostsMapper aggregatePostsMapper;
 
     @Autowired
-    private PostIdentifierMapper postIdentifierMapper;
+    private PostIdentifierDtoMapper postIdentifierDtoMapper;
 
     @Autowired
-    private AggregateUserPostsMapper aggregateUserPostsMapper;
+    private AggregateUserPostsDtoMapper aggregateUserPostsDtoMapper;
+
+    @Autowired
+    private GrpcClientActivityService grpcClientActivityService;
 
     public GenericResponseDto createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException, UserNotFoundException {
         UserDto user = localUserCache.getFromCache(userId);
@@ -117,12 +119,18 @@ public class PostService {
         return genericDtoMapper.toDto("Post deleted successfully", postId, null);
     }
 
-    public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) {
+    public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) throws InterruptedException {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : null;
 
         Page<Post> posts = postRepository.findByUserId(userId, page);
 
-        return aggregateUserPostsMapper.toPaginatedDto(posts.getContent(), userId, aggregateUserPostsMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, posts.stream().map(Post::getId).distinct().collect(Collectors.toList()));
+
+        return aggregateUserPostsDtoMapper.toPaginatedDto(
+                posts.getContent(),
+                userId,
+                metadata,
+                aggregateUserPostsDtoMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
     }
 
     public PostIdentifierDto getPostIdentifier(String postId) throws PostNotFoundException {
@@ -133,10 +141,10 @@ public class PostService {
 
         Post post = optionalPost.get();
 
-        return postIdentifierMapper.toDto(post);
+        return postIdentifierDtoMapper.toDto(post);
     }
 
-    public PostDto getPost(String postId) throws PostNotFoundException, UserNotFoundException {
+    public PostDto getPost(String postId, Integer userId) throws PostNotFoundException, UserNotFoundException, InterruptedException {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
             throw new PostNotFoundException("Post does not exist");
@@ -149,7 +157,9 @@ public class PostService {
             throw new UserNotFoundException("User not found");
         }
 
-        return postMapper.toDto(post);
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, List.of(postId));
+
+        return postDtoMapper.toDto(post, metadata.get(postId));
     }
 
     private String[] parseDescription(String text) {

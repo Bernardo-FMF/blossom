@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.blossom.model.KafkaEntity;
 import org.blossom.model.KafkaPostResource;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -32,9 +31,8 @@ public class Post implements KafkaEntity {
     @Field(name = "user_id")
     private int userId;
 
-    @CreatedDate
     @Field(name = "created_at")
-    private Date createdAt;
+    private Instant createdAt;
 
     @Override
     public KafkaPostResource mapToResource() {

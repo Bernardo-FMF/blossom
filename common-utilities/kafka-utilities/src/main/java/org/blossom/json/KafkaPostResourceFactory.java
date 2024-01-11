@@ -3,8 +3,8 @@ package org.blossom.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.blossom.model.KafkaPostResource;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class KafkaPostResourceFactory implements KafkaResourceFactory<KafkaPostResource> {
     @Override
@@ -18,8 +18,8 @@ public class KafkaPostResourceFactory implements KafkaResourceFactory<KafkaPostR
                 .build();
     }
 
-    private Date parseDate(JsonNode node) {
-        return new Date(node.asLong());
+    private Instant parseDate(JsonNode node) {
+        return Instant.ofEpochMilli(node.asLong());
     }
 
     private String[] parseArray(JsonNode node) {

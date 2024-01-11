@@ -6,7 +6,7 @@ import org.blossom.post.mapper.interfac.IDtoMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapper implements IDtoMapper<KafkaUserResource, UserDto> {
+public class UserDtoMapper implements IDtoMapper<KafkaUserResource, UserDto> {
     @Override
     public UserDto toDto(KafkaUserResource entity) {
         return UserDto.builder()

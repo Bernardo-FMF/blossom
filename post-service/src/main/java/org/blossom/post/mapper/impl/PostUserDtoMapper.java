@@ -7,10 +7,9 @@ import org.blossom.post.mapper.interfac.IDtoMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PostUserMapper implements IDtoMapper<Post, PostWithUserDto> {
-    public PostWithUserDto setUser(PostWithUserDto postWithUserDto, UserDto userDto) {
+public class PostUserDtoMapper implements IDtoMapper<Post, PostWithUserDto> {
+    public void setUser(PostWithUserDto postWithUserDto, UserDto userDto) {
         postWithUserDto.setUser(userDto);
-        return postWithUserDto;
     }
 
     @Override

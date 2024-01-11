@@ -5,6 +5,7 @@ import org.blossom.post.entity.Post;
 import org.blossom.post.factory.interfac.IEntityFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Component
@@ -16,6 +17,7 @@ public class PostFactory implements IEntityFactory<Post, PostInfoDto> {
                 .description(data.getText())
                 .media(Optional.ofNullable(data.getMediaUrls()).orElse(new String[] {}))
                 .hashtags(Optional.ofNullable(data.getHashtags()).orElse(new String[] {}))
+                .createdAt(Instant.now())
                 .build();
     }
 }

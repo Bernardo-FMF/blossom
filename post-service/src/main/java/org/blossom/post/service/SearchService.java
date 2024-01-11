@@ -2,11 +2,13 @@ package org.blossom.post.service;
 
 import org.blossom.post.cache.LocalUserCacheService;
 import org.blossom.post.dto.AggregatePostsDto;
+import org.blossom.post.dto.MetadataDto;
 import org.blossom.post.dto.SearchParametersDto;
 import org.blossom.post.dto.UserDto;
 import org.blossom.post.entity.Post;
+import org.blossom.post.grpc.service.GrpcClientActivityService;
 import org.blossom.post.mapper.impl.AggregatePostsMapper;
-import org.blossom.post.mapper.impl.PostUserMapper;
+import org.blossom.post.mapper.impl.PostUserDtoMapper;
 import org.blossom.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,13 +29,16 @@ public class SearchService {
     private LocalUserCacheService localUserCache;
 
     @Autowired
-    private PostUserMapper postUserMapper;
+    private PostUserDtoMapper postUserDtoMapper;
 
     @Autowired
     private AggregatePostsMapper aggregatePostsMapper;
 
-    public AggregatePostsDto postHashtagLookup(SearchParametersDto searchParameters) {
-        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+    @Autowired
+    private GrpcClientActivityService grpcClientActivityService;
+
+    public AggregatePostsDto postHashtagLookup(Integer userId, SearchParametersDto searchParameters) throws InterruptedException {
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : Pageable.unpaged();
         Page<Post> posts = postRepository.findByHashtagsIn(searchParameters.getQuery(), page);
 
         List<Integer> userIds = posts.getContent().stream().map(Post::getUserId).toList();
@@ -41,6 +46,12 @@ public class SearchService {
         Map<Integer, UserDto> allUsers = userIds.stream().distinct().map(id -> localUserCache.getFromCache(id))
                 .collect(Collectors.toMap(UserDto::getId, user -> user));
 
-        return aggregatePostsMapper.toPaginatedDto(posts.getContent(), allUsers, aggregatePostsMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, posts.stream().map(Post::getId).distinct().collect(Collectors.toList()));
+
+        return aggregatePostsMapper.toPaginatedDto(
+                posts.getContent(),
+                allUsers,
+                metadata,
+                aggregatePostsMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
     }
 }

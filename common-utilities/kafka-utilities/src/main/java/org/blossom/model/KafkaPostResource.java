@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -14,5 +14,5 @@ public class KafkaPostResource extends KafkaResource {
     private int userId;
     private String[] media;
     private String description;
-    private Date createdAt;
+    private Instant createdAt;
 }

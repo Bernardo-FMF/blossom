@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -15,5 +15,6 @@ public class PostWithUserDto {
     private String[] mediaUrls;
     private String[] hashtags;
     private String description;
-    private Date createdAt;
+    private Instant createdAt;
+    private MetadataDto metadata;
 }

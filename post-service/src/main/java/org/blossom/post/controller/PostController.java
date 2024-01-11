@@ -30,7 +30,7 @@ public class PostController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<AggregateUserPostsDto> getPostsByUser(@PathVariable("userId") Integer userId, SearchParametersDto searchParameters) {
+    public ResponseEntity<AggregateUserPostsDto> getPostsByUser(@PathVariable("userId") Integer userId, SearchParametersDto searchParameters, Authentication authentication) throws InterruptedException {
         return ResponseEntity.status(HttpStatus.OK).body(postService.findByUser(userId, searchParameters));
     }
 
@@ -40,7 +40,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDto> getPost(@PathVariable("postId") String postId) throws PostNotFoundException, UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(postService.getPost(postId));
+    public ResponseEntity<PostDto> getPost(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, UserNotFoundException, InterruptedException {
+        Integer userId = authentication != null ? ((CommonUserDetails) authentication.getPrincipal()).getUserId() : null;
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getPost(postId, userId));
     }
 }

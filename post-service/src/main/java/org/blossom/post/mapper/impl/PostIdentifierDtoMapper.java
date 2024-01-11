@@ -6,7 +6,7 @@ import org.blossom.post.mapper.interfac.IDtoMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PostIdentifierMapper implements IDtoMapper<Post, PostIdentifierDto> {
+public class PostIdentifierDtoMapper implements IDtoMapper<Post, PostIdentifierDto> {
     @Override
     public PostIdentifierDto toDto(Post entity) {
         return PostIdentifierDto.builder()

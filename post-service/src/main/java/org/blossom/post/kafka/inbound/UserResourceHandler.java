@@ -5,7 +5,7 @@ import org.blossom.model.KafkaUserResource;
 import org.blossom.post.cache.LocalUserCacheService;
 import org.blossom.post.entity.Post;
 import org.blossom.post.kafka.outbound.KafkaMessageService;
-import org.blossom.post.mapper.impl.UserMapper;
+import org.blossom.post.mapper.impl.UserDtoMapper;
 import org.blossom.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     private LocalUserCacheService localUserCache;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDtoMapper userDtoMapper;
 
     @Autowired
     private PostRepository postRepository;
@@ -28,12 +28,12 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void save(KafkaUserResource resource) {
-        localUserCache.addToCache(String.valueOf(resource.getId()), userMapper.toDto(resource));
+        localUserCache.addToCache(String.valueOf(resource.getId()), userDtoMapper.toDto(resource));
     }
 
     @Override
     public void update(KafkaUserResource resource) {
-        localUserCache.updateCacheEntry(String.valueOf(resource.getId()), userMapper.toDto(resource));
+        localUserCache.updateCacheEntry(String.valueOf(resource.getId()), userDtoMapper.toDto(resource));
     }
 
     @Override
