@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Builder
 @Setter
@@ -17,8 +17,8 @@ public class CommentProjection {
     private String postId;
     private String commentContent;
     private Integer parentComment;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private Boolean isDeleted;
     private Long replyCount;
 }

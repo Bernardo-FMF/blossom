@@ -9,7 +9,7 @@ import org.blossom.activity.exception.CommentNotFoundException;
 import org.blossom.activity.exception.OperationNotAllowedException;
 import org.blossom.activity.exception.PostNotFoundException;
 import org.blossom.activity.exception.UserNotFoundException;
-import org.blossom.activity.kafka.model.LocalPost;
+import org.blossom.activity.dto.PostDto;
 import org.blossom.activity.mapper.CommentDtoMapper;
 import org.blossom.activity.mapper.CommentMapper;
 import org.blossom.activity.projection.CommentProjection;
@@ -170,8 +170,8 @@ public class CommentService {
     }
 
     public PostCommentsDto getPostComments(String postId, SearchParametersDto searchParameters) throws PostNotFoundException {
-        LocalPost localPost = localPostCache.getFromCache(postId);
-        if (localPost == null) {
+        PostDto postDto = localPostCache.getFromCache(postId);
+        if (postDto == null) {
             throw new PostNotFoundException("Post not found");
         }
 
@@ -183,8 +183,7 @@ public class CommentService {
                 .collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
 
         return PostCommentsDto.builder()
-                .postId(postId)
-                .post(localPost)
+                .post(postDto)
                 .comments(comments.get().peek(comment -> comment.setCommentContent(comment.getIsDeleted() ? null : comment.getCommentContent())).map(comment -> commentDtoMapper.mapToCommentDto(comment, allUsers.get(comment.getUserId()))).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())
@@ -201,8 +200,8 @@ public class CommentService {
 
         Comment comment = optionalComment.get();
 
-        LocalPost localPost = localPostCache.getFromCache(comment.getPostId());
-        if (localPost == null) {
+        PostDto postDto = localPostCache.getFromCache(comment.getPostId());
+        if (postDto == null) {
             throw new PostNotFoundException("Post not found");
         }
 
@@ -211,8 +210,7 @@ public class CommentService {
         Page<Comment> comments = commentRepository.findByTopLevelCommentId(commentId, page);
 
         return PostCommentsDto.builder()
-                .postId(comment.getPostId())
-                .post(localPost)
+                .post(postDto)
                 .comments(comments.get().map(comment1 -> commentDtoMapper.mapToCommentDto(comment1)).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())

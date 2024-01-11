@@ -5,11 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SourceType;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Builder
 @Data
@@ -41,13 +38,11 @@ public class Comment {
     @Column(name = "comment_content", nullable = false)
     private String commentContent;
 
-    @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private Instant createdAt;
 
-    @UpdateTimestamp(source = SourceType.DB)
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;

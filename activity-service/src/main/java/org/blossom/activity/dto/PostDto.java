@@ -1,4 +1,4 @@
-package org.blossom.activity.kafka.model;
+package org.blossom.activity.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-public class LocalPost implements Serializable {
+public class PostDto implements Serializable {
     private String postId;
     private int userId;
 }

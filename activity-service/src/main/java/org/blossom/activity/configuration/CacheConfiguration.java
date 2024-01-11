@@ -1,6 +1,6 @@
 package org.blossom.activity.configuration;
 
-import org.blossom.activity.kafka.model.LocalPost;
+import org.blossom.activity.dto.PostDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +22,8 @@ public class CacheConfiguration {
     }
 
     @Bean
-    RedisTemplate<String, LocalPost> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, LocalPost> template = new RedisTemplate<>();
+    RedisTemplate<String, PostDto> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, PostDto> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }

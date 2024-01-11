@@ -1,7 +1,7 @@
 package org.blossom.activity.cache;
 
 import org.blossom.activity.client.PostClient;
-import org.blossom.activity.kafka.model.LocalPost;
+import org.blossom.activity.dto.PostDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -13,25 +13,25 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class LocalPostCacheService {
     @Autowired
-    private RedisTemplate<String, LocalPost> redisTemplatePost;
+    private RedisTemplate<String, PostDto> redisTemplatePost;
 
     @Autowired
     private PostClient postClient;
 
-    public void addToCache(String key, LocalPost value) {
+    public void addToCache(String key, PostDto value) {
         redisTemplatePost.opsForValue().set(key, value, Duration.of(3, ChronoUnit.DAYS));
     }
 
-    public LocalPost getFromCache(String key) {
-        LocalPost localPost = redisTemplatePost.opsForValue().get(key);
-        if (localPost == null) {
-            ResponseEntity<LocalPost> postIdentifier = postClient.getPostIdentifier(key);
+    public PostDto getFromCache(String key) {
+        PostDto postDto = redisTemplatePost.opsForValue().get(key);
+        if (postDto == null) {
+            ResponseEntity<PostDto> postIdentifier = postClient.getPostIdentifier(key);
             if (postIdentifier.getStatusCode().is2xxSuccessful()) {
-                localPost = postIdentifier.getBody();
-                addToCache(key, localPost);
+                postDto = postIdentifier.getBody();
+                addToCache(key, postDto);
             }
         }
-        return localPost;
+        return postDto;
     }
 
     public void deleteCacheEntry(String s) {

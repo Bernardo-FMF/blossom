@@ -6,7 +6,7 @@ import org.blossom.activity.entity.Interaction;
 import org.blossom.activity.entity.LocalUser;
 import org.blossom.activity.enums.InteractionType;
 import org.blossom.activity.exception.*;
-import org.blossom.activity.kafka.model.LocalPost;
+import org.blossom.activity.dto.PostDto;
 import org.blossom.activity.mapper.InteractionDtoMapper;
 import org.blossom.activity.mapper.InteractionMapper;
 import org.blossom.activity.repository.InteractionRepository;
@@ -146,8 +146,8 @@ public class InteractionService {
 
         Page<Interaction> likes = interactionRepository.findByUserIdAndInteractionType(userId, InteractionType.LIKE, page);
 
-        Map<String, LocalPost> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
-                .collect(Collectors.toMap(LocalPost::getPostId, post -> post));
+        Map<String, PostDto> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
+                .collect(Collectors.toMap(PostDto::getPostId, post -> post));
 
         return UserInteractionsDto.builder()
                 .user(optionalLocalUser.get())
@@ -170,8 +170,8 @@ public class InteractionService {
 
         Page<Interaction> likes = interactionRepository.findByUserIdAndInteractionType(userId, InteractionType.SAVE, page);
 
-        Map<String, LocalPost> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
-                .collect(Collectors.toMap(LocalPost::getPostId, post -> post));
+        Map<String, PostDto> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
+                .collect(Collectors.toMap(PostDto::getPostId, post -> post));
 
         return UserInteractionsDto.builder()
                 .user(optionalLocalUser.get())
@@ -190,13 +190,13 @@ public class InteractionService {
             throw new UserNotFoundException("User does not exist");
         }
 
-        LocalPost localPost = localPostCache.getFromCache(postId);
-        if (localPost == null) {
+        PostDto postDto = localPostCache.getFromCache(postId);
+        if (postDto == null) {
             throw new PostNotFoundException("Post not found");
         }
 
         Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.SAVE);
-        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, localPost)).orElse(null);
+        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, postDto)).orElse(null);
     }
 
     public InteractionDto findLike(String postId, int userId) throws PostNotFoundException, UserNotFoundException {
@@ -205,12 +205,12 @@ public class InteractionService {
             throw new UserNotFoundException("User does not exist");
         }
 
-        LocalPost localPost = localPostCache.getFromCache(postId);
-        if (localPost == null) {
+        PostDto postDto = localPostCache.getFromCache(postId);
+        if (postDto == null) {
             throw new PostNotFoundException("Post not found");
         }
 
         Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.LIKE);
-        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, localPost)).orElse(null);
+        return optionalInteraction.map(interaction -> interactionDtoMapper.mapToInteractionDto(interaction, postDto)).orElse(null);
     }
 }

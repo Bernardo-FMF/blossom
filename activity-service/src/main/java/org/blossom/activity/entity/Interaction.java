@@ -3,10 +3,8 @@ package org.blossom.activity.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.blossom.activity.enums.InteractionType;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SourceType;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -32,7 +30,6 @@ public class Interaction {
     @Enumerated(EnumType.STRING)
     private InteractionType interactionType;
 
-    @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private Instant createdAt;
 }
