@@ -1,0 +1,19 @@
+package org.blossom.social.factory.impl;
+
+import org.blossom.social.dto.SocialRelationDto;
+import org.blossom.social.kafka.outbound.model.SocialFollow;
+import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+
+@Component
+public class SocialFollowFactory {
+    public SocialFollow buildEntity(SocialRelationDto data, boolean mutualFollow) {
+        return SocialFollow.builder()
+                .initiatingUser(data.getInitiatingUser())
+                .receivingUser(data.getReceivingUser())
+                .isMutualFollow(mutualFollow)
+                .createdAt(Instant.now())
+                .build();
+    }
+}

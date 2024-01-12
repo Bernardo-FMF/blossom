@@ -1,4 +1,4 @@
-package org.blossom.social.grpc.configuration;
+package org.blossom.social.configuration;
 
 import org.blossom.server.IGrpcServerConfiguration;
 import org.springframework.beans.factory.annotation.Value;

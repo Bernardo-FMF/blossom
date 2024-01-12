@@ -18,12 +18,12 @@ public class SocialController {
     private SocialService socialService;
 
     @PostMapping
-    public ResponseEntity<String> createSocialRelation(@RequestBody SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException {
+    public ResponseEntity<GenericResponseDto> createSocialRelation(@RequestBody SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(socialService.createSocialRelation(socialRelationDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteSocialRelation(SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException, UserNotFoundException {
+    public ResponseEntity<GenericResponseDto> deleteSocialRelation(SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(socialService.deleteSocialRelation(socialRelationDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 

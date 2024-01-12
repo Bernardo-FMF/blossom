@@ -1,4 +1,4 @@
-package org.blossom.social.grpc.configuration;
+package org.blossom.social.grpc;
 
 import org.blossom.social.grpc.server.GrpcServer;
 import org.springframework.beans.BeansException;
@@ -26,5 +26,4 @@ public class GrpcServerRegistration implements BeanPostProcessor {
         }
         return bean;
     }
-
 }

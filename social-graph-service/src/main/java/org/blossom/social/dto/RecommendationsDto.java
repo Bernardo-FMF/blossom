@@ -2,16 +2,15 @@ package org.blossom.social.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 public class RecommendationsDto {
     private int userId;
     private List<UserDto> recommendations;
-    private boolean eof;
-    private long currentPage;
-    private long totalPages;
-    private long totalElements;
+    private PaginationInfoDto paginationInfo;
 }

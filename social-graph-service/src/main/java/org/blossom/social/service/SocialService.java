@@ -4,18 +4,16 @@ import org.blossom.social.dto.*;
 import org.blossom.social.entity.GraphUser;
 import org.blossom.social.exception.FollowNotValidException;
 import org.blossom.social.exception.UserNotFoundException;
+import org.blossom.social.factory.impl.SocialFollowFactory;
 import org.blossom.social.kafka.outbound.KafkaMessageService;
 import org.blossom.social.kafka.outbound.model.SocialFollow;
-import org.blossom.social.mapper.LocalUserMapper;
+import org.blossom.social.mapper.impl.*;
 import org.blossom.social.repository.SocialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.stream.Collectors;
 
 @Service
 public class SocialService {
@@ -26,9 +24,24 @@ public class SocialService {
     private KafkaMessageService messageService;
 
     @Autowired
-    private LocalUserMapper localUserMapper;
+    private UserDtoMapper userDtoMapper;
 
-    public String createSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException {
+    @Autowired
+    private GenericDtoMapper genericDtoMapper;
+
+    @Autowired
+    private RecommendationsDtoMapper recommendationsDtoMapper;
+
+    @Autowired
+    private GraphUserDtoMapper graphUserDtoMapper;
+
+    @Autowired
+    private FollowCountDtoMapper followCountDtoMapper;
+
+    @Autowired
+    private SocialFollowFactory socialFollowFactory;
+
+    public GenericResponseDto createSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException {
         if (socialRelationDto.getInitiatingUser() != userId) {
             throw new FollowNotValidException("Could not perform operation on this user");
         }
@@ -47,19 +60,14 @@ public class SocialService {
 
         socialRepository.createFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
 
-        SocialFollow socialFollow = SocialFollow.builder()
-                .initiatingUser(socialRelationDto.getInitiatingUser())
-                .receivingUser(socialRelationDto.getReceivingUser())
-                .isMutualFollow(socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), socialRelationDto.getInitiatingUser()))
-                .createdAt(new Date())
-                .build();
+        SocialFollow socialFollow = socialFollowFactory.buildEntity(socialRelationDto, socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), socialRelationDto.getInitiatingUser()));
 
         messageService.publishCreation(socialFollow);
 
-        return "Relation was created successfully";
+        return genericDtoMapper.toDto("Relation was created successfully", userId, null);
     }
 
-    public String deleteSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException, UserNotFoundException {
+    public GenericResponseDto deleteSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException, UserNotFoundException {
         if (socialRelationDto.getInitiatingUser() != userId) {
             throw new FollowNotValidException("Could not perform operation on this user");
         }
@@ -78,15 +86,11 @@ public class SocialService {
 
         socialRepository.deleteFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
 
-        SocialFollow socialFollow = SocialFollow.builder()
-                .initiatingUser(socialRelationDto.getInitiatingUser())
-                .receivingUser(socialRelationDto.getReceivingUser())
-                .isMutualFollow(false)
-                .createdAt(new Date())
-                .build();
+        SocialFollow socialFollow = socialFollowFactory.buildEntity(socialRelationDto, false);
+
         messageService.publishCreation(socialFollow);
 
-        return "Relation was deleted successfully";
+        return genericDtoMapper.toDto("Relation was deleted successfully", userId, null);
     }
 
     public RecommendationsDto getFollowRecommendations(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
@@ -94,18 +98,12 @@ public class SocialService {
             throw new UserNotFoundException("User not found");
         }
 
-        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : Pageable.unpaged();
 
         Page<GraphUser> recommendations = socialRepository.findRecommendations(userId, page);
 
-        return RecommendationsDto.builder()
-                .userId(userId)
-                .recommendations(recommendations.stream().map(user -> localUserMapper.mapToLocalUser(user)).collect(Collectors.toList()))
-                .currentPage(recommendations.getNumber())
-                .totalPages(recommendations.getTotalPages())
-                .totalElements(recommendations.getTotalElements())
-                .eof(!recommendations.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = recommendationsDtoMapper.createPaginationInfo(searchParameters.getPage(), recommendations.getTotalPages(), recommendations.getTotalElements(), !recommendations.hasNext());
+        return recommendationsDtoMapper.toPaginatedDto(userId, recommendations.getContent(), paginationInfo);
     }
 
     public GraphUserDto getUserFollowers(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
@@ -113,18 +111,12 @@ public class SocialService {
             throw new UserNotFoundException("User not found");
         }
 
-        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : Pageable.unpaged();
 
         Page<GraphUser> followers = socialRepository.findFollowers(userId, page);
 
-        return GraphUserDto.builder()
-                .userId(userId)
-                .otherUsers(followers.stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
-                .totalPages(followers.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(followers.getTotalElements())
-                .eof(!followers.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = recommendationsDtoMapper.createPaginationInfo(searchParameters.getPage(), followers.getTotalPages(), followers.getTotalElements(), !followers.hasNext());
+        return graphUserDtoMapper.toPaginatedDto(userId, followers.getContent(), paginationInfo);
     }
 
     public GraphUserDto getUserFollowings(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
@@ -132,18 +124,12 @@ public class SocialService {
             throw new UserNotFoundException("User not found");
         }
 
-        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : Pageable.unpaged();
 
         Page<GraphUser> followers = socialRepository.findFollowing(userId, page);
 
-        return GraphUserDto.builder()
-                .userId(userId)
-                .otherUsers(followers.stream().map(graphUser -> localUserMapper.mapToLocalUser(graphUser)).collect(Collectors.toList()))
-                .totalPages(followers.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(followers.getTotalElements())
-                .eof(!followers.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = recommendationsDtoMapper.createPaginationInfo(searchParameters.getPage(), followers.getTotalPages(), followers.getTotalElements(), !followers.hasNext());
+        return graphUserDtoMapper.toPaginatedDto(userId, followers.getContent(), paginationInfo);
     }
 
     public FollowCountDto getFollowCount(int userId) throws UserNotFoundException {
@@ -154,10 +140,6 @@ public class SocialService {
         long followCount = socialRepository.findFollowCount(userId);
         long followerCount = socialRepository.findFollowerCount(userId);
 
-        return FollowCountDto.builder()
-                .id(userId)
-                .totalFollows(followCount)
-                .totalFollowers(followerCount)
-                .build();
+        return followCountDtoMapper.toDto(userId, followCount, followerCount);
     }
 }

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -13,5 +13,5 @@ public class KafkaSocialFollowResource extends KafkaResource {
     private int initiatingUser;
     private int receivingUser;
     private boolean isMutualFollow;
-    private Date createdAt;
+    private Instant createdAt;
 }

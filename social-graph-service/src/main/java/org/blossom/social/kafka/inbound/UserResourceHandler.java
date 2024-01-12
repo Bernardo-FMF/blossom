@@ -3,7 +3,8 @@ package org.blossom.social.kafka.inbound;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaUserResource;
 import org.blossom.social.entity.GraphUser;
-import org.blossom.social.mapper.LocalUserMapper;
+import org.blossom.social.factory.impl.GraphUserFactory;
+import org.blossom.social.mapper.impl.UserDtoMapper;
 import org.blossom.social.repository.SocialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,14 +14,17 @@ import java.util.Optional;
 @Service
 public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResource> {
     @Autowired
-    private LocalUserMapper localUserMapper;
+    private UserDtoMapper userDtoMapper;
 
     @Autowired
     private SocialRepository socialRepository;
 
+    @Autowired
+    private GraphUserFactory graphUserFactory;
+
     @Override
     public void save(KafkaUserResource resource) {
-        socialRepository.save(GraphUser.builder().userId(resource.getId()).username(resource.getUsername()).fullName(resource.getFullName()).imageUrl(resource.getImageUrl()).build());
+        socialRepository.save(graphUserFactory.buildEntity(resource));
     }
 
     @Override

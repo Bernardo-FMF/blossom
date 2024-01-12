@@ -12,9 +12,17 @@ public class GrpcServerRunner implements ApplicationRunner {
     private GrpcServer grpcServer;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         grpcServer.start();
-        grpcServer.blockUntilShutdown();
+        Runtime.getRuntime().addShutdownHook(
+                new Thread(() -> {
+                    try {
+                        grpcServer.blockUntilShutdown();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+        );
     }
 
 }
