@@ -26,14 +26,10 @@ public class SearchService {
 
     public UsersDto userLookup(SearchParametersDto searchParameters) {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
-        Page<User> localUsers = userRepository.findByUsernameContainingIgnoreCaseAndVerifiedIsTrueOrFullNameContainingIgnoreCaseAndVerifiedIsTrue(searchParameters.getContains(), searchParameters.getContains(), page);
+        Page<User> users = userRepository.findByUsernameContainingIgnoreCaseAndVerifiedIsTrueOrFullNameContainingIgnoreCaseAndVerifiedIsTrue(searchParameters.getContains(), searchParameters.getContains(), page);
 
-        return usersDtoMapper.toPaginatedDto(localUsers.getContent(), PaginationInfoDto.builder()
-                .totalPages(localUsers.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(localUsers.getTotalElements())
-                .eof(!localUsers.hasNext())
-                .build());
+        PaginationInfoDto paginationInfo = usersDtoMapper.createPaginationInfo(searchParameters.getPage(), users.getTotalPages(), users.getTotalElements(), !users.hasNext());
+        return usersDtoMapper.toPaginatedDto(users.getContent(), paginationInfo);
     }
 
     public SimplifiedUserDto userLookupByUsername(String username) {
