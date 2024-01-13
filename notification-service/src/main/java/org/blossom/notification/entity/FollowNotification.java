@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class FollowNotification {
     private int senderId;
 
     @Field(name = "followed_at")
-    private Date followedAt;
+    private Instant followedAt;
 
     @Field(name = "is_delivered")
     private boolean isDelivered;

@@ -3,12 +3,12 @@ package org.blossom.notification.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Builder
 @Getter
 public class NotificationFollowDto {
     private String id;
     private UserDto follower;
-    private Date followedAt;
+    private Instant followedAt;
 }
