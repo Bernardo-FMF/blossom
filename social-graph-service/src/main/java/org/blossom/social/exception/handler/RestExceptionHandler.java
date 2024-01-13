@@ -2,6 +2,7 @@ package org.blossom.social.exception.handler;
 
 
 import org.blossom.social.exception.FollowNotValidException;
+import org.blossom.social.exception.UserNotFoundException;
 import org.blossom.social.exception.model.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorMessage> followNotValidException(FollowNotValidException exception, WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorMessage message = new ErrorMessage(status, FollowNotValidException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorMessage> userNotFoundException(UserNotFoundException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorMessage message = new ErrorMessage(status, UserNotFoundException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
 }

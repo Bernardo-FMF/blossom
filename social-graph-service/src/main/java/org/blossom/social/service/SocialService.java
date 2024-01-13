@@ -64,7 +64,7 @@ public class SocialService {
 
         messageService.publishCreation(socialFollow);
 
-        return genericDtoMapper.toDto("Relation was created successfully", userId, null);
+        return genericDtoMapper.toDto("Follow was created successfully", userId, null);
     }
 
     public GenericResponseDto deleteSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException, UserNotFoundException {
