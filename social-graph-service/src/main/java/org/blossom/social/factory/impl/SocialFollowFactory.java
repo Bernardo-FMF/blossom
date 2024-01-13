@@ -8,9 +8,9 @@ import java.time.Instant;
 
 @Component
 public class SocialFollowFactory {
-    public SocialFollow buildEntity(SocialRelationDto data, boolean mutualFollow) {
+    public SocialFollow buildEntity(SocialRelationDto data, int userId, boolean mutualFollow) {
         return SocialFollow.builder()
-                .initiatingUser(data.getInitiatingUser())
+                .initiatingUser(userId)
                 .receivingUser(data.getReceivingUser())
                 .isMutualFollow(mutualFollow)
                 .createdAt(Instant.now())

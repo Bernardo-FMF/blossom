@@ -38,7 +38,6 @@ class SocialControllerTest extends AbstractContextBeans {
     @Test
     void followUser_successful() throws Exception {
         SocialRelationDto socialRelationDto = new SocialRelationDto();
-        socialRelationDto.setInitiatingUser(1);
         socialRelationDto.setReceivingUser(2);
 
         MvcResult postResult = mockMvc.perform(post("/api/v1/social")

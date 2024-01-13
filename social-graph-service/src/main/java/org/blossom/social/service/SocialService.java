@@ -42,25 +42,21 @@ public class SocialService {
     private SocialFollowFactory socialFollowFactory;
 
     public GenericResponseDto createSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException {
-        if (socialRelationDto.getInitiatingUser() != userId) {
-            throw new FollowNotValidException("Could not perform operation on this user");
-        }
-
-        if (socialRelationDto.getInitiatingUser() == socialRelationDto.getReceivingUser()) {
+        if (userId == socialRelationDto.getReceivingUser()) {
             throw new FollowNotValidException("Follow not valid. A user cannot follow itself");
         }
 
-        if (!socialRepository.existsById(socialRelationDto.getInitiatingUser()) || !socialRepository.existsById(socialRelationDto.getReceivingUser())) {
+        if (!socialRepository.existsById(userId) || !socialRepository.existsById(socialRelationDto.getReceivingUser())) {
             throw new FollowNotValidException("Users not found");
         }
 
-        if (socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser())) {
+        if (socialRepository.existsRelationshipBetweenUsers(userId, socialRelationDto.getReceivingUser())) {
             throw new FollowNotValidException("User is already following the requested user");
         }
 
-        socialRepository.createFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
+        socialRepository.createFollowerRelationship(userId, socialRelationDto.getReceivingUser());
 
-        SocialFollow socialFollow = socialFollowFactory.buildEntity(socialRelationDto, socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), socialRelationDto.getInitiatingUser()));
+        SocialFollow socialFollow = socialFollowFactory.buildEntity(socialRelationDto, userId, socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getReceivingUser(), userId));
 
         messageService.publishCreation(socialFollow);
 
@@ -68,29 +64,25 @@ public class SocialService {
     }
 
     public GenericResponseDto deleteSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException, UserNotFoundException {
-        if (socialRelationDto.getInitiatingUser() != userId) {
-            throw new FollowNotValidException("Could not perform operation on this user");
-        }
-
-        if (socialRelationDto.getInitiatingUser() == socialRelationDto.getReceivingUser()) {
+        if (userId == socialRelationDto.getReceivingUser()) {
             throw new FollowNotValidException("Follow not valid. A user cannot follow itself");
         }
 
-        if (!socialRepository.existsById(socialRelationDto.getInitiatingUser()) || !socialRepository.existsById(socialRelationDto.getReceivingUser())) {
+        if (!socialRepository.existsById(userId) || !socialRepository.existsById(socialRelationDto.getReceivingUser())) {
             throw new UserNotFoundException("Users not found");
         }
 
-        if (!socialRepository.existsRelationshipBetweenUsers(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser())) {
+        if (!socialRepository.existsRelationshipBetweenUsers(userId, socialRelationDto.getReceivingUser())) {
             throw new FollowNotValidException("User is not following the requested user");
         }
 
-        socialRepository.deleteFollowerRelationship(socialRelationDto.getInitiatingUser(), socialRelationDto.getReceivingUser());
+        socialRepository.deleteFollowerRelationship(userId, socialRelationDto.getReceivingUser());
 
-        SocialFollow socialFollow = socialFollowFactory.buildEntity(socialRelationDto, false);
+        SocialFollow socialFollow = socialFollowFactory.buildEntity(socialRelationDto, userId, false);
 
         messageService.publishCreation(socialFollow);
 
-        return genericDtoMapper.toDto("Relation was deleted successfully", userId, null);
+        return genericDtoMapper.toDto("Follow was deleted successfully", userId, null);
     }
 
     public RecommendationsDto getFollowRecommendations(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
