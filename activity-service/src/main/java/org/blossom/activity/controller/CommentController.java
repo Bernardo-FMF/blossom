@@ -20,17 +20,17 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<GenericCreationDto> createComment(@RequestBody CommentInfoDto commentInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
+    public ResponseEntity<GenericResponseDto> createComment(@RequestBody CommentInfoDto commentInfoDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(commentInfoDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable("commentId") Integer commentId, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
+    public ResponseEntity<GenericResponseDto> deleteComment(@PathVariable("commentId") Integer commentId, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.deleteComment(commentId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<String> updateComment(@PathVariable("commentId") Integer commentId, @RequestBody UpdatedCommentDto updatedCommentDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
+    public ResponseEntity<GenericResponseDto> updateComment(@PathVariable("commentId") Integer commentId, @RequestBody UpdatedCommentDto updatedCommentDto, Authentication authentication) throws UserNotFoundException, PostNotFoundException, OperationNotAllowedException, CommentNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(commentId, updatedCommentDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 

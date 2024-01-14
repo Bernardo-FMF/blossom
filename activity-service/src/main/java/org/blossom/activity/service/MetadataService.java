@@ -17,8 +17,6 @@ public class MetadataService {
     private InteractionRepository interactionRepository;
 
     public MetadataDto getPostMetadata(String postId, Integer userId) {
-        MetadataDto.MetadataDtoBuilder metadataBuilder = MetadataDto.builder();
-
         InteractionCountProjection interactionCountProjection;
         if (userId == null) {
             interactionCountProjection = interactionRepository.getInteractionCountWithNoUser(postId);
@@ -33,12 +31,11 @@ public class MetadataService {
             commentCountProjection = commentRepository.getCommentCount(postId, userId);
         }
 
-        metadataBuilder
+        return MetadataDto.builder()
                 .userId(userId)
                 .postId(postId)
                 .interactionMetadata(interactionCountProjection)
-                .commentMetadata(commentCountProjection);
-
-        return metadataBuilder.build();
+                .commentMetadata(commentCountProjection)
+                .build();
     }
 }

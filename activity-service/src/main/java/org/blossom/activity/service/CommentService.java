@@ -10,8 +10,9 @@ import org.blossom.activity.exception.OperationNotAllowedException;
 import org.blossom.activity.exception.PostNotFoundException;
 import org.blossom.activity.exception.UserNotFoundException;
 import org.blossom.activity.dto.PostDto;
-import org.blossom.activity.mapper.CommentDtoMapper;
-import org.blossom.activity.mapper.CommentMapper;
+import org.blossom.activity.mapper.impl.CommentDtoMapper;
+import org.blossom.activity.factory.impl.CommentFactory;
+import org.blossom.activity.mapper.impl.GenericDtoMapper;
 import org.blossom.activity.projection.CommentProjection;
 import org.blossom.activity.repository.CommentRepository;
 import org.blossom.activity.repository.LocalUserRepository;
@@ -38,13 +39,16 @@ public class CommentService {
     private CommentDtoMapper commentDtoMapper;
 
     @Autowired
-    private CommentMapper commentMapper;
+    private CommentFactory commentFactory;
 
     @Autowired
     private LocalUserRepository localUserRepository;
 
+    @Autowired
+    private GenericDtoMapper genericDtoMapper;
+
     @Transactional
-    public GenericCreationDto createComment(CommentInfoDto commentInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
+    public GenericResponseDto createComment(CommentInfoDto commentInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
         if (commentInfoDto.getUserId() != userId) {
             throw new OperationNotAllowedException("Logged in user cannot perform this operation");
         }
@@ -73,7 +77,7 @@ public class CommentService {
             throw new UserNotFoundException("User does not exist");
         }
 
-        Comment comment = commentMapper.mapToComment(commentInfoDto, optionalLocalUser.get());
+        Comment comment = commentFactory.buildEntity(commentInfoDto, optionalLocalUser.get());
 
         Comment newComment = commentRepository.save(comment);
 
@@ -89,13 +93,10 @@ public class CommentService {
             commentRepository.updateParentComment(newComment.getId(), topLevelCommentId, commentInfoDto.getParentComment());
         }
 
-        return GenericCreationDto.builder()
-                .id(newComment.getId())
-                .message("Comment was created successfully")
-                .build();
+        return genericDtoMapper.toDto("Comment was created successfully", newComment.getId(), null);
     }
 
-    public String deleteComment(int commentId, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
+    public GenericResponseDto deleteComment(int commentId, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
         Optional<Comment> optionalComment = commentRepository.findById(commentId);
         if (optionalComment.isEmpty()) {
             throw new CommentNotFoundException("Comment not found");
@@ -116,13 +117,14 @@ public class CommentService {
         }
 
         comment.setDeleted(true);
+        comment.setCommentContent(null);
 
         commentRepository.save(comment);
 
-        return "Comment was deleted successfully";
+        return genericDtoMapper.toDto("Comment was deleted successfully", commentId, null);
     }
 
-    public String updateComment(Integer commentId, UpdatedCommentDto updatedCommentDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
+    public GenericResponseDto updateComment(Integer commentId, UpdatedCommentDto updatedCommentDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
         Optional<Comment> optionalComment = commentRepository.findById(commentId);
         if (optionalComment.isEmpty()) {
             throw new CommentNotFoundException("Comment not found");
@@ -146,7 +148,7 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        return "Comment was updated successfully";
+        return genericDtoMapper.toDto("Comment was updated successfully", commentId, null);
     }
 
     public UserCommentsDto getUserComments(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
@@ -161,7 +163,7 @@ public class CommentService {
 
         return UserCommentsDto.builder()
                 .user(optionalLocalUser.get())
-                .comments(comments.get().map(comment -> commentDtoMapper.mapToCommentDto(comment)).toList())
+                .comments(comments.get().map(comment -> commentDtoMapper.toDto(comment)).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())
                 .totalElements(comments.getTotalElements())
@@ -184,7 +186,7 @@ public class CommentService {
 
         return PostCommentsDto.builder()
                 .post(postDto)
-                .comments(comments.get().peek(comment -> comment.setCommentContent(comment.getIsDeleted() ? null : comment.getCommentContent())).map(comment -> commentDtoMapper.mapToCommentDto(comment, allUsers.get(comment.getUserId()))).toList())
+                .comments(comments.get().peek(comment -> comment.setCommentContent(comment.getIsDeleted() ? null : comment.getCommentContent())).map(comment -> commentDtoMapper.toDto(comment, allUsers.get(comment.getUserId()))).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())
                 .totalElements(comments.getTotalElements())
@@ -211,7 +213,7 @@ public class CommentService {
 
         return PostCommentsDto.builder()
                 .post(postDto)
-                .comments(comments.get().map(comment1 -> commentDtoMapper.mapToCommentDto(comment1)).toList())
+                .comments(comments.get().map(comment1 -> commentDtoMapper.toDto(comment1)).toList())
                 .totalPages(comments.getTotalPages())
                 .currentPage(searchParameters.getPage())
                 .totalElements(comments.getTotalElements())

@@ -3,7 +3,7 @@ package org.blossom.activity.kafka;
 import org.apache.commons.lang.NotImplementedException;
 import org.blossom.activity.cache.LocalPostCacheService;
 import org.blossom.facade.KafkaResourceHandler;
-import org.blossom.activity.mapper.LocalPostMapper;
+import org.blossom.activity.mapper.impl.LocalPostDtoMapper;
 import org.blossom.model.KafkaPostResource;
 import org.blossom.activity.repository.CommentRepository;
 import org.blossom.activity.repository.InteractionRepository;
@@ -16,7 +16,7 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
     private LocalPostCacheService localPostCache;
 
     @Autowired
-    private LocalPostMapper localPostMapper;
+    private LocalPostDtoMapper localPostDtoMapper;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -26,7 +26,7 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
 
     @Override
     public void save(KafkaPostResource resource) {
-        localPostCache.addToCache(resource.getId(), localPostMapper.mapToLocalPost(resource));
+        localPostCache.addToCache(resource.getId(), localPostDtoMapper.toDto(resource));
     }
 
     @Override

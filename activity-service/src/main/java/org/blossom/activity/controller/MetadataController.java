@@ -20,6 +20,7 @@ public class MetadataController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<MetadataDto> getPostMetadata(@PathVariable("postId") String postId, Authentication authentication) {
-        return ResponseEntity.status(HttpStatus.OK).body(metadataService.getPostMetadata(postId, authentication != null ? ((CommonUserDetails) authentication.getPrincipal()).getUserId() : null));
+        Integer userId = authentication != null ? ((CommonUserDetails) authentication.getPrincipal()).getUserId() : null;
+        return ResponseEntity.status(HttpStatus.OK).body(metadataService.getPostMetadata(postId, userId));
     }
 }

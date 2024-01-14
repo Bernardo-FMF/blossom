@@ -1,7 +1,7 @@
 package org.blossom.activity.kafka;
 
 import org.blossom.activity.entity.LocalUser;
-import org.blossom.activity.mapper.LocalUserMapper;
+import org.blossom.activity.factory.impl.LocalUserFactory;
 import org.blossom.activity.repository.LocalUserRepository;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaUserResource;
@@ -16,12 +16,12 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     private LocalUserRepository localUserRepository;
 
     @Autowired
-    private LocalUserMapper localUserMapper;
+    private LocalUserFactory localUserFactory;
 
     @Override
     public void save(KafkaUserResource resource) {
         if (!localUserRepository.existsById(resource.getId())) {
-            localUserRepository.save(localUserMapper.mapToLocalUser(resource));
+            localUserRepository.save(localUserFactory.buildEntity(resource));
         }
     }
 

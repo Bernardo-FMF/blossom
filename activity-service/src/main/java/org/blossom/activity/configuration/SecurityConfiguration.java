@@ -42,8 +42,6 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/api/v1/interaction/save").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/interaction/like/{interactionId}").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/interaction/save/{interactionId}").authenticated()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/interaction/post/{postId}/save").authenticated()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/interaction/post/{postId}/like").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/metadata/{postId}").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
