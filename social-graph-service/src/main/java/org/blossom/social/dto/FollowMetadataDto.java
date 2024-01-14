@@ -5,8 +5,9 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class FollowCountDto {
+public class FollowMetadataDto {
     private int id;
     private long totalFollows;
     private long totalFollowers;
+    private FollowRelationDto followRelation;
 }

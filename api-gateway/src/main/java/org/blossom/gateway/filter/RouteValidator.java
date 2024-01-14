@@ -28,7 +28,6 @@ public class RouteValidator {
         openApiEndpoints.put("/api/v1/user-search/username-lookup", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/user/{userId}", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/post/{postId}/identifier", Collections.singletonList(HttpMethod.GET));
-        openApiEndpoints.put("/api/v1/social/follow-count", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/comment/{postId}", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/comment/{commentId}/replies", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/eureka", Collections.singletonList(HttpMethod.GET));
@@ -38,6 +37,7 @@ public class RouteValidator {
         optionallyAuthenticatedApiEndpoints.put("/api/v1/post/user/{userId}", Collections.singletonList(HttpMethod.GET));
         optionallyAuthenticatedApiEndpoints.put("/api/v1/post-search/simple-hashtag-lookup", Collections.singletonList(HttpMethod.GET));
         optionallyAuthenticatedApiEndpoints.put("/api/v1/post/{postId}", Collections.singletonList(HttpMethod.GET));
+        optionallyAuthenticatedApiEndpoints.put("/api/v1/social/follow-metadata", Collections.singletonList(HttpMethod.GET));
     }
 
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();

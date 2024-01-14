@@ -27,9 +27,10 @@ public class SocialController {
         return ResponseEntity.status(HttpStatus.OK).body(socialService.deleteSocialRelation(socialRelationDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
-    @GetMapping("/follow-count")
-    public ResponseEntity<FollowCountDto> getFollowCount(@RequestParam("id") Integer id) throws UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(socialService.getFollowCount(id));
+    @GetMapping("/follow-metadata")
+    public ResponseEntity<FollowMetadataDto> getFollowMetadata(@RequestParam("id") Integer id, Authentication authentication) throws UserNotFoundException {
+        Integer userId = authentication != null ? ((CommonUserDetails) authentication.getPrincipal()).getUserId() : null;
+        return ResponseEntity.status(HttpStatus.OK).body(socialService.getFollowMetadata(id, userId));
     }
 
     @GetMapping("/follower")

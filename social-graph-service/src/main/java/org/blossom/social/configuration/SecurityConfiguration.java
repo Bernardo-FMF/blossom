@@ -35,7 +35,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/social/follower").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/social/following").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/social/follow-recommendation").authenticated()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/social/follow-count").permitAll())
+                                .requestMatchers(HttpMethod.GET, "/api/v1/social/follow-metadata").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

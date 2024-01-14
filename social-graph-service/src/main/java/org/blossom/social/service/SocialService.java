@@ -36,10 +36,13 @@ public class SocialService {
     private GraphUserDtoMapper graphUserDtoMapper;
 
     @Autowired
-    private FollowCountDtoMapper followCountDtoMapper;
+    private FollowMetadataDtoMapper followMetadataDtoMapper;
 
     @Autowired
     private SocialFollowFactory socialFollowFactory;
+
+    @Autowired
+    private FollowRelationDtoMapper followRelationDtoMapper;
 
     public GenericResponseDto createSocialRelation(SocialRelationDto socialRelationDto, int userId) throws FollowNotValidException {
         if (userId == socialRelationDto.getReceivingUser()) {
@@ -124,7 +127,7 @@ public class SocialService {
         return graphUserDtoMapper.toPaginatedDto(userId, followers.getContent(), paginationInfo);
     }
 
-    public FollowCountDto getFollowCount(int userId) throws UserNotFoundException {
+    public FollowMetadataDto getFollowMetadata(int userId, Integer id) throws UserNotFoundException {
         if (!socialRepository.existsById(userId)) {
             throw new UserNotFoundException("User not found");
         }
@@ -132,6 +135,9 @@ public class SocialService {
         long followCount = socialRepository.findFollowCount(userId);
         long followerCount = socialRepository.findFollowerCount(userId);
 
-        return followCountDtoMapper.toDto(userId, followCount, followerCount);
+        boolean userIsFollowed = socialRepository.existsRelationshipBetweenUsers(id, userId);
+        boolean userFollows = socialRepository.existsRelationshipBetweenUsers(userId, id);
+
+        return followMetadataDtoMapper.toDto(userId, followCount, followerCount, followRelationDtoMapper.toDto(userFollows, userIsFollowed));
     }
 }

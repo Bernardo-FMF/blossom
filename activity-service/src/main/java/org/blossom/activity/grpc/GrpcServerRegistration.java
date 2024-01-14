@@ -1,4 +1,4 @@
-package org.blossom.activity.grpc.configuration;
+package org.blossom.activity.grpc;
 
 import org.blossom.activity.grpc.server.GrpcServer;
 import org.springframework.beans.BeansException;
