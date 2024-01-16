@@ -51,7 +51,7 @@ public class PostService {
     private GenericDtoMapper genericDtoMapper;
 
     @Autowired
-    private AggregatePostsMapper aggregatePostsMapper;
+    private AggregatePostsDtoMapper aggregatePostsDtoMapper;
 
     @Autowired
     private PostIdentifierDtoMapper postIdentifierDtoMapper;

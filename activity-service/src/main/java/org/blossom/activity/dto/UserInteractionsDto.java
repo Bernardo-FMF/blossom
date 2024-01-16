@@ -13,8 +13,5 @@ public class UserInteractionsDto {
     private LocalUser user;
     private InteractionType interactionType;
     private List<InteractionDto> interactions;
-    private boolean eof;
-    private long currentPage;
-    private long totalPages;
-    private long totalElements;
+    private PaginationInfoDto paginationInfo;
 }

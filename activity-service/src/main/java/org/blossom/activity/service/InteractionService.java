@@ -10,6 +10,7 @@ import org.blossom.activity.dto.PostDto;
 import org.blossom.activity.mapper.impl.InteractionDtoMapper;
 import org.blossom.activity.factory.impl.InteractionFactory;
 import org.blossom.activity.mapper.impl.GenericDtoMapper;
+import org.blossom.activity.mapper.impl.UserInteractionsDtoMapper;
 import org.blossom.activity.repository.InteractionRepository;
 import org.blossom.activity.repository.LocalUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class InteractionService {
 
     @Autowired
     private GenericDtoMapper genericDtoMapper;
+
+    @Autowired
+    private UserInteractionsDtoMapper userInteractionsDtoMapper;
 
     public GenericResponseDto createLike(InteractionInfoDto interactionInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, InteractionAlreadyExistsException {
         if (interactionInfoDto.getUserId() != userId) {
@@ -147,15 +151,8 @@ public class InteractionService {
         Map<String, PostDto> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
                 .collect(Collectors.toMap(PostDto::getPostId, post -> post));
 
-        return UserInteractionsDto.builder()
-                .user(optionalLocalUser.get())
-                .interactionType(InteractionType.LIKE)
-                .interactions(likes.get().map(interaction -> interactionDtoMapper.toDto(interaction, allPosts.get(interaction.getPostId()))).toList())
-                .totalPages(likes.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(likes.getTotalElements())
-                .eof(!likes.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(likes.getTotalPages(), searchParameters.getPage(), likes.getTotalElements(), !likes.hasNext());
+        return userInteractionsDtoMapper.toDto(optionalLocalUser.get(), InteractionType.LIKE, likes.getContent(), allPosts, paginationInfo);
     }
 
     public UserInteractionsDto getUserSaves(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {
@@ -166,19 +163,12 @@ public class InteractionService {
 
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : null;
 
-        Page<Interaction> likes = interactionRepository.findByUserIdAndInteractionType(userId, InteractionType.SAVE, page);
+        Page<Interaction> saves = interactionRepository.findByUserIdAndInteractionType(userId, InteractionType.SAVE, page);
 
-        Map<String, PostDto> allPosts = likes.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
+        Map<String, PostDto> allPosts = saves.stream().map(like -> localPostCache.getFromCache(like.getPostId()))
                 .collect(Collectors.toMap(PostDto::getPostId, post -> post));
 
-        return UserInteractionsDto.builder()
-                .user(optionalLocalUser.get())
-                .interactionType(InteractionType.SAVE)
-                .interactions(likes.get().map(interaction -> interactionDtoMapper.toDto(interaction, allPosts.get(interaction.getPostId()))).toList())
-                .totalPages(likes.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(likes.getTotalElements())
-                .eof(!likes.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(saves.getTotalPages(), searchParameters.getPage(), saves.getTotalElements(), !saves.hasNext());
+        return userInteractionsDtoMapper.toDto(optionalLocalUser.get(), InteractionType.SAVE, saves.getContent(), allPosts, paginationInfo);
     }
 }

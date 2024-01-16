@@ -7,7 +7,7 @@ import org.blossom.post.dto.SearchParametersDto;
 import org.blossom.post.dto.UserDto;
 import org.blossom.post.entity.Post;
 import org.blossom.post.grpc.service.GrpcClientActivityService;
-import org.blossom.post.mapper.impl.AggregatePostsMapper;
+import org.blossom.post.mapper.impl.AggregatePostsDtoMapper;
 import org.blossom.post.mapper.impl.PostUserDtoMapper;
 import org.blossom.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class SearchService {
     private PostUserDtoMapper postUserDtoMapper;
 
     @Autowired
-    private AggregatePostsMapper aggregatePostsMapper;
+    private AggregatePostsDtoMapper aggregatePostsDtoMapper;
 
     @Autowired
     private GrpcClientActivityService grpcClientActivityService;
@@ -48,10 +48,10 @@ public class SearchService {
 
         Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, posts.stream().map(Post::getId).distinct().collect(Collectors.toList()));
 
-        return aggregatePostsMapper.toPaginatedDto(
+        return aggregatePostsDtoMapper.toPaginatedDto(
                 posts.getContent(),
                 allUsers,
                 metadata,
-                aggregatePostsMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
+                aggregatePostsDtoMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
     }
 }

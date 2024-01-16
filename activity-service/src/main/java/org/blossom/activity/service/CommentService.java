@@ -9,10 +9,11 @@ import org.blossom.activity.exception.CommentNotFoundException;
 import org.blossom.activity.exception.OperationNotAllowedException;
 import org.blossom.activity.exception.PostNotFoundException;
 import org.blossom.activity.exception.UserNotFoundException;
-import org.blossom.activity.dto.PostDto;
-import org.blossom.activity.mapper.impl.CommentDtoMapper;
 import org.blossom.activity.factory.impl.CommentFactory;
+import org.blossom.activity.mapper.impl.CommentDtoMapper;
 import org.blossom.activity.mapper.impl.GenericDtoMapper;
+import org.blossom.activity.mapper.impl.PostCommentsDtoMapper;
+import org.blossom.activity.mapper.impl.UserCommentsDtoMapper;
 import org.blossom.activity.projection.CommentProjection;
 import org.blossom.activity.repository.CommentRepository;
 import org.blossom.activity.repository.LocalUserRepository;
@@ -46,6 +47,12 @@ public class CommentService {
 
     @Autowired
     private GenericDtoMapper genericDtoMapper;
+
+    @Autowired
+    private PostCommentsDtoMapper postCommentsDtoMapper;
+
+    @Autowired
+    private UserCommentsDtoMapper userCommentsDtoMapper;
 
     @Transactional
     public GenericResponseDto createComment(CommentInfoDto commentInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
@@ -161,14 +168,8 @@ public class CommentService {
 
         Page<Comment> comments = commentRepository.findByUserId(userId, page);
 
-        return UserCommentsDto.builder()
-                .user(optionalLocalUser.get())
-                .comments(comments.get().map(comment -> commentDtoMapper.toDto(comment)).toList())
-                .totalPages(comments.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(comments.getTotalElements())
-                .eof(!comments.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(comments.getTotalPages(), searchParameters.getPage(), comments.getTotalElements(), !comments.hasNext());
+        return userCommentsDtoMapper.toDto(optionalLocalUser.get(), comments.getContent(), paginationInfo);
     }
 
     public PostCommentsDto getPostComments(String postId, SearchParametersDto searchParameters) throws PostNotFoundException {
@@ -184,14 +185,9 @@ public class CommentService {
         Map<Integer, LocalUser> allUsers = localUserRepository.findAllById(comments.get().map(CommentProjection::getUserId).toList()).stream()
                 .collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
 
-        return PostCommentsDto.builder()
-                .post(postDto)
-                .comments(comments.get().peek(comment -> comment.setCommentContent(comment.getIsDeleted() ? null : comment.getCommentContent())).map(comment -> commentDtoMapper.toDto(comment, allUsers.get(comment.getUserId()))).toList())
-                .totalPages(comments.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(comments.getTotalElements())
-                .eof(!comments.hasNext())
-                .build();
+
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(comments.getTotalPages(), searchParameters.getPage(), comments.getTotalElements(), !comments.hasNext());
+        return postCommentsDtoMapper.toDto(postDto, comments.getContent(), allUsers, paginationInfo);
     }
 
     public PostCommentsDto getCommentReplies(Integer commentId, SearchParametersDto searchParameters) throws CommentNotFoundException, PostNotFoundException {
@@ -211,13 +207,7 @@ public class CommentService {
 
         Page<Comment> comments = commentRepository.findByTopLevelCommentId(commentId, page);
 
-        return PostCommentsDto.builder()
-                .post(postDto)
-                .comments(comments.get().map(comment1 -> commentDtoMapper.toDto(comment1)).toList())
-                .totalPages(comments.getTotalPages())
-                .currentPage(searchParameters.getPage())
-                .totalElements(comments.getTotalElements())
-                .eof(!comments.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(comments.getTotalPages(), searchParameters.getPage(), comments.getTotalElements(), !comments.hasNext());
+        return postCommentsDtoMapper.toDto(postDto, comments.getContent(), paginationInfo);
     }
 }

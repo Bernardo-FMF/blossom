@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class AggregatePostsMapper implements IPaginatedDtoMapper<Post, AggregatePostsDto, PostWithUserDto, PaginationInfoDto> {
+public class AggregatePostsDtoMapper implements IPaginatedDtoMapper<Post, AggregatePostsDto, PostWithUserDto, PaginationInfoDto> {
     @Autowired
     private PostUserDtoMapper postUserDtoMapper;
 

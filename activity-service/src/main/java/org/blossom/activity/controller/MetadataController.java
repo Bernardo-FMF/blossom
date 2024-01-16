@@ -1,6 +1,7 @@
 package org.blossom.activity.controller;
 
 import org.blossom.activity.dto.MetadataDto;
+import org.blossom.activity.exception.PostNotFoundException;
 import org.blossom.model.CommonUserDetails;
 import org.blossom.activity.service.MetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class MetadataController {
     private MetadataService metadataService;
 
     @GetMapping("/{postId}")
-    public ResponseEntity<MetadataDto> getPostMetadata(@PathVariable("postId") String postId, Authentication authentication) {
+    public ResponseEntity<MetadataDto> getPostMetadata(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException {
         Integer userId = authentication != null ? ((CommonUserDetails) authentication.getPrincipal()).getUserId() : null;
         return ResponseEntity.status(HttpStatus.OK).body(metadataService.getPostMetadata(postId, userId));
     }

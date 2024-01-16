@@ -10,8 +10,5 @@ import java.util.List;
 public class PostCommentsDto {
     private PostDto post;
     private List<CommentDto> comments;
-    private boolean eof;
-    private long currentPage;
-    private long totalPages;
-    private long totalElements;
+    private PaginationInfoDto paginationInfo;
 }
