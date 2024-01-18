@@ -8,6 +8,10 @@ spring:
       port: ${BLOSSOM_FEED_DB_PORT}
       local-datacenter: ${BLOSSOM_FEED_DB_DATACENTER}
       schema-action: CREATE_IF_NOT_EXISTS
+      timeout:
+        schema-request: 30s
+        control-connection: 10s
+        request: 5s
   kafka:
     bootstrap-servers: ${BLOSSOM_KAFKA}
     consumer:
