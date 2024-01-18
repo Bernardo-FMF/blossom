@@ -16,6 +16,7 @@
         <module>auth-utilities</module>
         <module>kafka-utilities</module>
         <module>grpc-utilities</module>
+        <module>test-utilities</module>
     </modules>
 
     <properties>
