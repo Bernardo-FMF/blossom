@@ -19,12 +19,4 @@ public class LocalUserPostCount {
 
     @CassandraType(type = CassandraType.Name.COUNTER)
     private long postCount;
-
-    public void incrementCount() {
-        this.postCount++;
-    }
-
-    public void decrementCount() {
-        this.postCount--;
-    }
 }

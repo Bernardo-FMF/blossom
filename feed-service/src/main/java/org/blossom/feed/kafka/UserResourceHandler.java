@@ -26,7 +26,7 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     public void save(KafkaUserResource resource) {
         if (!localUserRepository.existsById(resource.getId())) {
             localUserRepository.save(localUserMapper.mapToLocalUser(resource));
-            localUserPostCountRepository.save(localUserMapper.mapToLocalUserPostCount(resource));
+            localUserPostCountRepository.createCount(resource.getId());
         }
     }
 

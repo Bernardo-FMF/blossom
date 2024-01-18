@@ -58,8 +58,7 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
             Optional<LocalUserPostCount> optionalUser = localUserPostCountRepository.findById(resource.getUserId());
             if (optionalUser.isPresent()) {
                 LocalUserPostCount user = optionalUser.get();
-                user.incrementCount();
-                localUserPostCountRepository.save(user);
+                localUserPostCountRepository.incrementCount(user.getUserId());
             }
 
             localPostByUserRepository.save(localPostByUserMapper.mapToLocalPostUsers(resource.getUserId(), resource.getId()));
@@ -82,8 +81,7 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
         Optional<LocalUserPostCount> optionalUser = localUserPostCountRepository.findById(resource.getUserId());
         if (optionalUser.isPresent()) {
             LocalUserPostCount user = optionalUser.get();
-            user.decrementCount();
-            localUserPostCountRepository.save(user);
+            localUserPostCountRepository.decrementCount(user.getUserId());
         }
 
         List<InvertedFeedEntry> allById = invertedFeedEntryRepository.findByPostId(resource.getId());
