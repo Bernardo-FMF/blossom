@@ -9,8 +9,8 @@ import org.blossom.feed.entity.LocalUserPostCount;
 import org.blossom.feed.exception.UserNotFoundException;
 import org.blossom.feed.grpc.service.GrpcClientActivityService;
 import org.blossom.feed.grpc.service.GrpcClientSocialService;
-import org.blossom.feed.mapper.FeedDtoMapper;
-import org.blossom.feed.mapper.LocalUserDtoMapper;
+import org.blossom.feed.mapper.impl.FeedDtoMapper;
+import org.blossom.feed.mapper.impl.LocalUserDtoMapper;
 import org.blossom.feed.repository.FeedEntryRepository;
 import org.blossom.feed.repository.LocalPostByUserRepository;
 import org.blossom.feed.repository.LocalUserPostCountRepository;
@@ -64,7 +64,7 @@ public class FeedService {
 
         long totalElements = feedEntryRepository.countByKeyUserId(userId);
         if (totalElements == 0) {
-            return getEmptyFeedDto(localUserDtoMapper.mapToLocalUserDto(user), searchParameters);
+            return getEmptyFeedDto(localUserDtoMapper.toDto(user), searchParameters);
         }
         Slice<FeedEntry> feedEntries = feedEntryRepository.findByKeyUserId(userId, page);
 
@@ -75,7 +75,7 @@ public class FeedService {
         Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, feedEntries.get().map(FeedEntry::getPostId).distinct().collect(Collectors.toList()));
 
         PaginationInfoDto paginationInfo = new PaginationInfoDto((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()), searchParameters.getPage(), totalElements, true);
-        return feedDtoMapper.toDto(feedEntries.getContent(), localUserDtoMapper.mapToLocalUserDto(user), allUsersMap, metadata, paginationInfo);
+        return feedDtoMapper.toDto(feedEntries.getContent(), localUserDtoMapper.toDto(user), allUsersMap, metadata, paginationInfo);
     }
 
     public FeedDto getGenericFeed(SearchParametersDto searchParameters) throws InterruptedException {
@@ -98,7 +98,7 @@ public class FeedService {
         Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(null, posts.get().map(LocalPostByUser::getPostId).distinct().collect(Collectors.toList()));
 
         PaginationInfoDto paginationInfo = new PaginationInfoDto((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()), searchParameters.getPage(), totalElements, true);
-        return feedDtoMapper.toDto(posts.getContent(), allUsersMap, metadata, paginationInfo);
+        return feedDtoMapper.toDto(posts.getContent(), null, allUsersMap, metadata, paginationInfo);
     }
 
     private Map<Integer, LocalUser> fetchAllUsersMap(List<Integer> mostFollowed) {

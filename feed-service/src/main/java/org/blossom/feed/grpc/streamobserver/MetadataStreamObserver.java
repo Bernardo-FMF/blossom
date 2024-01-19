@@ -3,7 +3,7 @@ package org.blossom.feed.grpc.streamobserver;
 import io.grpc.stub.StreamObserver;
 import org.blossom.activitycontract.PostInfoResponse;
 import org.blossom.feed.dto.MetadataDto;
-import org.blossom.feed.mapper.MetadataDtoMapper;
+import org.blossom.feed.mapper.impl.MetadataDtoMapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +28,7 @@ public class MetadataStreamObserver implements StreamObserver<PostInfoResponse> 
 
     @Override
     public void onNext(PostInfoResponse postInfoResponse) {
-        MetadataDto metadataDto = metadataDtoMapper.mapToMetadataDto(userId, postInfoResponse);
+        MetadataDto metadataDto = metadataDtoMapper.toDto(userId, postInfoResponse);
         mappedMetadata.put(metadataDto.getPostId(), metadataDto);
         countDownLatch.countDown();
     }

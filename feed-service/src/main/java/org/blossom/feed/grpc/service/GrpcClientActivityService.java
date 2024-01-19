@@ -4,7 +4,7 @@ import org.blossom.activitycontract.PostInfoRequest;
 import org.blossom.feed.dto.MetadataDto;
 import org.blossom.feed.grpc.client.ActivityContractGrpcClientFacade;
 import org.blossom.feed.grpc.streamobserver.MetadataStreamObserver;
-import org.blossom.feed.mapper.MetadataDtoMapper;
+import org.blossom.feed.mapper.impl.MetadataDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

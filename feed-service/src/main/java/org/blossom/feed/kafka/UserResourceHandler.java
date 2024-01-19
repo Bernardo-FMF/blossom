@@ -4,7 +4,7 @@ import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.feed.entity.FeedEntry;
 import org.blossom.feed.entity.LocalPostByUser;
 import org.blossom.feed.entity.LocalUser;
-import org.blossom.feed.mapper.LocalUserMapper;
+import org.blossom.feed.factory.impl.LocalUserFactory;
 import org.blossom.feed.repository.FeedEntryRepository;
 import org.blossom.feed.repository.LocalPostByUserRepository;
 import org.blossom.feed.repository.LocalUserPostCountRepository;
@@ -25,18 +25,18 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     private LocalUserPostCountRepository localUserPostCountRepository;
 
     @Autowired
-    private LocalUserMapper localUserMapper;
-
-    @Autowired
     private LocalPostByUserRepository localPostByUserRepository;
 
     @Autowired
     private FeedEntryRepository feedEntryRepository;
 
+    @Autowired
+    private LocalUserFactory localUserFactory;
+
     @Override
     public void save(KafkaUserResource resource) {
         if (!localUserRepository.existsById(resource.getId())) {
-            localUserRepository.save(localUserMapper.mapToLocalUser(resource));
+            localUserRepository.save(localUserFactory.buildEntity(resource));
             localUserPostCountRepository.createCount(resource.getId());
         }
     }

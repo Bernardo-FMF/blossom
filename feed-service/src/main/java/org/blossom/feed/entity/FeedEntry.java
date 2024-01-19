@@ -31,7 +31,6 @@ public class FeedEntry {
     @AllArgsConstructor
     @Getter
     public static class FeedEntryKey implements Serializable {
-
         @PrimaryKeyColumn(name = "userId", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private int userId;
 

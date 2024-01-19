@@ -4,10 +4,9 @@ import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.feed.entity.FeedEntry;
 import org.blossom.feed.entity.LocalPostByUser;
+import org.blossom.feed.factory.impl.FeedEntryFactory;
+import org.blossom.feed.factory.impl.LocalPostByUserFactory;
 import org.blossom.feed.grpc.service.GrpcClientSocialService;
-import org.blossom.feed.mapper.FeedEntryMapper;
-import org.blossom.feed.mapper.LocalPostByUserMapper;
-import org.blossom.feed.mapper.LocalUserMapper;
 import org.blossom.feed.repository.FeedEntryRepository;
 import org.blossom.feed.repository.LocalPostByUserRepository;
 import org.blossom.feed.repository.LocalUserPostCountRepository;
@@ -30,13 +29,10 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
     private LocalPostByUserRepository localPostByUserRepository;
 
     @Autowired
-    private FeedEntryMapper feedEntryMapper;
+    private FeedEntryFactory feedEntryFactory;
 
     @Autowired
-    private LocalUserMapper localUserMapper;
-
-    @Autowired
-    private LocalPostByUserMapper localPostByUserMapper;
+    private LocalPostByUserFactory localPostByUserFactory;
 
     @Autowired
     private GrpcClientSocialService grpcClientSocialService;
@@ -45,10 +41,10 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
     public void save(KafkaPostResource resource) {
         localUserPostCountRepository.incrementCount(resource.getUserId());
 
-        localPostByUserRepository.save(localPostByUserMapper.mapToLocalPostUsers(resource));
+        localPostByUserRepository.save(localPostByUserFactory.buildEntity(resource));
 
         List<Integer> userFollowers = grpcClientSocialService.getUserFollowers(resource.getUserId());
-        feedEntryRepository.saveAll(userFollowers.stream().map(userId -> feedEntryMapper.mapToFeedEntry(resource, userId)).collect(Collectors.toList()));
+        feedEntryRepository.saveAll(userFollowers.stream().map(userId -> feedEntryFactory.buildEntity(resource, userId)).collect(Collectors.toList()));
     }
 
     @Override
