@@ -35,7 +35,7 @@ public abstract class AbstractContextBeans extends AbstractTestContainers {
                     "spring.data.cassandra.keyspace-name=" + "feedSpace",
                     "spring.data.cassandra.contact-points=" + cassandraDbContainer.getHost(),
                     "spring.data.cassandra.port=" + cassandraDbContainer.getFirstMappedPort(),
-                    "spring.data.cassandra.local-datacenter=" + "datacenter1",
+                    "spring.data.cassandra.local-datacenter=" + cassandraDbContainer.getLocalDatacenter(),
                     "server.port=" + 8080,
                     "spring.kafka.bootstrap-servers=" + kafkaContainer.getBootstrapServers(),
                     "spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer",

@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserCrud_IT extends AbstractContextBeans {
+class UserKafkaMessage_IT extends AbstractContextBeans {
     @Autowired
     private LocalUserRepository localUserRepository;
 
