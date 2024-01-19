@@ -12,8 +12,5 @@ import java.util.List;
 public class FeedDto {
     private LocalUserDto user;
     private List<LocalPostDto> posts;
-    private boolean eof;
-    private long currentPage;
-    private long totalPages;
-    private long totalElements;
+    private PaginationInfoDto paginationInfo;
 }

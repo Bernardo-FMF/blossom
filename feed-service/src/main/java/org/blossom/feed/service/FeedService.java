@@ -2,21 +2,29 @@ package org.blossom.feed.service;
 
 import jakarta.annotation.Nullable;
 import org.blossom.feed.dto.*;
-import org.blossom.feed.entity.*;
+import org.blossom.feed.entity.FeedEntry;
+import org.blossom.feed.entity.LocalPostByUser;
+import org.blossom.feed.entity.LocalUser;
+import org.blossom.feed.entity.LocalUserPostCount;
 import org.blossom.feed.exception.UserNotFoundException;
 import org.blossom.feed.grpc.service.GrpcClientActivityService;
 import org.blossom.feed.grpc.service.GrpcClientSocialService;
-import org.blossom.feed.mapper.LocalPostDtoMapper;
+import org.blossom.feed.mapper.FeedDtoMapper;
 import org.blossom.feed.mapper.LocalUserDtoMapper;
-import org.blossom.feed.repository.*;
+import org.blossom.feed.repository.FeedEntryRepository;
+import org.blossom.feed.repository.LocalPostByUserRepository;
+import org.blossom.feed.repository.LocalUserPostCountRepository;
+import org.blossom.feed.repository.LocalUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,19 +42,16 @@ public class FeedService {
     private LocalPostByUserRepository localPostByUserRepository;
 
     @Autowired
-    private LocalPostRepository localPostRepository;
-
-    @Autowired
     private LocalUserDtoMapper localUserDtoMapper;
-
-    @Autowired
-    private LocalPostDtoMapper localPostDtoMapper;
 
     @Autowired
     private GrpcClientSocialService grpcClientSocialService;
 
     @Autowired
     private GrpcClientActivityService grpcClientActivityService;
+
+    @Autowired
+    private FeedDtoMapper feedDtoMapper;
 
     public FeedDto getUserFeed(int userId, SearchParametersDto searchParameters) throws UserNotFoundException, InterruptedException {
         Optional<LocalUser> optionalUser = localUserRepository.findById(userId);
@@ -59,26 +64,24 @@ public class FeedService {
 
         long totalElements = feedEntryRepository.countByKeyUserId(userId);
         if (totalElements == 0) {
-            return getFeedDto(localUserDtoMapper.mapToLocalUserDto(user), null, 0, null, null, searchParameters);
+            return getEmptyFeedDto(localUserDtoMapper.mapToLocalUserDto(user), searchParameters);
         }
         Slice<FeedEntry> feedEntries = feedEntryRepository.findByKeyUserId(userId, page);
 
-        List<String> allPostIds = feedEntries.get().map(FeedEntry::getPostId).distinct().collect(Collectors.toList());
-        List<Integer> allUserIds = feedEntries.get().map(FeedEntry::getUserId).distinct().collect(Collectors.toList());
-
-        List<LocalPost> allPosts = localPostRepository.findAllById(allPostIds);
+        List<Integer> allUserIds = feedEntries.get().map(entry -> entry.getKey().getUserId()).distinct().collect(Collectors.toList());
 
         Map<Integer, LocalUser> allUsersMap = localUserRepository.findAllById(allUserIds).stream().collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
 
-        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, allPosts.stream().map(LocalPost::getId).distinct().collect(Collectors.toList()));
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, feedEntries.get().map(FeedEntry::getPostId).distinct().collect(Collectors.toList()));
 
-        return getFeedDto(localUserDtoMapper.mapToLocalUserDto(user), new SliceImpl<>(allPosts, page, feedEntries.hasNext()), totalElements, allUsersMap, metadata, searchParameters);
+        PaginationInfoDto paginationInfo = new PaginationInfoDto((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()), searchParameters.getPage(), totalElements, true);
+        return feedDtoMapper.toDto(feedEntries.getContent(), localUserDtoMapper.mapToLocalUserDto(user), allUsersMap, metadata, paginationInfo);
     }
 
     public FeedDto getGenericFeed(SearchParametersDto searchParameters) throws InterruptedException {
         List<Integer> mostFollowed = grpcClientSocialService.getMostFollowed();
         if (mostFollowed.isEmpty()) {
-            return getFeedDto(null, null, 0, null, null, searchParameters);
+            return getEmptyFeedDto(null, searchParameters);
         }
 
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit()) : Pageable.unpaged();
@@ -87,15 +90,15 @@ public class FeedService {
 
         long totalElements = computeTotalElements(allUsersMap.keySet());
         if (totalElements == 0L) {
-            return getFeedDto(null, null, 0, null, null, searchParameters);
+            return getEmptyFeedDto(null, searchParameters);
         }
 
-        List<LocalPostByUser> allPostsByUser = localPostByUserRepository.findAllById(allUsersMap.keySet());
-        Slice<LocalPost> posts = localPostRepository.findByIdIn(allPostsByUser.stream().map(LocalPostByUser::getPostId).toList(), page);
+        Slice<LocalPostByUser> posts = localPostByUserRepository.findByUserIdIn(allUsersMap.keySet(), page);
 
-        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(null, posts.get().map(LocalPost::getId).distinct().collect(Collectors.toList()));
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(null, posts.get().map(LocalPostByUser::getPostId).distinct().collect(Collectors.toList()));
 
-        return getFeedDto(null, posts, totalElements, allUsersMap, metadata, searchParameters);
+        PaginationInfoDto paginationInfo = new PaginationInfoDto((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()), searchParameters.getPage(), totalElements, true);
+        return feedDtoMapper.toDto(posts.getContent(), allUsersMap, metadata, paginationInfo);
     }
 
     private Map<Integer, LocalUser> fetchAllUsersMap(List<Integer> mostFollowed) {
@@ -108,16 +111,8 @@ public class FeedService {
         return allUsersCount.stream().map(LocalUserPostCount::getPostCount).reduce(0L, Long::sum);
     }
 
-    private FeedDto getFeedDto(@Nullable LocalUserDto user, @Nullable Slice<LocalPost> posts, long totalElements, Map<Integer, LocalUser> allUsers, Map<String, MetadataDto> metadata, SearchParametersDto searchParameters) {
-        List<LocalPostDto> postDtos = posts == null ? List.of() : posts.stream().map(post -> localPostDtoMapper.mapToLocalPostDto(post, localUserDtoMapper.mapToLocalUserDto(allUsers.get(post.getUserId())), metadata.get(post.getId()))).collect(Collectors.toList());
-
-        return FeedDto.builder()
-                .user(user)
-                .posts(postDtos)
-                .totalPages((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()))
-                .currentPage(searchParameters.getPage())
-                .totalElements(totalElements)
-                .eof(posts == null || !posts.hasNext())
-                .build();
+    private FeedDto getEmptyFeedDto(@Nullable LocalUserDto user, SearchParametersDto searchParameters) {
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(0, searchParameters.getPage(), 0, true);
+        return feedDtoMapper.toDto(List.of(), user, null, null, paginationInfo);
     }
 }
