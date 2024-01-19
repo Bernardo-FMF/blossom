@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
-import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,14 +20,12 @@ import java.io.Serializable;
 public class FeedEntry {
     @PrimaryKey
     private FeedEntryKey key;
-
-    public int getUserId() {
-        return key.getUserId();
-    }
-
-    public String getPostId() {
-        return key.getPostId();
-    }
+    @Indexed
+    private String postId;
+    private int postCreatorId;
+    @CassandraType(type = CassandraType.Name.LIST, typeArguments = CassandraType.Name.TEXT)
+    private List<String> media;
+    private String description;
 
     @PrimaryKeyClass
     @AllArgsConstructor
@@ -37,7 +35,7 @@ public class FeedEntry {
         @PrimaryKeyColumn(name = "userId", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private int userId;
 
-        @PrimaryKeyColumn(name = "postId", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-        private String postId;
+        @PrimaryKeyColumn(name = "createdAt", ordinal = 1, ordering = Ordering.DESCENDING)
+        private Instant createdAt;
     }
 }
