@@ -2,41 +2,32 @@ package org.blossom.feed.kafka;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
-import org.blossom.feed.entity.InvertedFeedEntry;
-import org.blossom.feed.entity.LocalUserPostCount;
+import org.blossom.feed.entity.FeedEntry;
+import org.blossom.feed.entity.LocalPostByUser;
 import org.blossom.feed.grpc.service.GrpcClientSocialService;
 import org.blossom.feed.mapper.FeedEntryMapper;
 import org.blossom.feed.mapper.LocalPostByUserMapper;
-import org.blossom.feed.mapper.LocalPostMapper;
 import org.blossom.feed.mapper.LocalUserMapper;
-import org.blossom.feed.repository.*;
+import org.blossom.feed.repository.FeedEntryRepository;
+import org.blossom.feed.repository.LocalPostByUserRepository;
+import org.blossom.feed.repository.LocalUserPostCountRepository;
 import org.blossom.model.KafkaPostResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResource> {
     @Autowired
-    private LocalPostRepository localPostRepository;
-
-    @Autowired
     private FeedEntryRepository feedEntryRepository;
-
-    @Autowired
-    private InvertedFeedEntryRepository invertedFeedEntryRepository;
 
     @Autowired
     private LocalUserPostCountRepository localUserPostCountRepository;
 
     @Autowired
     private LocalPostByUserRepository localPostByUserRepository;
-
-    @Autowired
-    private LocalPostMapper localPostMapper;
 
     @Autowired
     private FeedEntryMapper feedEntryMapper;
@@ -52,21 +43,12 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
 
     @Override
     public void save(KafkaPostResource resource) {
-        if (!localPostRepository.existsById(resource.getId())) {
-            localPostRepository.save(localPostMapper.mapToLocalPost(resource));
+        localUserPostCountRepository.incrementCount(resource.getUserId());
 
-            Optional<LocalUserPostCount> optionalUser = localUserPostCountRepository.findById(resource.getUserId());
-            if (optionalUser.isPresent()) {
-                LocalUserPostCount user = optionalUser.get();
-                localUserPostCountRepository.incrementCount(user.getUserId());
-            }
+        localPostByUserRepository.save(localPostByUserMapper.mapToLocalPostUsers(resource));
 
-            localPostByUserRepository.save(localPostByUserMapper.mapToLocalPostUsers(resource.getUserId(), resource.getId()));
-
-            List<Integer> userFollowers = grpcClientSocialService.getUserFollowers(resource.getUserId());
-            feedEntryRepository.saveAll(userFollowers.stream().map(userId -> feedEntryMapper.mapToFeedEntry(resource.getId(), userId)).collect(Collectors.toList()));
-            invertedFeedEntryRepository.saveAll(userFollowers.stream().map(userId -> feedEntryMapper.mapToInvertedFeedEntry(resource.getId(), userId)).collect(Collectors.toList()));
-        }
+        List<Integer> userFollowers = grpcClientSocialService.getUserFollowers(resource.getUserId());
+        feedEntryRepository.saveAll(userFollowers.stream().map(userId -> feedEntryMapper.mapToFeedEntry(resource, userId)).collect(Collectors.toList()));
     }
 
     @Override
@@ -76,20 +58,12 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
 
     @Override
     public void delete(KafkaPostResource resource) {
-        localPostRepository.deleteById(resource.getId());
+        List<FeedEntry> feedEntriesToDelete = feedEntryRepository.findByPostIdIn(List.of(resource.getId()));
+        feedEntryRepository.deleteAll(feedEntriesToDelete);
 
-        Optional<LocalUserPostCount> optionalUser = localUserPostCountRepository.findById(resource.getUserId());
-        if (optionalUser.isPresent()) {
-            LocalUserPostCount user = optionalUser.get();
-            localUserPostCountRepository.decrementCount(user.getUserId());
-        }
+        List<LocalPostByUser> localPostByUsersToDelete = localPostByUserRepository.findByPostIdIn(List.of(resource.getId()));
+        localPostByUserRepository.deleteAll(localPostByUsersToDelete);
 
-        List<InvertedFeedEntry> allById = invertedFeedEntryRepository.findByPostId(resource.getId());
-
-        for (InvertedFeedEntry invertedFeedEntry: allById) {
-            feedEntryRepository.deleteByKeyUserIdAndKeyPostId(invertedFeedEntry.getUserId(), invertedFeedEntry.getPostId());
-        }
-
-        invertedFeedEntryRepository.deleteById(resource.getId());
+        localUserPostCountRepository.decrementCount(resource.getUserId());
     }
 }
