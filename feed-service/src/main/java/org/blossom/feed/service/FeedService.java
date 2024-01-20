@@ -68,7 +68,7 @@ public class FeedService {
         }
         Slice<FeedEntry> feedEntries = feedEntryRepository.findByKeyUserId(userId, page);
 
-        List<Integer> allUserIds = feedEntries.get().map(entry -> entry.getKey().getUserId()).distinct().collect(Collectors.toList());
+        List<Integer> allUserIds = feedEntries.get().map(FeedEntry::getPostCreatorId).distinct().collect(Collectors.toList());
 
         Map<Integer, LocalUser> allUsersMap = localUserRepository.findAllById(allUserIds).stream().collect(Collectors.toMap(LocalUser::getId, localUser -> localUser));
 

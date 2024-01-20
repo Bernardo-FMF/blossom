@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 public class FeedDtoMapper {
@@ -38,7 +39,7 @@ public class FeedDtoMapper {
         return LocalPostDto.builder()
                 .id(entry.getPostId())
                 .creator(localUser)
-                .media(entry.getMedia().toArray(new String[0]))
+                .media(Objects.isNull(entry.getMedia()) ? new String[] {} : entry.getMedia().toArray(new String[0]))
                 .description(entry.getDescription())
                 .metadata(metadataDto)
                 .build();
@@ -48,7 +49,7 @@ public class FeedDtoMapper {
         return LocalPostDto.builder()
                 .id(entry.getPostId())
                 .creator(localUser)
-                .media(entry.getMedia().toArray(new String[0]))
+                .media(Objects.isNull(entry.getMedia()) ? new String[] {} : entry.getMedia().toArray(new String[0]))
                 .description(entry.getDescription())
                 .metadata(metadataDto)
                 .build();
