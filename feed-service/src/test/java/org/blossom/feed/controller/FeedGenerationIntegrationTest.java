@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class FeedGeneration_IT extends AbstractContextBeans {
+class FeedGenerationIntegrationTest extends AbstractContextBeans {
     @Autowired
     private LocalUserRepository localUserRepository;
 

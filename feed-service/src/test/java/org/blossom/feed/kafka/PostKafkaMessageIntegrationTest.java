@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PostKafkaMessage_IT extends AbstractContextBeans {
+public class PostKafkaMessageIntegrationTest extends AbstractContextBeans {
     @Autowired
     private LocalUserRepository localUserRepository;
 
