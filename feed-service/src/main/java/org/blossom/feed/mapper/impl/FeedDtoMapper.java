@@ -30,7 +30,7 @@ public class FeedDtoMapper {
             return toDto(tmp, localUserDtoMapper.toDto(allUsers.get(tmp.getPostCreatorId())), metadata.get(tmp.getPostId()));
         } else if (entry instanceof LocalPostByUser) {
             LocalPostByUser tmp = (LocalPostByUser) entry;
-            return toDto(tmp, localUserDtoMapper.toDto(allUsers.get(tmp.getUserId())), metadata.get(tmp.getPostId()));
+            return toDto(tmp, localUserDtoMapper.toDto(allUsers.get(tmp.getKey().getUserId())), metadata.get(tmp.getPostId()));
         }
         return null;
     }
@@ -41,6 +41,7 @@ public class FeedDtoMapper {
                 .creator(localUser)
                 .media(Objects.isNull(entry.getMedia()) ? new String[] {} : entry.getMedia().toArray(new String[0]))
                 .description(entry.getDescription())
+                .createdAt(entry.getKey().getCreatedAt())
                 .metadata(metadataDto)
                 .build();
     }
@@ -51,6 +52,7 @@ public class FeedDtoMapper {
                 .creator(localUser)
                 .media(Objects.isNull(entry.getMedia()) ? new String[] {} : entry.getMedia().toArray(new String[0]))
                 .description(entry.getDescription())
+                .createdAt(entry.getKey().getCreatedAt())
                 .metadata(metadataDto)
                 .build();
     }

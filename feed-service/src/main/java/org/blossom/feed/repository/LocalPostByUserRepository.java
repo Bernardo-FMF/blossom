@@ -13,5 +13,5 @@ public interface LocalPostByUserRepository extends CassandraRepository<LocalPost
     @AllowFiltering
     List<LocalPostByUser> findByPostIdIn(List<String> postIds);
 
-    Slice<LocalPostByUser> findByUserIdIn(Set<Integer> integers, Pageable page);
+    Slice<LocalPostByUser> findByKeyUserIdIn(Set<Integer> integers, Pageable page);
 }

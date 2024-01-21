@@ -21,10 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,12 +90,14 @@ public class FeedService {
             return getEmptyFeedDto(null, searchParameters);
         }
 
-        Slice<LocalPostByUser> posts = localPostByUserRepository.findByUserIdIn(allUsersMap.keySet(), page);
+        Slice<LocalPostByUser> posts = localPostByUserRepository.findByKeyUserIdIn(allUsersMap.keySet(), page);
 
         Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(null, posts.get().map(LocalPostByUser::getPostId).distinct().collect(Collectors.toList()));
 
         PaginationInfoDto paginationInfo = new PaginationInfoDto((int) Math.ceil((double) totalElements / searchParameters.getPageLimit()), searchParameters.getPage(), totalElements, true);
-        return feedDtoMapper.toDto(posts.getContent(), null, allUsersMap, metadata, paginationInfo);
+        List<LocalPostByUser> content = new ArrayList<>(posts.getContent());
+        content.sort((obj1, obj2) -> obj2.getKey().getCreatedAt().compareTo(obj1.getKey().getCreatedAt()));
+        return feedDtoMapper.toDto(content, null, allUsersMap, metadata, paginationInfo);
     }
 
     private Map<Integer, LocalUser> fetchAllUsersMap(List<Integer> mostFollowed) {

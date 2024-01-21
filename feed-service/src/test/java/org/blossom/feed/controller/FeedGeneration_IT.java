@@ -2,8 +2,10 @@ package org.blossom.feed.controller;
 
 import org.blossom.feed.AbstractContextBeans;
 import org.blossom.feed.dto.FeedDto;
-import org.blossom.feed.dto.MetadataDto;
+import org.blossom.feed.entity.FeedEntry;
+import org.blossom.feed.entity.LocalPostByUser;
 import org.blossom.feed.entity.LocalUser;
+import org.blossom.feed.entity.LocalUserPostCount;
 import org.blossom.feed.grpc.service.GrpcClientActivityService;
 import org.blossom.feed.grpc.service.GrpcClientSocialService;
 import org.blossom.feed.repository.FeedEntryRepository;
@@ -61,6 +63,7 @@ class FeedGeneration_IT extends AbstractContextBeans {
     private KafkaFutureExecutor kafkaFutureExecutor;
 
     private final Map<Integer, Integer> postUserMap = new HashMap<>();
+    private final Map<Integer, List<Integer>> followerMap = new HashMap<>();
 
     @BeforeEach
     void setUp() throws InterruptedException {
@@ -77,19 +80,21 @@ class FeedGeneration_IT extends AbstractContextBeans {
         postUserMap.put(9, 2);
         postUserMap.put(10, 3);
 
-        Mockito.when(grpcClientSocialService.getUserFollowers(1)).thenReturn(List.of(2, 3, 4, 5));
-        Mockito.when(grpcClientSocialService.getUserFollowers(2)).thenReturn(List.of(1));
-        Mockito.when(grpcClientSocialService.getUserFollowers(3)).thenReturn(List.of(1, 2));
-        Mockito.when(grpcClientSocialService.getUserFollowers(4)).thenReturn(List.of(1));
-        Mockito.when(grpcClientSocialService.getUserFollowers(5)).thenReturn(List.of(1, 2, 3, 4));
+        followerMap.put(1, List.of(2, 3, 4, 5));
+        followerMap.put(2, List.of(1));
+        followerMap.put(3, List.of(1, 2));
+        followerMap.put(4, List.of(1));
+        followerMap.put(5, List.of(1, 2, 3, 4));
 
-        Map<String, MetadataDto> metadataDtoMap = new HashMap<>();
-        metadataDtoMap.put("postId1", null);
-        metadataDtoMap.put("postId2", null);
-        metadataDtoMap.put("postId3", null);
+        Mockito.when(grpcClientSocialService.getUserFollowers(1)).thenReturn(followerMap.get(1));
+        Mockito.when(grpcClientSocialService.getUserFollowers(2)).thenReturn(followerMap.get(2));
+        Mockito.when(grpcClientSocialService.getUserFollowers(3)).thenReturn(followerMap.get(3));
+        Mockito.when(grpcClientSocialService.getUserFollowers(4)).thenReturn(followerMap.get(4));
+        Mockito.when(grpcClientSocialService.getUserFollowers(5)).thenReturn(followerMap.get(5));
 
-        Mockito.when(grpcClientActivityService.getMetadata(1, List.of("postId1", "postId2", "postId3"))).thenReturn(metadataDtoMap);
-        Mockito.when(grpcClientActivityService.getMetadata(null, List.of("postId1", "postId2", "postId3"))).thenReturn(metadataDtoMap);
+        Mockito.when(grpcClientSocialService.getMostFollowed()).thenReturn(List.of(1, 5));
+
+        Mockito.when(grpcClientActivityService.getMetadata(Mockito.anyInt(), Mockito.anyList())).thenReturn(new HashMap<>());
     }
 
     @Order(1)
@@ -124,7 +129,6 @@ class FeedGeneration_IT extends AbstractContextBeans {
         countDownLatch.await();
     }
 
-    //create posts
     @Order(2)
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
@@ -151,8 +155,50 @@ class FeedGeneration_IT extends AbstractContextBeans {
         countDownLatch.await();
     }
 
-    //get user feed
     @Order(3)
+    @Test
+    void validateDbConsistency() {
+        List<FeedEntry> allFeedEntries = feedEntryRepository.findAll();
+        List<LocalPostByUser> allLocalPostsByUser = localPostByUserRepository.findAll();
+        List<LocalUserPostCount> allLocalUserPostsCount = localUserPostCountRepository.findAll();
+
+        Assertions.assertEquals(10, allLocalPostsByUser.size());
+        Assertions.assertEquals(5, allLocalUserPostsCount.size());
+
+        for (LocalUserPostCount localUserPostCount: allLocalUserPostsCount) {
+            int userId = localUserPostCount.getUserId();
+            List<String> postIds = postUserMap.entrySet().stream()
+                    .filter(postUser -> postUser.getValue() == userId).map(Map.Entry::getKey).map(id -> "postId" + id).toList();
+
+            Assertions.assertEquals(localUserPostCount.getPostCount(), postIds.size());
+
+            List<String> postIds1 = allLocalPostsByUser.stream()
+                    .filter(localPostByUser -> localPostByUser.getKey().getUserId() == userId)
+                    .map(LocalPostByUser::getPostId).toList();
+
+            Assertions.assertEquals(postIds.size(), postIds1.size());
+            Assertions.assertTrue(postIds1.containsAll(postIds));
+            Assertions.assertTrue(postIds.containsAll(postIds1));
+        }
+
+        for (int userId = 1; userId < 6; userId++) {
+            int finalUserId = userId;
+
+            List<Integer> userFollows = followerMap.entrySet().stream().filter(entry -> entry.getValue().contains(finalUserId)).map(Map.Entry::getKey).toList();
+
+            List<String> postIds = postUserMap.entrySet().stream()
+                    .filter(postUser -> userFollows.contains(postUser.getValue())).map(Map.Entry::getKey).map(id -> "postId" + id).toList();
+            List<String> postIds1 = allFeedEntries.stream()
+                    .filter(entry -> entry.getKey().getUserId() == finalUserId)
+                    .map(FeedEntry::getPostId).toList();
+
+            Assertions.assertEquals(postIds.size(), postIds1.size());
+            Assertions.assertTrue(postIds1.containsAll(postIds));
+            Assertions.assertTrue(postIds.containsAll(postIds1));
+        }
+    }
+
+    @Order(4)
     @Test
     void getUserFeed() throws Exception {
         MvcResult getResult = mockMvc.perform(get("/api/v1/feed")
@@ -166,11 +212,39 @@ class FeedGeneration_IT extends AbstractContextBeans {
                 .andReturn();
 
         FeedDto feedDto = objectMapper.readValue(getResult.getResponse().getContentAsString(), FeedDto.class);
+
+        Assertions.assertEquals(1, feedDto.getUser().getId());
+        Assertions.assertEquals("user1", feedDto.getUser().getUsername());
+
+        Assertions.assertEquals(6, feedDto.getPosts().size());
+        Assertions.assertEquals(6, feedDto.getPaginationInfo().getTotalElements());
+
+        for (int i = 0; i < feedDto.getPosts().size() - 1; i++) {
+            if (feedDto.getPosts().get(i).getCreatedAt().isBefore(feedDto.getPosts().get(i + 1).getCreatedAt())) {
+                Assertions.fail("Posts are not ordered in descending order");
+            }
+        }
     }
 
-    @Order(4)
+    @Order(5)
     @Test
-    void getGenericUserFeed() {
+    void getGenericUserFeed() throws Exception {
+        MvcResult getResult = mockMvc.perform(get("/api/v1/feed")
+                        .queryParam("pageLimit", "100")
+                        .queryParam("page", "0"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
+        FeedDto feedDto = objectMapper.readValue(getResult.getResponse().getContentAsString(), FeedDto.class);
+
+        Assertions.assertEquals(7, feedDto.getPosts().size());
+        Assertions.assertEquals(7, feedDto.getPaginationInfo().getTotalElements());
+
+        for (int i = 0; i < feedDto.getPosts().size() - 1; i++) {
+            if (feedDto.getPosts().get(i).getCreatedAt().isBefore(feedDto.getPosts().get(i + 1).getCreatedAt())) {
+                Assertions.fail("Posts are not ordered in descending order");
+            }
+        }
     }
 }

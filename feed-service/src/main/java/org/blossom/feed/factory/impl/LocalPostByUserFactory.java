@@ -12,10 +12,9 @@ public class LocalPostByUserFactory implements IEntityFactory<LocalPostByUser, K
     @Override
     public LocalPostByUser buildEntity(KafkaPostResource data) {
         return LocalPostByUser.builder()
-                .userId(data.getUserId())
+                .key(new LocalPostByUser.LocalPostByUserKey(data.getUserId(), data.getCreatedAt()))
                 .postId(data.getId())
                 .media(List.of(data.getMedia()))
-                .createdAt(data.getCreatedAt())
                 .build();
         }
 }
