@@ -11,6 +11,7 @@ public class LocalPostDto {
     private String id;
     private LocalUserDto creator;
     private String[] media;
+    private String[] hashtags;
     private String description;
     private Instant createdAt;
     private MetadataDto metadata;

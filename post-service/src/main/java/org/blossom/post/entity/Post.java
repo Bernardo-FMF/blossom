@@ -40,6 +40,7 @@ public class Post implements KafkaEntity {
                 .id(id)
                 .userId(userId)
                 .media(media)
+                .hashtags(hashtags)
                 .description(description)
                 .createdAt(createdAt)
                 .build();

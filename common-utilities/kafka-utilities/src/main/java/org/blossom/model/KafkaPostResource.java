@@ -13,6 +13,7 @@ public class KafkaPostResource extends KafkaResource {
     private String id;
     private int userId;
     private String[] media;
+    private String[] hashtags;
     private String description;
     private Instant createdAt;
 }

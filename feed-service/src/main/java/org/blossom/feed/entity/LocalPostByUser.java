@@ -20,10 +20,20 @@ import java.util.List;
 public class LocalPostByUser {
     @PrimaryKey
     private LocalPostByUserKey key;
+
     @Indexed
+    @Column(value = "postId")
     private String postId;
+
+    @Column(value = "media")
     @CassandraType(type = CassandraType.Name.LIST, typeArguments = CassandraType.Name.TEXT)
     private List<String> media;
+
+    @Column(value = "hashtags")
+    @CassandraType(type = CassandraType.Name.LIST, typeArguments = CassandraType.Name.TEXT)
+    private List<String> hashtags;
+
+    @Column(value = "description")
     private String description;
 
     @PrimaryKeyClass

@@ -101,6 +101,7 @@ public class PostKafkaMessage_IT extends AbstractContextBeans {
                 .id("postId1")
                 .userId(1)
                 .media(new String[] {})
+                .hashtags(new String[] {})
                 .description("this is post 1")
                 .createdAt(Instant.now())
                 .build();

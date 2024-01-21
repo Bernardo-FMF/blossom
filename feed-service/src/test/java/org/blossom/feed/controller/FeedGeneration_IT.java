@@ -141,6 +141,7 @@ class FeedGeneration_IT extends AbstractContextBeans {
                 .id("postId" + id)
                 .userId(userId)
                 .media(new String[] {})
+                .hashtags(new String[] {})
                 .description("this is post " + id)
                 .createdAt(Instant.now().plusSeconds(id))
                 .build();

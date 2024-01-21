@@ -5,6 +5,8 @@ import org.blossom.feed.factory.interfac.ICompoundEntityFactory;
 import org.blossom.model.KafkaPostResource;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class FeedEntryFactory implements ICompoundEntityFactory<FeedEntry, KafkaPostResource, Integer> {
     @Override
@@ -13,6 +15,8 @@ public class FeedEntryFactory implements ICompoundEntityFactory<FeedEntry, Kafka
                 .key(new FeedEntry.FeedEntryKey(data2, data.getCreatedAt()))
                 .postId(data.getId())
                 .postCreatorId(data.getUserId())
+                .media(List.of(data.getMedia()))
+                .hashtags(List.of(data.getHashtags()))
                 .description(data.getDescription())
                 .build();
     }

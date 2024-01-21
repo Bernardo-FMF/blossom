@@ -13,6 +13,7 @@ public class KafkaPostResourceFactory implements KafkaResourceFactory<KafkaPostR
                 .id(json.get("id").asText())
                 .userId(json.get("userId").asInt())
                 .media(parseArray(json.get("media")))
+                .hashtags(parseArray(json.get("hashtags")))
                 .description(json.get("description").asText())
                 .createdAt(parseDate(json.get("createdAt")))
                 .build();
@@ -24,7 +25,7 @@ public class KafkaPostResourceFactory implements KafkaResourceFactory<KafkaPostR
 
     private String[] parseArray(JsonNode node) {
         ArrayList<String> values = new ArrayList<>(node.size());
-        node.elements().forEachRemaining(x -> values.add(x.asText()));
+        node.elements().forEachRemaining(elem -> values.add(elem.asText()));
 
         return values.toArray(String[]::new);
     }

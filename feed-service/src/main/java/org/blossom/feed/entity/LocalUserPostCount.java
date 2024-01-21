@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
+import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -15,8 +16,10 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @Table("Blossom_Local_User_Post_Count")
 public class LocalUserPostCount {
     @PrimaryKey
+    @Column(value = "userId")
     private int userId;
 
+    @Column(value = "postCount")
     @CassandraType(type = CassandraType.Name.COUNTER)
     private long postCount;
 }

@@ -15,6 +15,7 @@ public class LocalPostByUserFactory implements IEntityFactory<LocalPostByUser, K
                 .key(new LocalPostByUser.LocalPostByUserKey(data.getUserId(), data.getCreatedAt()))
                 .postId(data.getId())
                 .media(List.of(data.getMedia()))
+                .hashtags(List.of(data.getHashtags()))
                 .build();
         }
 }
