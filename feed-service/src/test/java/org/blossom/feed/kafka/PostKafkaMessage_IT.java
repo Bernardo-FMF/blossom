@@ -115,7 +115,7 @@ public class PostKafkaMessage_IT extends AbstractContextBeans {
             Assertions.assertEquals(1, localUserPostCount.getUserId());
             Assertions.assertEquals(1, localUserPostCount.getPostCount());
 
-            List<LocalPostByUser> postIdsByUser = localPostByUserRepository.findAllById(List.of(1));
+            List<LocalPostByUser> postIdsByUser = localPostByUserRepository.findByKeyUserIdIn(List.of(1));
             Assertions.assertFalse(postIdsByUser.isEmpty());
             Assertions.assertEquals("postId1", postIdsByUser.get(0).getPostId());
 
@@ -167,7 +167,7 @@ public class PostKafkaMessage_IT extends AbstractContextBeans {
             Assertions.assertEquals(1, localUserPostCount.getUserId());
             Assertions.assertEquals(0, localUserPostCount.getPostCount());
 
-            List<LocalPostByUser> postIdsByUser = localPostByUserRepository.findAllById(List.of(1));
+            List<LocalPostByUser> postIdsByUser = localPostByUserRepository.findByKeyUserIdIn(List.of(1));
             Assertions.assertTrue(postIdsByUser.isEmpty());
 
             long count2 = feedEntryRepository.countByKeyUserId(2);

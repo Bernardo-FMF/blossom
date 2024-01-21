@@ -60,8 +60,8 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
         localUserRepository.deleteById(resource.getId());
         localUserPostCountRepository.deleteById(resource.getId());
 
-        List<LocalPostByUser> postsToDelete = localPostByUserRepository.findAllById(List.of(resource.getId()));
-        localPostByUserRepository.deleteById(resource.getId());
+        List<LocalPostByUser> postsToDelete = localPostByUserRepository.findByKeyUserIdIn(List.of(resource.getId()));
+        localPostByUserRepository.deleteAll(postsToDelete);
 
         List<FeedEntry> feedEntriesToDelete = feedEntryRepository.findByPostIdIn(postsToDelete.stream().map(LocalPostByUser::getPostId).toList());
         feedEntryRepository.deleteAll(feedEntriesToDelete);
