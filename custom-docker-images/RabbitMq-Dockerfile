@@ -1,2 +1,3 @@
 FROM rabbitmq:management
 RUN rabbitmq-plugins enable rabbitmq_stomp
+EXPOSE 15672 61613

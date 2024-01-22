@@ -30,6 +30,7 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
+                                .requestMatchers("/ws-chat/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/chat").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/chat/{chatId}/leave").authenticated()
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/chat/{chatId}/user/{userId}").authenticated()

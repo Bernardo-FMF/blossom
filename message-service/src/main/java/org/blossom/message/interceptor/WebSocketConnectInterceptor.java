@@ -1,5 +1,6 @@
 package org.blossom.message.interceptor;
 
+import jakarta.annotation.Nullable;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
@@ -17,7 +18,7 @@ public class WebSocketConnectInterceptor<S> implements ApplicationListener<Sessi
     }
 
     @Override
-    public void onApplicationEvent(SessionConnectEvent event) {
+    public void onApplicationEvent(@Nullable SessionConnectEvent event) {
         Optional.ofNullable(readUser(event)).ifPresent(user -> log(event, user));
     }
 

@@ -1,5 +1,6 @@
 package org.blossom.message.interceptor;
 
+import jakarta.annotation.Nullable;
 import lombok.extern.log4j.Log4j2;
 import org.blossom.message.client.AuthClient;
 import org.blossom.message.dto.LocalTokenDto;
@@ -32,7 +33,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     private AuthClient authClient;
 
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+    public Message<?> preSend(@Nullable Message<?> message, @Nullable MessageChannel channel) {
         final StompHeaderAccessor accessor = readHeaderAccessor(message);
 
         if (accessor.getCommand() == StompCommand.CONNECT) {
