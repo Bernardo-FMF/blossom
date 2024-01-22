@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.testcontainers.containers.CassandraContainer;
 
 public class CassandraContainerBuilder {
-    public static final String CASSANDRA_IMAGE_NAME = "cassandra:latest";
+    private static final String CASSANDRA_IMAGE_NAME = "cassandra:latest";
 
     public static CassandraContainer<?> getCassandraContainer() {
         try (CassandraContainer<?> container = new CassandraContainer<>(CASSANDRA_IMAGE_NAME)) {
