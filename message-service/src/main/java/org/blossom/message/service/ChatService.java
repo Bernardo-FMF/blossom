@@ -1,9 +1,6 @@
 package org.blossom.message.service;
 
-import org.blossom.message.dto.ChatCreationDto;
-import org.blossom.message.dto.ChatDto;
-import org.blossom.message.dto.SearchParametersDto;
-import org.blossom.message.dto.UserChatsDto;
+import org.blossom.message.dto.*;
 import org.blossom.message.entity.Chat;
 import org.blossom.message.entity.User;
 import org.blossom.message.enums.BroadcastType;
@@ -13,6 +10,7 @@ import org.blossom.message.exception.IllegalChatOperationException;
 import org.blossom.message.exception.InvalidChatException;
 import org.blossom.message.exception.UserNotFoundException;
 import org.blossom.message.mapper.ChatDtoMapper;
+import org.blossom.message.mapper.impl.GenericDtoMapper;
 import org.blossom.message.repository.ChatRepository;
 import org.blossom.message.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,9 @@ public class ChatService {
 
     @Autowired
     private ChatDtoMapper chatDtoMapper;
+
+    @Autowired
+    private GenericDtoMapper genericDtoMapper;
 
     public Set<User> getUsersInChat(int chatId) throws ChatNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
@@ -89,7 +90,7 @@ public class ChatService {
                 .build();
     }
 
-    public String addToChat(int chatId, int userId, int participantId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
+    public GenericResponseDto addToChat(int chatId, int userId, int participantId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
         if (optionalChat.isEmpty()) {
             throw new ChatNotFoundException("Chat does not exist");
@@ -117,10 +118,10 @@ public class ChatService {
         User user = optionalUser.get();
         chat.addToChat(user);
 
-        return "User added to chat with success";
+        return genericDtoMapper.toDto("User added to chat with success", chatId, null);
     }
 
-    public String leaveChat(int chatId, int userId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
+    public GenericResponseDto leaveChat(int chatId, int userId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
         if (optionalChat.isEmpty()) {
             throw new ChatNotFoundException("Chat does not exist");
@@ -150,16 +151,16 @@ public class ChatService {
 
             broadcastService.broadcastChat(chat, BroadcastType.CHAT_DELETED);
 
-            return "Chat was deleted due to no participants";
+            return genericDtoMapper.toDto("Chat was deleted due to no participants", chatId, null);
         } else {
             chat.setNewOwner(chat.getParticipants().stream().findAny().get());
             chatRepository.save(chat);
 
-            return "User removed from chat with success";
+            return genericDtoMapper.toDto("User removed from chat with success", chatId, null);
         }
     }
 
-    public String removeFromChat(int chatId, int userId, int ownerId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
+    public GenericResponseDto removeFromChat(int chatId, int userId, int ownerId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
         if (optionalChat.isEmpty()) {
             throw new ChatNotFoundException("Chat does not exist");
@@ -193,7 +194,7 @@ public class ChatService {
         chat.removeFromChat(user);
         chatRepository.save(chat);
 
-        return "User removed from chat with success";
+        return genericDtoMapper.toDto("User removed from chat with success", chatId, null);
     }
 
     public void updateActivity(int chatId) throws ChatNotFoundException {

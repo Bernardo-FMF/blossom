@@ -1,9 +1,6 @@
 package org.blossom.message.controller;
 
-import org.blossom.message.dto.ChatCreationDto;
-import org.blossom.message.dto.ChatDto;
-import org.blossom.message.dto.SearchParametersDto;
-import org.blossom.message.dto.UserChatsDto;
+import org.blossom.message.dto.*;
 import org.blossom.message.enums.ChatType;
 import org.blossom.message.exception.ChatNotFoundException;
 import org.blossom.message.exception.IllegalChatOperationException;
@@ -30,7 +27,7 @@ public class ChatController {
     }
 
     @DeleteMapping("/{chatId}/leave")
-    public ResponseEntity<String> leaveChat(@PathVariable("chatId") Integer chatId, Authentication authentication) throws UserNotFoundException, ChatNotFoundException, IllegalChatOperationException {
+    public ResponseEntity<GenericResponseDto> leaveChat(@PathVariable("chatId") Integer chatId, Authentication authentication) throws UserNotFoundException, ChatNotFoundException, IllegalChatOperationException {
         return ResponseEntity.status(HttpStatus.OK).body(chatService.leaveChat(chatId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
@@ -40,13 +37,13 @@ public class ChatController {
     }
 
     @PutMapping("/{chatId}/user/{userId}")
-    public ResponseEntity<String> addToChat(@PathVariable("chatId") Integer chatId, @PathVariable("userId") Integer userId, Authentication authentication) throws UserNotFoundException, ChatNotFoundException, IllegalChatOperationException {
+    public ResponseEntity<GenericResponseDto> addToChat(@PathVariable("chatId") Integer chatId, @PathVariable("userId") Integer userId, Authentication authentication) throws UserNotFoundException, ChatNotFoundException, IllegalChatOperationException {
         return ResponseEntity.status(HttpStatus.OK).body(chatService.addToChat(chatId, userId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
 
     @DeleteMapping("/{chatId}/user/{userId}")
-    public ResponseEntity<String> removeFromChat(@PathVariable("chatId") Integer chatId, @PathVariable("userId") Integer userId, Authentication authentication) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
+    public ResponseEntity<GenericResponseDto> removeFromChat(@PathVariable("chatId") Integer chatId, @PathVariable("userId") Integer userId, Authentication authentication) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(chatService.removeFromChat(chatId, userId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

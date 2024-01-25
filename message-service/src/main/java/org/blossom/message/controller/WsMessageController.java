@@ -64,7 +64,7 @@ public class WsMessageController {
     private static CommonUserDetails ensureAuthentication(SimpMessageHeaderAccessor headerAccessor) {
         Authentication authentication = (Authentication) headerAccessor.getUser();
         if (authentication == null) {
-            throw new AuthenticationCredentialsNotFoundException("User not authenticated");
+            throw new AuthenticationCredentialsNotFoundException("User is not authenticated");
         }
 
         return (CommonUserDetails) authentication.getPrincipal();
