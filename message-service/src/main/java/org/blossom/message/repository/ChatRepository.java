@@ -15,6 +15,6 @@ public interface ChatRepository extends JpaRepository<Chat, Integer> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Chat c SET c.lastUpdate = CURRENT_TIMESTAMP WHERE c.id = :chatId")
+    @Query("UPDATE Chat c SET c.lastUpdate = instant WHERE c.id = :chatId")
     void updateLastUpdateDate(@Param("chatId") int chatId);
 }

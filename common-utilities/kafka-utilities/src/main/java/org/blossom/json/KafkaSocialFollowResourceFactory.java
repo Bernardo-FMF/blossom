@@ -9,7 +9,7 @@ public class KafkaSocialFollowResourceFactory implements KafkaResourceFactory<Ka
         return KafkaSocialFollowResource.builder()
                 .initiatingUser(json.get("initiatingUser").asInt())
                 .receivingUser(json.get("receivingUser").asInt())
-                .isMutualFollow(json.get("isMutualFollow").asBoolean())
+                .isMutualFollow(json.get("mutualFollow").asBoolean())
                 .build();
     }
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.blossom.message.enums.ChatType;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 
 @Data
@@ -41,7 +41,7 @@ public class Chat {
     private ChatType chatType;
 
     @Column(name = "last_update")
-    private Date lastUpdate;
+    private Instant lastUpdate;
 
     public void addToChat(User user) {
         this.participants.add(user);

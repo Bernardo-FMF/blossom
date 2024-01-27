@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,16 +50,21 @@ public class ChatService {
     }
 
     public ChatDto createChat(ChatCreationDto chatCreation, int userId, ChatType type) throws InvalidChatException {
-        if (chatCreation.getInitialParticipants().isEmpty() || chatCreation.getInitialParticipants().contains(userId)) {
+        if (chatCreation.getInitialParticipants().isEmpty() ||
+                (chatCreation.getInitialParticipants().size() == 1 && chatCreation.getInitialParticipants().contains(userId))) {
             throw new InvalidChatException("Chat participants are not valid");
         }
 
         List<Integer> userIds = new ArrayList<>(chatCreation.getInitialParticipants());
-        userIds.add(userId);
+        if (!userIds.contains(userId)) {
+            userIds.add(userId);
+        }
 
-        Map<Integer, User> participants = userRepository.findAllById(userIds).stream().collect(Collectors.toMap(User::getId, localUser -> localUser));
+        List<Integer> uniqueUserIds = userIds.stream().distinct().toList();
 
-        if (participants.size() < chatCreation.getInitialParticipants().size() + 1) {
+        Map<Integer, User> participants = userRepository.findAllById(uniqueUserIds).stream().collect(Collectors.toMap(User::getId, localUser -> localUser));
+
+        if (participants.size() < uniqueUserIds.size()) {
             throw new InvalidChatException("Not all users exist");
         }
 
@@ -67,6 +73,7 @@ public class ChatService {
                 .participants(new HashSet<>(participants.values()))
                 .name(chatCreation.getName())
                 .chatType(type)
+                .lastUpdate(Instant.now())
                 .build();
 
         Chat newChat = chatRepository.save(chat);

@@ -3,9 +3,6 @@ package org.blossom.message.kafka.inbound;
 import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.message.dto.ChatCreationDto;
-import org.blossom.message.dto.ChatDto;
-import org.blossom.message.entity.Chat;
-import org.blossom.message.enums.BroadcastType;
 import org.blossom.message.enums.ChatType;
 import org.blossom.message.exception.InvalidChatException;
 import org.blossom.message.repository.ChatRepository;
@@ -17,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSocialFollowResource> {
@@ -40,10 +36,7 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
                 ChatCreationDto chatCreation = new ChatCreationDto();
                 chatCreation.setInitialParticipants(List.of(resource.getInitiatingUser(), resource.getReceivingUser()));
 
-                ChatDto chatDto = chatService.createChat(chatCreation, resource.getInitiatingUser(), ChatType.PRIVATE);
-
-                Optional<Chat> optionalChat = chatRepository.findById(chatDto.getId());
-                optionalChat.ifPresent(chat -> broadcastService.broadcastChat(chat, BroadcastType.CHAT_CREATED));
+                chatService.createChat(chatCreation, resource.getInitiatingUser(), ChatType.PRIVATE);
             } catch (InvalidChatException e) {
                 throw new RuntimeException(e);
             }
