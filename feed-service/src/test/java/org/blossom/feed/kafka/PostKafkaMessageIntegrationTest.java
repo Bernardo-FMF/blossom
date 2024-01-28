@@ -24,7 +24,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -53,7 +55,9 @@ public class PostKafkaMessageIntegrationTest extends AbstractContextBeans {
 
     @BeforeEach
     void setUp() {
-        kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, List.of("user-resource-event-feed"));
+        Map<ResourceType, List<String>> topicMap = new HashMap<>();
+        topicMap.put(ResourceType.USER, List.of("user-resource-event-feed"));
+        kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
 
         Mockito.when(grpcClientSocialService.getUserFollowers(1)).thenReturn(List.of(2, 3));
         Mockito.when(grpcClientSocialService.getUserFollowers(2)).thenReturn(List.of(1));

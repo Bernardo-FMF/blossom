@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -35,7 +37,9 @@ class UserKafkaMessageIntegrationTest extends AbstractContextBeans {
 
     @BeforeEach
     void setUp() {
-        kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, List.of("user-resource-event-feed"));
+        Map<ResourceType, List<String>> topicMap = new HashMap<>();
+        topicMap.put(ResourceType.USER, List.of("user-resource-event-feed"));
+        kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
     }
 
     @Order(1)
