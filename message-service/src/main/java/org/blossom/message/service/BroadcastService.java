@@ -32,7 +32,7 @@ public class BroadcastService {
     public void broadcastMessage(Set<User> usersInChat, Message message, BroadcastType type) {
         for (User user: usersInChat) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
-                messagingTemplate.convertAndSend("/topic/user/" + user.getId() + "/message", messageOperationMapper.mapToMessageOperationDto(message, type));
+                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat.message", messageOperationMapper.mapToMessageOperationDto(message, type));
             } else {
                 notificationService.sendMessageNotification(message, type);
             }
@@ -42,7 +42,7 @@ public class BroadcastService {
     public void broadcastChat(Chat chat, BroadcastType type) {
         for (User user: chat.getParticipants()) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
-                messagingTemplate.convertAndSend("/topic/user/" + user.getId() + "/chat", chatOperationMapper.mapToChatOperationDto(chat, type));
+                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat", chatOperationMapper.mapToChatOperationDto(chat, type));
             }
         }
     }

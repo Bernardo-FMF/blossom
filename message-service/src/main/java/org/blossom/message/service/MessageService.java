@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -49,6 +49,7 @@ public class MessageService {
                 .chat(optionalChat.get())
                 .sender(user.get())
                 .content(chatMessage.getContent())
+                .createdAt(Instant.now())
                 .build();
 
         return messageRepository.save(message);
@@ -65,6 +66,7 @@ public class MessageService {
             throw new IllegalMessageOperationException("Message is not associated with the user");
         }
 
+        message.setUpdatedAt(Instant.now());
         message.setDeleted(true);
         message.setContent(null);
 
@@ -83,7 +85,7 @@ public class MessageService {
         }
 
         message.setContent(updateMessage.getNewContent());
-        message.setUpdatedAt(new Date());
+        message.setUpdatedAt(Instant.now());
 
         return messageRepository.save(message);
     }

@@ -19,7 +19,7 @@ CREATE TABLE Blossom_Chat_Participants (
     PRIMARY KEY (chat_id, user_id)
 );
 
-CREATE TABLE Blossom_Message (
+CREATE TABLE Blossom_Chat_Message (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
     chat_id INT REFERENCES Blossom_Chat(id),

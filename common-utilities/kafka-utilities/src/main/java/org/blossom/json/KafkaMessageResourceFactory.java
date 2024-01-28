@@ -3,8 +3,8 @@ package org.blossom.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.blossom.model.KafkaMessageResource;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class KafkaMessageResourceFactory implements KafkaResourceFactory<KafkaMessageResource> {
     @Override
@@ -28,7 +28,10 @@ public class KafkaMessageResourceFactory implements KafkaResourceFactory<KafkaMe
         return values.toArray(Integer[]::new);
     }
 
-    private Date parseDate(JsonNode node) {
-        return new Date(node.asLong());
+    private Instant parseDate(JsonNode node) {
+        if (node.isNull()) {
+            return null;
+        }
+        return Instant.parse(node.textValue());
     }
 }

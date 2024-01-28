@@ -3,7 +3,7 @@ package org.blossom.message.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Builder
 @Getter
@@ -12,7 +12,8 @@ public class MessageDto {
     private ChatDto chat;
     private UserDto user;
     private String content;
-    private Date createdAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private boolean isEdited;
     private boolean isDeleted;
 }

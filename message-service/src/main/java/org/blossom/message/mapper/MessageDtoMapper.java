@@ -20,6 +20,7 @@ public class MessageDtoMapper {
                 .user(userDtoMapper.mapToUserDto(message.getSender()))
                 .content(message.getContent())
                 .createdAt(message.getCreatedAt())
+                .updatedAt(message.getUpdatedAt())
                 .isEdited(message.getUpdatedAt() != null)
                 .isDeleted(message.isDeleted())
                 .build();

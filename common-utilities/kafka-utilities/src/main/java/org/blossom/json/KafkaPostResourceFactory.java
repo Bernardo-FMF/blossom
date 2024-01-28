@@ -20,7 +20,7 @@ public class KafkaPostResourceFactory implements KafkaResourceFactory<KafkaPostR
     }
 
     private Instant parseDate(JsonNode node) {
-        return Instant.ofEpochMilli(node.asLong());
+        return Instant.parse(node.textValue());
     }
 
     private String[] parseArray(JsonNode node) {

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ public class KafkaMessageResource extends KafkaResource {
     private Integer[] recipientsIds;
     private int chatId;
     private String content;
-    private Date createdAt;
-    private Date updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private boolean isDeleted;
 }

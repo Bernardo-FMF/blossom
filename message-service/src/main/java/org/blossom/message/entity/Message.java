@@ -7,11 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.blossom.model.KafkaEntity;
 import org.blossom.model.KafkaMessageResource;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SourceType;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -36,13 +33,11 @@ public class Message implements KafkaEntity {
     @Column(name = "content")
     private String content;
 
-    @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Date createdAt;
+    private Instant createdAt;
 
-    @UpdateTimestamp(source = SourceType.DB)
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
