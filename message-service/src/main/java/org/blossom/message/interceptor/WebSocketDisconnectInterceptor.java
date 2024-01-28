@@ -2,18 +2,12 @@ package org.blossom.message.interceptor;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.Optional;
 
 @Log4j2
 public class WebSocketDisconnectInterceptor<S> implements ApplicationListener<SessionDisconnectEvent> {
-
-    public WebSocketDisconnectInterceptor(SimpMessageSendingOperations messagingTemplate) {
-        super();
-    }
-
     @Override
     public void onApplicationEvent(SessionDisconnectEvent event) {
         Optional.ofNullable(event.getUser()).ifPresent(user ->
