@@ -9,8 +9,5 @@ import java.util.List;
 @Builder
 public class ChatMessagesDto {
     private List<MessageDto> messageDtos;
-    private boolean eof;
-    private long currentPage;
-    private long totalPages;
-    private long totalElements;
+    private PaginationInfoDto paginationInfo;
 }

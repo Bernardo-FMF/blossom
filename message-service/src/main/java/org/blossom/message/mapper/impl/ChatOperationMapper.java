@@ -1,4 +1,4 @@
-package org.blossom.message.mapper;
+package org.blossom.message.mapper.impl;
 
 import org.blossom.message.dto.ChatOperationDto;
 import org.blossom.message.entity.Chat;
@@ -13,7 +13,7 @@ public class ChatOperationMapper {
 
     public ChatOperationDto mapToChatOperationDto(Chat chat, BroadcastType broadcastType) {
         return ChatOperationDto.builder()
-                .chat(chatDtoMapper.mapToChatDto(chat))
+                .chat(chatDtoMapper.toDto(chat))
                 .broadcastType(broadcastType)
                 .build();
     }

@@ -8,7 +8,9 @@ import org.blossom.message.exception.ChatNotFoundException;
 import org.blossom.message.exception.IllegalMessageOperationException;
 import org.blossom.message.exception.MessageNotFoundException;
 import org.blossom.message.exception.UserNotFoundException;
-import org.blossom.message.mapper.MessageDtoMapper;
+import org.blossom.message.factory.impl.MessageFactory;
+import org.blossom.message.mapper.impl.MessageDtoMapper;
+import org.blossom.message.mapper.impl.ChatMessagesDtoMapper;
 import org.blossom.message.repository.ChatRepository;
 import org.blossom.message.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,12 @@ public class MessageService {
     @Autowired
     private MessageDtoMapper messageDtoMapper;
 
+    @Autowired
+    private MessageFactory messageFactory;
+
+    @Autowired
+    private ChatMessagesDtoMapper chatMessagesDtoMapper;
+
     public Message createMessage(PublishMessageDto chatMessage, int chatId, int userId) throws UserNotFoundException, ChatNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
         if (optionalChat.isEmpty()) {
@@ -40,17 +48,12 @@ public class MessageService {
 
         Chat chat = optionalChat.get();
 
-        Optional<User> user = chat.getParticipants().stream().filter(participant -> participant.getId() == userId).findFirst();
-        if (user.isEmpty()) {
+        Optional<User> optionalUser = chat.getParticipants().stream().filter(participant -> participant.getId() == userId).findFirst();
+        if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User is not a chat participant");
         }
 
-        Message message = Message.builder()
-                .chat(optionalChat.get())
-                .sender(user.get())
-                .content(chatMessage.getContent())
-                .createdAt(Instant.now())
-                .build();
+        Message message = messageFactory.buildEntity(chat, optionalUser.get(), chatMessage);
 
         return messageRepository.save(message);
     }
@@ -105,12 +108,7 @@ public class MessageService {
 
         Page<Message> messages = messageRepository.findByChatId(chatId, page);
 
-        return ChatMessagesDto.builder()
-                .messageDtos(messages.get().map(message -> messageDtoMapper.mapToMessageDto(message)).toList())
-                .currentPage(messages.getNumber())
-                .totalPages(messages.getTotalPages())
-                .totalElements(messages.getTotalElements())
-                .eof(!messages.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(messages.getTotalPages(), messages.getNumber(), messages.getTotalElements(), !messages.hasNext());
+        return chatMessagesDtoMapper.toPaginatedDto(messages.getContent(), paginationInfo);
     }
 }

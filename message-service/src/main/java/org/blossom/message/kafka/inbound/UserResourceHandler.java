@@ -2,7 +2,7 @@ package org.blossom.message.kafka.inbound;
 
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.message.entity.User;
-import org.blossom.message.mapper.UserMapper;
+import org.blossom.message.factory.impl.UserFactory;
 import org.blossom.message.repository.UserRepository;
 import org.blossom.model.KafkaUserResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +16,12 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     private UserRepository userRepository;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserFactory userFactory;
 
     @Override
     public void save(KafkaUserResource resource) {
         if (!userRepository.existsById(resource.getId())) {
-            userRepository.save(userMapper.mapToUser(resource));
+            userRepository.save(userFactory.buildEntity(resource));
         }
     }
 
@@ -41,6 +41,8 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void delete(KafkaUserResource resource) {
+        //TODO: delete chat and message if necessary
+
         userRepository.deleteById(resource.getId());
     }
 }

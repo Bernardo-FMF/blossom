@@ -50,6 +50,7 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
     @Override
     public void delete(KafkaSocialFollowResource resource) {
+        //TODO: Delete messages?
         throw new NotImplementedException("Social follow updates are not processed");
     }
 }

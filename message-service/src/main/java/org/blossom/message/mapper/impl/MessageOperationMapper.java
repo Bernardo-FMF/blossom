@@ -1,19 +1,21 @@
-package org.blossom.message.mapper;
+package org.blossom.message.mapper.impl;
 
 import org.blossom.message.dto.MessageOperationDto;
 import org.blossom.message.entity.Message;
 import org.blossom.message.enums.BroadcastType;
+import org.blossom.message.mapper.interfac.ICompoundDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MessageOperationMapper {
+public class MessageOperationMapper implements ICompoundDtoMapper<Message, BroadcastType, MessageOperationDto> {
     @Autowired
     private MessageDtoMapper messageDtoMapper;
 
-    public MessageOperationDto mapToMessageOperationDto(Message message, BroadcastType broadcastType) {
+    @Override
+    public MessageOperationDto toDto(Message message, BroadcastType broadcastType) {
         return MessageOperationDto.builder()
-                .message(messageDtoMapper.mapToMessageDto(message))
+                .message(messageDtoMapper.toDto(message))
                 .type(broadcastType)
                 .build();
     }

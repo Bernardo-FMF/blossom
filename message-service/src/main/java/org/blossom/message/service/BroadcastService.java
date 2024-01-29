@@ -4,8 +4,8 @@ import org.blossom.message.entity.Chat;
 import org.blossom.message.entity.Message;
 import org.blossom.message.entity.User;
 import org.blossom.message.enums.BroadcastType;
-import org.blossom.message.mapper.ChatOperationMapper;
-import org.blossom.message.mapper.MessageOperationMapper;
+import org.blossom.message.mapper.impl.ChatOperationMapper;
+import org.blossom.message.mapper.impl.MessageOperationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class BroadcastService {
     public void broadcastMessage(Set<User> usersInChat, Message message, BroadcastType type) {
         for (User user: usersInChat) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
-                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat.message", messageOperationMapper.mapToMessageOperationDto(message, type));
+                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat.message", messageOperationMapper.toDto(message, type));
             } else {
                 notificationService.sendMessageNotification(message, type);
             }

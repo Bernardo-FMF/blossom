@@ -9,8 +9,10 @@ import org.blossom.message.exception.ChatNotFoundException;
 import org.blossom.message.exception.IllegalChatOperationException;
 import org.blossom.message.exception.InvalidChatException;
 import org.blossom.message.exception.UserNotFoundException;
-import org.blossom.message.mapper.ChatDtoMapper;
+import org.blossom.message.factory.impl.ChatFactory;
+import org.blossom.message.mapper.impl.ChatDtoMapper;
 import org.blossom.message.mapper.impl.GenericDtoMapper;
+import org.blossom.message.mapper.impl.UserChatsDtoMapper;
 import org.blossom.message.repository.ChatRepository;
 import org.blossom.message.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,12 @@ public class ChatService {
 
     @Autowired
     private GenericDtoMapper genericDtoMapper;
+
+    @Autowired
+    private ChatFactory chatFactory;
+
+    @Autowired
+    private UserChatsDtoMapper userChatsDtoMapper;
 
     public Set<User> getUsersInChat(int chatId) throws ChatNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
@@ -68,19 +75,13 @@ public class ChatService {
             throw new InvalidChatException("Not all users exist");
         }
 
-        Chat chat = Chat.builder()
-                .owner(participants.get(userId))
-                .participants(new HashSet<>(participants.values()))
-                .name(chatCreation.getName())
-                .chatType(type)
-                .lastUpdate(Instant.now())
-                .build();
+        Chat chat = chatFactory.buildEntity(new HashSet<>(participants.values()), participants.get(userId), chatCreation, type);
 
         Chat newChat = chatRepository.save(chat);
 
         broadcastService.broadcastChat(newChat, BroadcastType.CHAT_CREATED);
 
-        return chatDtoMapper.mapToChatDto(newChat);
+        return chatDtoMapper.toDto(newChat);
     }
 
     public UserChatsDto getUserChats(SearchParametersDto searchParameters, int userId) {
@@ -88,13 +89,8 @@ public class ChatService {
 
         Page<Chat> userChats = chatRepository.findByUserId(userId, page);
 
-        return UserChatsDto.builder()
-                .chats(userChats.get().map(userChat -> chatDtoMapper.mapToChatDto(userChat)).collect(Collectors.toList()))
-                .currentPage(userChats.getNumber())
-                .totalPages(userChats.getTotalPages())
-                .totalElements(userChats.getTotalElements())
-                .eof(!userChats.hasNext())
-                .build();
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(userChats.getTotalPages(), userChats.getNumber(), userChats.getTotalElements(), !userChats.hasNext());
+        return userChatsDtoMapper.toPaginatedDto(userChats.getContent(), paginationInfo);
     }
 
     public GenericResponseDto addToChat(int chatId, int userId, int participantId) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
@@ -160,7 +156,7 @@ public class ChatService {
 
             return genericDtoMapper.toDto("Chat was deleted due to no participants", chatId, null);
         } else {
-            chat.setNewOwner(chat.getParticipants().stream().findAny().get());
+            chat.setNewOwner(chat.getParticipants().stream().findFirst().get());
             chatRepository.save(chat);
 
             return genericDtoMapper.toDto("User removed from chat with success", chatId, null);
