@@ -20,6 +20,7 @@ public class ChatDtoMapper implements IDtoMapper<Chat, ChatDto> {
                 .name(chat.getName())
                 .participants(chat.getParticipants().stream().map(participant -> userDtoMapper.toDto(participant)).collect(Collectors.toSet()))
                 .owner(userDtoMapper.toDto(chat.getOwner()))
+                .chatType(chat.getChatType())
                 .build();
     }
 }
