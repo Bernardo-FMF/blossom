@@ -37,8 +37,8 @@ public class MessageOperationDto {
         ChatDto chatDto = mapJsonChat(message.get("chat"));
         UserDto userDto = mapJsonUser(message.get("user"));
 
-        Instant createdAt = Instant.parse(message.get("createdAt").textValue());
-        Instant updatedAt = message.get("updatedAt").isNull() ? null : Instant.ofEpochMilli(message.get("updatedAt").asLong());
+        Instant createdAt = Instant.ofEpochSecond(message.get("createdAt").asLong());
+        Instant updatedAt = message.get("updatedAt").isNull() ? null : Instant.ofEpochSecond(message.get("updatedAt").asLong());
 
         return MessageDto.builder()
                 .id(id)

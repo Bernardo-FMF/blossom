@@ -57,6 +57,7 @@ public class PostKafkaMessageIntegrationTest extends AbstractContextBeans {
     void setUp() {
         Map<ResourceType, List<String>> topicMap = new HashMap<>();
         topicMap.put(ResourceType.USER, List.of("user-resource-event-feed"));
+        topicMap.put(ResourceType.POST, List.of("post-resource-event-feed"));
         kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
 
         Mockito.when(grpcClientSocialService.getUserFollowers(1)).thenReturn(List.of(2, 3));

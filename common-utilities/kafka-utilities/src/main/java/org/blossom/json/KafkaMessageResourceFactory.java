@@ -32,6 +32,6 @@ public class KafkaMessageResourceFactory implements KafkaResourceFactory<KafkaMe
         if (node.isNull()) {
             return null;
         }
-        return Instant.parse(node.textValue());
+        return Instant.ofEpochSecond(node.asLong());
     }
 }

@@ -69,6 +69,7 @@ class FeedGenerationIntegrationTest extends AbstractContextBeans {
     void setUp() throws InterruptedException {
         Map<ResourceType, List<String>> topicMap = new HashMap<>();
         topicMap.put(ResourceType.USER, List.of("user-resource-event-feed"));
+        topicMap.put(ResourceType.POST, List.of("post-resource-event-feed"));
         kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
 
         postUserMap.put(1, 1);
