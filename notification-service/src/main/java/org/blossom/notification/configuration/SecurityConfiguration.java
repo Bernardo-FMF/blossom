@@ -30,6 +30,7 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
+                                .requestMatchers("/ws-notification/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/notification/message").authenticated()
                                 .requestMatchers(HttpMethod.PATCH, "/api/v1/notification/message/{notificationId}/received").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/notification/follow").authenticated()
