@@ -1,6 +1,7 @@
 package org.blossom.notification.controller;
 
 import org.blossom.model.CommonUserDetails;
+import org.blossom.notification.dto.GenericResponseDto;
 import org.blossom.notification.dto.NotificationFollowsDto;
 import org.blossom.notification.dto.SearchParametersDto;
 import org.blossom.notification.service.FollowService;
@@ -22,7 +23,7 @@ public class FollowController {
     }
 
     @PatchMapping("/{notificationId}/received")
-    public ResponseEntity<String> confirmUserReceivedNotification(@PathVariable("notificationId") String notificationId, Authentication authentication) {
+    public ResponseEntity<GenericResponseDto> confirmUserReceivedNotification(@PathVariable("notificationId") String notificationId, Authentication authentication) {
         return ResponseEntity.status(HttpStatus.OK).body(followService.confirmUserReceivedNotification(notificationId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

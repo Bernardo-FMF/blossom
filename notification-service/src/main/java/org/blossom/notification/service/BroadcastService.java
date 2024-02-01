@@ -3,7 +3,7 @@ package org.blossom.notification.service;
 import org.blossom.notification.client.AuthClient;
 import org.blossom.notification.dto.UserDto;
 import org.blossom.notification.entity.FollowNotification;
-import org.blossom.notification.mapper.NotificationFollowDtoMapper;
+import org.blossom.notification.mapper.impl.NotificationFollowDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -31,7 +31,7 @@ public class BroadcastService {
                 if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
                     ResponseEntity<UserDto> response1 = authClient.getUser(notification.getSenderId());
                     if (response1.getStatusCode().is2xxSuccessful()) {
-                        messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/notification.follow", notificationFollowDtoMapper.mapToNotificationFollowDto(notification, response1.getBody()));
+                        messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/notification.follow", notificationFollowDtoMapper.toDto(notification, response1.getBody()));
                         return true;
                     }
                 }

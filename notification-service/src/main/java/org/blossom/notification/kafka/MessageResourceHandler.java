@@ -3,6 +3,7 @@ package org.blossom.notification.kafka;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaMessageResource;
 import org.blossom.notification.entity.MessageNotification;
+import org.blossom.notification.factory.impl.MessageNotificationFactory;
 import org.blossom.notification.repository.MessageNotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,22 +16,16 @@ public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessage
     @Autowired
     private MessageNotificationRepository messageNotificationRepository;
 
+    @Autowired
+    private MessageNotificationFactory messageNotification;
+
     @Override
     public void save(KafkaMessageResource resource) {
         Integer[] ids = Optional.ofNullable(resource.getRecipientsIds()).orElse(new Integer[0]);
         MessageNotification[] notifications = new MessageNotification[ids.length];
 
         for (int idx = 0; idx < ids.length; idx++) {
-            MessageNotification messageNotification = MessageNotification.builder()
-                    .messageId(resource.getId())
-                    .chatId(resource.getChatId())
-                    .content(resource.getContent())
-                    .sentAt(resource.getCreatedAt())
-                    .senderId(resource.getSenderId())
-                    .recipientId(ids[idx])
-                    .build();
-
-            notifications[idx] = messageNotification;
+            notifications[idx] = messageNotification.buildEntity(resource, ids[idx]);
         }
 
         messageNotificationRepository.saveAll(List.of(notifications));

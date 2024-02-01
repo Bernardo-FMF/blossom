@@ -10,8 +10,5 @@ import java.util.List;
 public class NotificationMessagesDto {
     private int userId;
     private List<NotificationMessageDto> notificationMessages;
-    private boolean eof;
-    private long currentPage;
-    private long totalPages;
-    private long totalElements;
+    private PaginationInfoDto paginationInfo;
 }

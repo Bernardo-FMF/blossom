@@ -5,6 +5,7 @@ import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaSocialFollowResource;
 import org.blossom.notification.client.AuthClient;
 import org.blossom.notification.entity.FollowNotification;
+import org.blossom.notification.factory.impl.FollowNotificationFactory;
 import org.blossom.notification.repository.FollowNotificationRepository;
 import org.blossom.notification.service.BroadcastService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,12 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
     @Autowired
     private AuthClient authClient;
 
+    @Autowired
+    private FollowNotificationFactory followNotificationFactory;
+
     @Override
     public void save(KafkaSocialFollowResource resource) {
-        FollowNotification followNotification = FollowNotification.builder()
-                .senderId(resource.getInitiatingUser())
-                .recipientId(resource.getReceivingUser())
-                .followedAt(resource.getCreatedAt())
-                .build();
+        FollowNotification followNotification = followNotificationFactory.buildEntity(resource);
 
         FollowNotification newFollowNotification = followNotificationRepository.save(followNotification);
 

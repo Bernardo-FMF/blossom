@@ -1,12 +1,10 @@
 package org.blossom.notification.service;
 
 import org.blossom.notification.client.AuthClient;
-import org.blossom.notification.dto.NotificationMessageDto;
-import org.blossom.notification.dto.NotificationMessagesDto;
-import org.blossom.notification.dto.SearchParametersDto;
-import org.blossom.notification.dto.UserDto;
+import org.blossom.notification.dto.*;
 import org.blossom.notification.entity.MessageNotification;
-import org.blossom.notification.mapper.NotificationMessageDtoMapper;
+import org.blossom.notification.mapper.impl.GenericDtoMapper;
+import org.blossom.notification.mapper.impl.NotificationMessagesDtoMapper;
 import org.blossom.notification.repository.MessageNotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,17 +27,26 @@ public class MessageService {
     private AuthClient authClient;
 
     @Autowired
-    private NotificationMessageDtoMapper notificationMessageDtoMapper;
+    private NotificationMessagesDtoMapper notificationMessagesDtoMapper;
+
+    @Autowired
+    private GenericDtoMapper genericDtoMapper;
 
     public NotificationMessagesDto getMessageNotifications(SearchParametersDto searchParameters, int userId) {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "sentAt")) : Pageable.unpaged();
 
         Page<MessageNotification> messageNotifications = messageNotificationRepository.findByRecipientIdAndIsDeliveredFalse(userId, page);
 
-        return getNotificationMessagesDto(messageNotifications);
+        List<Integer> userIds = messageNotifications.get().map(MessageNotification::getSenderId).toList();
+
+        Map<Integer, UserDto> users = userIds.stream().map(id -> authClient.getUser(id).getBody())
+                .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getUserId() : 0, user -> user));
+
+        PaginationInfoDto paginationInfo = new PaginationInfoDto(messageNotifications.getTotalPages(), searchParameters.getPage(), messageNotifications.getTotalElements(), !messageNotifications.hasNext());
+        return notificationMessagesDtoMapper.toDto(messageNotifications.toList(), users, paginationInfo);
     }
 
-    public String confirmUserReceivedNotification(String notificationId, int userId) {
+    public GenericResponseDto confirmUserReceivedNotification(String notificationId, int userId) {
         Optional<MessageNotification> optionalNotification = messageNotificationRepository.findById(notificationId);
         if (optionalNotification.isEmpty()) {
             return null;
@@ -54,23 +61,6 @@ public class MessageService {
         notification.setDelivered(true);
         messageNotificationRepository.save(notification);
 
-        return "Notification updated successfully";
-    }
-
-    private NotificationMessagesDto getNotificationMessagesDto(Page<MessageNotification> messageNotifications) {
-        List<Integer> userIds = messageNotifications.get().map(MessageNotification::getSenderId).toList();
-
-        Map<Integer, UserDto> users = userIds.stream().map(id -> authClient.getUser(id).getBody())
-                .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getUserId() : 0, user -> user));
-
-        List<NotificationMessageDto> messages = messageNotifications.get().map(message -> notificationMessageDtoMapper.mapToNotificationMessageDto(message, users.get(message.getSenderId()))).toList();
-
-        return NotificationMessagesDto.builder()
-                .notificationMessages(messages)
-                .currentPage(messageNotifications.getNumber())
-                .totalPages(messageNotifications.getTotalPages())
-                .totalElements(messageNotifications.getTotalElements())
-                .eof(!messageNotifications.hasNext())
-                .build();
+        return genericDtoMapper.toDto("Notification updated successfully", notificationId, null);
     }
 }
