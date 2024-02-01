@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -36,7 +36,7 @@ public class MessageNotification {
     private boolean isDeleted;
 
     @Field(name = "sent_at")
-    private Date sentAt;
+    private Instant sentAt;
 
     @Field(name = "is_delivered")
     private boolean isDelivered;
