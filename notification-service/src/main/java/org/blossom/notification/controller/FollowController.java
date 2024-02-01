@@ -22,7 +22,7 @@ public class FollowController {
     }
 
     @PatchMapping("/{notificationId}/received")
-    public ResponseEntity<String> confirmUserReceivedMessage(@PathVariable("notificationId") String notificationId, Authentication authentication) {
+    public ResponseEntity<String> confirmUserReceivedNotification(@PathVariable("notificationId") String notificationId, Authentication authentication) {
         return ResponseEntity.status(HttpStatus.OK).body(followService.confirmUserReceivedNotification(notificationId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

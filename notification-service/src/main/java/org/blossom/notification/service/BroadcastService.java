@@ -31,7 +31,7 @@ public class BroadcastService {
                 if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
                     ResponseEntity<UserDto> response1 = authClient.getUser(notification.getSenderId());
                     if (response1.getStatusCode().is2xxSuccessful()) {
-                        messagingTemplate.convertAndSend("/topic/user/" + notification.getRecipientId() + "/notification", notificationFollowDtoMapper.mapToNotificationFollowDto(notification, response1.getBody()));
+                        messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/notification.follow", notificationFollowDtoMapper.mapToNotificationFollowDto(notification, response1.getBody()));
                         return true;
                     }
                 }
