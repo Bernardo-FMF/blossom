@@ -1,5 +1,6 @@
 package org.blossom.notification.kafka;
 
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaMessageResource;
 import org.blossom.notification.entity.MessageNotification;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Log4j2
 public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessageResource> {
     @Autowired
     private MessageNotificationRepository messageNotificationRepository;
@@ -21,6 +23,8 @@ public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessage
 
     @Override
     public void save(KafkaMessageResource resource) {
+        log.info("processing save message of type message: {}", resource);
+
         Integer[] ids = Optional.ofNullable(resource.getRecipientsIds()).orElse(new Integer[0]);
         MessageNotification[] notifications = new MessageNotification[ids.length];
 
@@ -33,6 +37,8 @@ public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessage
 
     @Override
     public void update(KafkaMessageResource resource) {
+        log.info("processing update message of type message: {}", resource);
+
         List<MessageNotification> notifications = messageNotificationRepository.findByMessageId(resource.getId());
 
         List<MessageNotification> newNotifications = notifications.stream().peek(notification -> {
@@ -44,6 +50,8 @@ public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessage
 
     @Override
     public void delete(KafkaMessageResource resource) {
+        log.info("processing delete message of type message: {}", resource);
+
         List<MessageNotification> notifications = messageNotificationRepository.findByMessageId(resource.getId());
 
         List<MessageNotification> newNotifications = notifications.stream().peek(notification -> {

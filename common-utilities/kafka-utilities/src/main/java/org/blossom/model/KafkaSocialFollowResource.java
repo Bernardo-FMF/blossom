@@ -14,4 +14,12 @@ public class KafkaSocialFollowResource extends KafkaResource {
     private int receivingUser;
     private boolean isMutualFollow;
     private Instant createdAt;
+
+    @Override
+    public String toString() {
+        return "KafkaSocialFollowResource(initiatingUser=" + this.getInitiatingUser() +
+                ", receivingUser=" + this.getReceivingUser() +
+                ", isMutualFollow=" + this.isMutualFollow() +
+                ", createdAt=" + this.getCreatedAt() + ")";
+    }
 }

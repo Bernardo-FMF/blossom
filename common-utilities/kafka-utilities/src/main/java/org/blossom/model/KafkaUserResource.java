@@ -12,4 +12,12 @@ public class KafkaUserResource extends KafkaResource {
     String fullName;
     String username;
     String imageUrl;
+
+    @Override
+    public String toString() {
+        return "KafkaUserResource(id=" + this.getId() +
+                ", fullName=" + this.getFullName() +
+                ", username=" + this.getUsername() +
+                ", imageUrl=" + this.getImageUrl() + ")";
+    }
 }

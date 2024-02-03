@@ -1,5 +1,6 @@
 package org.blossom.message.kafka.inbound;
 
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.message.entity.User;
 import org.blossom.message.factory.impl.UserFactory;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Log4j2
 public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResource> {
     @Autowired
     private UserRepository userRepository;
@@ -20,6 +22,8 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void save(KafkaUserResource resource) {
+        log.info("processing save message of type user: {}", resource);
+
         if (!userRepository.existsById(resource.getId())) {
             userRepository.save(userFactory.buildEntity(resource));
         }
@@ -27,6 +31,8 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void update(KafkaUserResource resource) {
+        log.info("processing update message of type user: {}", resource);
+
         Optional<User> optionalUser = userRepository.findById(resource.getId());
         if (optionalUser.isEmpty()) {
             save(resource);
@@ -41,8 +47,9 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void delete(KafkaUserResource resource) {
-        //TODO: delete chat and message if necessary
+        log.info("processing delete message of type user: {}", resource);
 
+        //TODO: delete chat and message if necessary
         userRepository.deleteById(resource.getId());
     }
 }

@@ -28,6 +28,8 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
     @Override
     public void save(KafkaSocialFollowResource resource) {
+        log.info("processing save message of type social follow: {}", resource);
+
         FollowNotification followNotification = followNotificationFactory.buildEntity(resource);
 
         FollowNotification newFollowNotification = followNotificationRepository.save(followNotification);
@@ -41,11 +43,11 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
     @Override
     public void update(KafkaSocialFollowResource resource) {
-        log.info("discarding update message of type: social follow");
+        log.info("discarding update message of type social follow: {}", resource);
     }
 
     @Override
     public void delete(KafkaSocialFollowResource resource) {
-        log.info("discarding delete message of type: social follow");
+        log.info("discarding delete message of type social follow: {}", resource);
     }
 }

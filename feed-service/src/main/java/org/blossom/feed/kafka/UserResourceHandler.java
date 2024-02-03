@@ -1,5 +1,6 @@
 package org.blossom.feed.kafka;
 
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.feed.entity.FeedEntry;
 import org.blossom.feed.entity.LocalPostByUser;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Log4j2
 public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResource> {
     @Autowired
     private LocalUserRepository localUserRepository;
@@ -35,6 +37,8 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void save(KafkaUserResource resource) {
+        log.info("processing save message of type user: {}", resource);
+
         if (!localUserRepository.existsById(resource.getId())) {
             localUserRepository.save(localUserFactory.buildEntity(resource));
             localUserPostCountRepository.createCount(resource.getId());
@@ -43,6 +47,8 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void update(KafkaUserResource resource) {
+        log.info("processing update message of type user: {}", resource);
+
         Optional<LocalUser> optionalLocalUser = localUserRepository.findById(resource.getId());
         if (optionalLocalUser.isEmpty()) {
             save(resource);
@@ -57,6 +63,8 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void delete(KafkaUserResource resource) {
+        log.info("processing delete message of type user: {}", resource);
+
         localUserRepository.deleteById(resource.getId());
         localUserPostCountRepository.deleteById(resource.getId());
 

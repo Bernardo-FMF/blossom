@@ -1,6 +1,6 @@
 package org.blossom.feed.kafka;
 
-import org.apache.commons.lang.NotImplementedException;
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.feed.entity.FeedEntry;
 import org.blossom.feed.entity.LocalPostByUser;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResource> {
     @Autowired
     private FeedEntryRepository feedEntryRepository;
@@ -39,6 +40,8 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
 
     @Override
     public void save(KafkaPostResource resource) {
+        log.info("processing save message of type post: {}", resource);
+
         localUserPostCountRepository.incrementCount(resource.getUserId());
 
         localPostByUserRepository.save(localPostByUserFactory.buildEntity(resource));
@@ -49,11 +52,13 @@ public class PostResourceHandler implements KafkaResourceHandler<KafkaPostResour
 
     @Override
     public void update(KafkaPostResource resource) {
-        throw new NotImplementedException("Post updates are not available");
+        log.info("discarding update message of type post: {}", resource);
     }
 
     @Override
     public void delete(KafkaPostResource resource) {
+        log.info("processing delete message of type post: {}", resource);
+
         List<FeedEntry> feedEntriesToDelete = feedEntryRepository.findByPostIdIn(List.of(resource.getId()));
         feedEntryRepository.deleteAll(feedEntriesToDelete);
 

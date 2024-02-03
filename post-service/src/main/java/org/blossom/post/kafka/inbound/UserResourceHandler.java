@@ -1,5 +1,6 @@
 package org.blossom.post.kafka.inbound;
 
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaUserResource;
 import org.blossom.post.cache.LocalUserCacheService;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@Log4j2
 public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResource> {
     @Autowired
     private LocalUserCacheService localUserCache;
@@ -28,16 +30,22 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
 
     @Override
     public void save(KafkaUserResource resource) {
+        log.info("processing save message of type user: {}", resource);
+
         localUserCache.addToCache(String.valueOf(resource.getId()), userDtoMapper.toDto(resource));
     }
 
     @Override
     public void update(KafkaUserResource resource) {
+        log.info("processing update message of type user: {}", resource);
+
         localUserCache.updateCacheEntry(String.valueOf(resource.getId()), userDtoMapper.toDto(resource));
     }
 
     @Override
     public void delete(KafkaUserResource resource) {
+        log.info("processing delete message of type user: {}", resource);
+
         localUserCache.deleteFromCache(String.valueOf(resource.getId()));
 
         Page<Post> allUserPosts = postRepository.findByUserId(resource.getId(), Pageable.unpaged());

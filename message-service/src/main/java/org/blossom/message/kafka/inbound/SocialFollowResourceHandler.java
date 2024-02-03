@@ -1,6 +1,6 @@
 package org.blossom.message.kafka.inbound;
 
-import org.apache.commons.lang.NotImplementedException;
+import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.message.dto.ChatCreationDto;
 import org.blossom.message.enums.ChatType;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Log4j2
 public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSocialFollowResource> {
     @Autowired
     private UserRepository userRepository;
@@ -31,6 +32,8 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
     @Override
     public void save(KafkaSocialFollowResource resource) {
+        log.info("processing save message of type social follow: {}", resource);
+
         if (userRepository.existsById(resource.getInitiatingUser()) && userRepository.existsById(resource.getReceivingUser()) && resource.isMutualFollow()) {
             try {
                 ChatCreationDto chatCreation = new ChatCreationDto();
@@ -45,12 +48,13 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
     @Override
     public void update(KafkaSocialFollowResource resource) {
-        throw new NotImplementedException("Social follow updates are not available");
+        log.info("discarding update message of type social follow: {}", resource);
     }
 
     @Override
     public void delete(KafkaSocialFollowResource resource) {
+        log.info("discarding delete message of type social follow: {}", resource);
+
         //TODO: Delete messages?
-        throw new NotImplementedException("Social follow updates are not processed");
     }
 }
