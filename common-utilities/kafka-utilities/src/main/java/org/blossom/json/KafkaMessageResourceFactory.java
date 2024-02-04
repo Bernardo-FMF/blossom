@@ -17,7 +17,7 @@ public class KafkaMessageResourceFactory implements KafkaResourceFactory<KafkaMe
                 .content(json.get("content").asText())
                 .createdAt(parseDate(json.get("createdAt")))
                 .updatedAt(parseDate(json.get("updatedAt")))
-                .isDeleted(json.get("isDeleted").asBoolean())
+                .isDeleted(json.get("deleted").asBoolean())
                 .build();
     }
 

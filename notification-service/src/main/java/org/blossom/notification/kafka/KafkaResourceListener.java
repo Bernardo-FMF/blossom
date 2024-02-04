@@ -1,7 +1,6 @@
 package org.blossom.notification.kafka;
 
 import jakarta.annotation.PostConstruct;
-import lombok.extern.log4j.Log4j2;
 import org.blossom.facade.KafkaConsumerFacade;
 import org.blossom.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Component
-@Log4j2
 public class KafkaResourceListener implements KafkaConsumerFacade {
     @Autowired
     private SocialFollowResourceHandler socialFollowResourceHandler;
@@ -44,8 +42,6 @@ public class KafkaResourceListener implements KafkaConsumerFacade {
 
     @KafkaListener(topics = {"message-resource-event-notification", "social-follow-resource-event-notification"})
     public void handleResource(ResourceEvent resourceEvent) {
-        log.debug("message received: {}", resourceEvent);
-
         handlers.get(resourceEvent.getEventType()).get(resourceEvent.getResourceType()).accept(resourceEvent.getResource());
     }
 }

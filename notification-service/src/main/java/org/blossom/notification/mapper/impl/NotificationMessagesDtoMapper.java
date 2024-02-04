@@ -17,10 +17,11 @@ public class NotificationMessagesDtoMapper {
     @Autowired
     private NotificationMessageDtoMapper notificationMessageDtoMapper;
 
-    public NotificationMessagesDto toDto(Collection<MessageNotification> notifications, Map<Integer, UserDto> users, PaginationInfoDto paginationInfoDto) {
+    public NotificationMessagesDto toDto(Collection<MessageNotification> notifications, Map<Integer, UserDto> users, int userId, PaginationInfoDto paginationInfoDto) {
         List<NotificationMessageDto> messages = notifications.stream().map(message -> notificationMessageDtoMapper.toDto(message, users.get(message.getSenderId()))).toList();
 
         return NotificationMessagesDto.builder()
+                .userId(userId)
                 .notificationMessages(messages)
                 .paginationInfo(paginationInfoDto)
                 .build();

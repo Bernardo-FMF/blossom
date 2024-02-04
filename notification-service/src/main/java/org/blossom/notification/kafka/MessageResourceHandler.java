@@ -54,11 +54,6 @@ public class MessageResourceHandler implements KafkaResourceHandler<KafkaMessage
 
         List<MessageNotification> notifications = messageNotificationRepository.findByMessageId(resource.getId());
 
-        List<MessageNotification> newNotifications = notifications.stream().peek(notification -> {
-            notification.setDeleted(true);
-            notification.setContent(null);
-        }).toList();
-
-        messageNotificationRepository.saveAll(newNotifications);
+        messageNotificationRepository.deleteAll(notifications);
     }
 }

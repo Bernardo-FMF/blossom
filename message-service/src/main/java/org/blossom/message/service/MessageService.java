@@ -9,7 +9,7 @@ import org.blossom.message.exception.IllegalMessageOperationException;
 import org.blossom.message.exception.MessageNotFoundException;
 import org.blossom.message.exception.UserNotFoundException;
 import org.blossom.message.factory.impl.MessageFactory;
-import org.blossom.message.mapper.impl.MessageDtoMapper;
+import org.blossom.message.mapper.impl.ChatDtoMapper;
 import org.blossom.message.mapper.impl.ChatMessagesDtoMapper;
 import org.blossom.message.repository.ChatRepository;
 import org.blossom.message.repository.MessageRepository;
@@ -32,13 +32,13 @@ public class MessageService {
     private MessageRepository messageRepository;
 
     @Autowired
-    private MessageDtoMapper messageDtoMapper;
-
-    @Autowired
     private MessageFactory messageFactory;
 
     @Autowired
     private ChatMessagesDtoMapper chatMessagesDtoMapper;
+
+    @Autowired
+    private ChatDtoMapper chatDtoMapper;
 
     public Message createMessage(PublishMessageDto chatMessage, int chatId, int userId) throws UserNotFoundException, ChatNotFoundException {
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
@@ -109,6 +109,6 @@ public class MessageService {
         Page<Message> messages = messageRepository.findByChatId(chatId, page);
 
         PaginationInfoDto paginationInfo = new PaginationInfoDto(messages.getTotalPages(), messages.getNumber(), messages.getTotalElements(), !messages.hasNext());
-        return chatMessagesDtoMapper.toPaginatedDto(messages.getContent(), paginationInfo);
+        return chatMessagesDtoMapper.toPaginatedDto(messages.getContent(), chatDtoMapper.toDto(chat), paginationInfo);
     }
 }

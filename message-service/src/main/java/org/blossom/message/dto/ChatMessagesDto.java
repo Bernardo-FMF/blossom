@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @Builder
 public class ChatMessagesDto {
+    private ChatDto chat;
     private List<MessageDto> messageDtos;
     private PaginationInfoDto paginationInfo;
 }
