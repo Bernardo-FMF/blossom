@@ -42,14 +42,14 @@ class MessageKafkaMessageIntegrationTest extends AbstractContextBeans {
         kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
 
         UserDto userDto1 = UserDto.builder()
-                .userId(1)
+                .id(1)
                 .username("user1")
                 .fullName("user 1")
                 .imageUrl(null)
                 .build();
 
         UserDto userDto2 = UserDto.builder()
-                .userId(2)
+                .id(2)
                 .username("user2")
                 .fullName("user 2")
                 .imageUrl(null)

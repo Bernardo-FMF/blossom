@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MessageOperationMapper implements ICompoundDtoMapper<Message, BroadcastType, MessageOperationDto> {
+public class MessageOperationDtoMapper implements ICompoundDtoMapper<Message, BroadcastType, MessageOperationDto> {
     @Autowired
     private MessageDtoMapper messageDtoMapper;
 

@@ -5,6 +5,7 @@ import org.blossom.facade.KafkaResourceHandler;
 import org.blossom.model.KafkaSocialFollowResource;
 import org.blossom.notification.client.AuthClient;
 import org.blossom.notification.entity.FollowNotification;
+import org.blossom.notification.enums.BroadcastType;
 import org.blossom.notification.factory.impl.FollowNotificationFactory;
 import org.blossom.notification.repository.FollowNotificationRepository;
 import org.blossom.notification.service.BroadcastService;
@@ -34,7 +35,7 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
         FollowNotification newFollowNotification = followNotificationRepository.save(followNotification);
 
-        if (broadcastService.broadcastFollow(resource.getReceivingUser(), newFollowNotification)) {
+        if (broadcastService.broadcastFollow(resource.getReceivingUser(), newFollowNotification, BroadcastType.SOCIAL_FOLLOW_CREATED)) {
             followNotification.setDelivered(true);
         }
 

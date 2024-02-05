@@ -63,14 +63,14 @@ class MessageControllerIntegrationTest extends AbstractContextBeans {
         Mockito.when(authClient.validate("token2")).thenReturn(responseToken2);
 
         UserDto userDto1 = UserDto.builder()
-                .userId(1)
+                .id(1)
                 .username("user1")
                 .fullName("user 1")
                 .imageUrl(null)
                 .build();
 
         UserDto userDto2 = UserDto.builder()
-                .userId(2)
+                .id(2)
                 .username("user2")
                 .fullName("user 2")
                 .imageUrl(null)
@@ -142,6 +142,6 @@ class MessageControllerIntegrationTest extends AbstractContextBeans {
         Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getId());
         Assertions.assertEquals("Hello", notificationMessagesDto.getNotificationMessages().get(0).getContent());
         Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getChatId());
-        Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getUser().getUserId());
+        Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getUser().getId());
     }
 }

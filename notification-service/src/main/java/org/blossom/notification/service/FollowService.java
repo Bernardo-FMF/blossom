@@ -39,8 +39,8 @@ public class FollowService {
 
         List<Integer> userIds = followNotifications.get().map(FollowNotification::getSenderId).toList();
 
-        Map<Integer, UserDto> users = userIds.stream().map(id -> authClient.getUser(id).getBody())
-                .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getUserId() : 0, user -> user));
+        Map<Integer, UserDto> users = userIds.stream().distinct().map(id -> authClient.getUser(id).getBody())
+                .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getId() : 0, user -> user));
 
         PaginationInfoDto paginationInfo = new PaginationInfoDto(followNotifications.getTotalPages(), searchParameters.getPage(), followNotifications.getTotalElements(), !followNotifications.hasNext());
         return notificationFollowsDtoMapper.toDto(followNotifications.getContent(), users, paginationInfo);

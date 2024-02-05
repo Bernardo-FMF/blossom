@@ -11,6 +11,7 @@ public class NotificationFollowDtoMapper implements ICompoundDtoMapper<FollowNot
     @Override
     public NotificationFollowDto toDto(FollowNotification followNotification, UserDto userDto) {
         return NotificationFollowDto.builder()
+                .userId(followNotification.getRecipientId())
                 .id(followNotification.getId())
                 .follower(userDto)
                 .followedAt(followNotification.getFollowedAt())

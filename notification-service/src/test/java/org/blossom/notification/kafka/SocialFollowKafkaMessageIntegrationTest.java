@@ -44,14 +44,14 @@ public class SocialFollowKafkaMessageIntegrationTest extends AbstractContextBean
         kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
 
         UserDto userDto1 = UserDto.builder()
-                .userId(1)
+                .id(1)
                 .username("user1")
                 .fullName("user 1")
                 .imageUrl(null)
                 .build();
 
         UserDto userDto2 = UserDto.builder()
-                .userId(2)
+                .id(2)
                 .username("user2")
                 .fullName("user 2")
                 .imageUrl(null)
@@ -85,6 +85,7 @@ public class SocialFollowKafkaMessageIntegrationTest extends AbstractContextBean
             FollowNotification notification = followNotifications.get(0);
             Assertions.assertEquals(2, notification.getRecipientId());
             Assertions.assertEquals(1, notification.getSenderId());
+            Assertions.assertFalse(notification.isDelivered());
 
             countDownLatch.countDown();
         };
@@ -96,4 +97,5 @@ public class SocialFollowKafkaMessageIntegrationTest extends AbstractContextBean
         countDownLatch.await();
     }
 
+    //TODO: create new follow notif but with websocket connection open
 }

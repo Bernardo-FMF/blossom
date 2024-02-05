@@ -6,7 +6,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class UserDto {
-    private int userId;
+    private int id;
     private String username;
     private String fullName;
     private String imageUrl;

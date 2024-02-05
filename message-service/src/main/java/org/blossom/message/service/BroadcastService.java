@@ -4,8 +4,8 @@ import org.blossom.message.entity.Chat;
 import org.blossom.message.entity.Message;
 import org.blossom.message.entity.User;
 import org.blossom.message.enums.BroadcastType;
-import org.blossom.message.mapper.impl.ChatOperationMapper;
-import org.blossom.message.mapper.impl.MessageOperationMapper;
+import org.blossom.message.mapper.impl.ChatOperationDtoMapper;
+import org.blossom.message.mapper.impl.MessageOperationDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -24,15 +24,15 @@ public class BroadcastService {
     private NotificationService notificationService;
 
     @Autowired
-    private MessageOperationMapper messageOperationMapper;
+    private MessageOperationDtoMapper messageOperationDtoMapper;
 
     @Autowired
-    private ChatOperationMapper chatOperationMapper;
+    private ChatOperationDtoMapper chatOperationDtoMapper;
 
     public void broadcastMessage(Set<User> usersInChat, Message message, BroadcastType type) {
         for (User user: usersInChat) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
-                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat.message", messageOperationMapper.toDto(message, type));
+                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat.message", messageOperationDtoMapper.toDto(message, type));
             } else {
                 notificationService.sendMessageNotification(message, type);
             }
@@ -42,7 +42,7 @@ public class BroadcastService {
     public void broadcastChat(Chat chat, BroadcastType type) {
         for (User user: chat.getParticipants()) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
-                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat", chatOperationMapper.mapToChatOperationDto(chat, type));
+                messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat", chatOperationDtoMapper.toDto(chat, type));
             }
         }
     }

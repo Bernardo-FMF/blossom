@@ -35,8 +35,6 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.messaging.support.AbstractSubscribableChannel;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
@@ -56,17 +54,12 @@ import java.util.function.Consumer;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WsMessageSendingIntegrationTest extends AbstractContextBeans {
     public static final String WS_URL = "ws://localhost:8080/ws-chat";
-    @Autowired
-    private AbstractSubscribableChannel clientInboundChannel;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private ChatRepository chatRepository;
-
-    @Autowired
-    private SimpUserRegistry userRegistry;
 
     @MockBean
     private WebSocketConnectInterceptor<?> webSocketConnectInterceptor;
@@ -239,4 +232,15 @@ class WsMessageSendingIntegrationTest extends AbstractContextBeans {
         Assertions.assertEquals("content", polledMessage.getMessage().getContent());
         Assertions.assertTrue(polledMessage.getMessage().getChat().getParticipants().stream().map(UserDto::getId).toList().containsAll(List.of(1, 2)));
     }
+
+    // get chat messages
+
+    // update message
+
+    // get chat messages
+
+    // delete message
+
+    // get chat messages (should be none)
+
 }

@@ -1,6 +1,6 @@
 package org.blossom.future;
 
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 
 import java.util.function.Consumer;
 
@@ -19,7 +19,7 @@ public class FutureCallback<T> implements com.google.common.util.concurrent.Futu
     }
 
     @Override
-    public void onFailure(@NotNull Throwable throwable) {
+    public void onFailure(@Nonnull Throwable throwable) {
         failureConsumer.accept(throwable);
     }
 }

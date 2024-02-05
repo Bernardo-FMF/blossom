@@ -9,6 +9,7 @@ import java.time.Instant;
 @Getter
 public class NotificationFollowDto {
     private String id;
+    private int userId;
     private UserDto follower;
     private Instant followedAt;
 }

@@ -40,7 +40,7 @@ public class MessageService {
         List<Integer> userIds = messageNotifications.get().map(MessageNotification::getSenderId).toList();
 
         Map<Integer, UserDto> users = userIds.stream().distinct().map(id -> authClient.getUser(id).getBody())
-                .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getUserId() : 0, user -> user));
+                .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getId() : 0, user -> user));
 
         PaginationInfoDto paginationInfo = new PaginationInfoDto(messageNotifications.getTotalPages(), searchParameters.getPage(), messageNotifications.getTotalElements(), !messageNotifications.hasNext());
         return notificationMessagesDtoMapper.toDto(messageNotifications.toList(), users, userId, paginationInfo);
