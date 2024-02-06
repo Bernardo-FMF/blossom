@@ -17,10 +17,11 @@ public class NotificationFollowsDtoMapper {
     @Autowired
     private NotificationFollowDtoMapper notificationFollowDtoMapper;
 
-    public NotificationFollowsDto toDto(Collection<FollowNotification> notifications, Map<Integer, UserDto> users, PaginationInfoDto paginationInfoDto) {
+    public NotificationFollowsDto toDto(Collection<FollowNotification> notifications, Map<Integer, UserDto> users, int userId, PaginationInfoDto paginationInfoDto) {
         List<NotificationFollowDto> follows = notifications.stream().map(follow -> notificationFollowDtoMapper.toDto(follow, users.get(follow.getSenderId()))).toList();
 
         return NotificationFollowsDto.builder()
+                .userId(userId)
                 .notificationFollows(follows)
                 .paginationInfo(paginationInfoDto)
                 .build();

@@ -43,7 +43,7 @@ public class FollowService {
                 .collect(Collectors.toMap(userDto -> userDto != null ? userDto.getId() : 0, user -> user));
 
         PaginationInfoDto paginationInfo = new PaginationInfoDto(followNotifications.getTotalPages(), searchParameters.getPage(), followNotifications.getTotalElements(), !followNotifications.hasNext());
-        return notificationFollowsDtoMapper.toDto(followNotifications.getContent(), users, paginationInfo);
+        return notificationFollowsDtoMapper.toDto(followNotifications.getContent(), users, userId, paginationInfo);
     }
 
     public GenericResponseDto confirmUserReceivedNotification(String notificationId, int userId) {

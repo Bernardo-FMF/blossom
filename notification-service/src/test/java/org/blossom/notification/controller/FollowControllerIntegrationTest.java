@@ -3,16 +3,15 @@ package org.blossom.notification.controller;
 import org.blossom.future.FutureCallback;
 import org.blossom.future.KafkaFutureExecutor;
 import org.blossom.model.EventType;
-import org.blossom.model.KafkaMessageResource;
+import org.blossom.model.KafkaSocialFollowResource;
 import org.blossom.model.ResourceEvent;
 import org.blossom.model.ResourceType;
 import org.blossom.notification.AbstractContextBeans;
 import org.blossom.notification.dto.GenericResponseDto;
-import org.blossom.notification.dto.LocalTokenDto;
-import org.blossom.notification.dto.NotificationMessagesDto;
+import org.blossom.notification.dto.NotificationFollowsDto;
 import org.blossom.notification.dto.UserDto;
-import org.blossom.notification.entity.MessageNotification;
-import org.blossom.notification.repository.MessageNotificationRepository;
+import org.blossom.notification.entity.FollowNotification;
+import org.blossom.notification.repository.FollowNotificationRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,31 +37,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class MessageControllerIntegrationTest extends AbstractContextBeans {
+class FollowControllerIntegrationTest extends AbstractContextBeans {
     @Autowired
-    private MessageNotificationRepository messageNotificationRepository;
+    private FollowNotificationRepository followNotificationRepository;
 
     private KafkaFutureExecutor kafkaFutureExecutor;
 
     @BeforeEach
     void setup() {
         Map<ResourceType, List<String>> topicMap = new HashMap<>();
-        topicMap.put(ResourceType.MESSAGE, List.of("message-resource-event-notification"));
+        topicMap.put(ResourceType.SOCIAL_FOLLOW, List.of("social-follow-resource-event-notification"));
         kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
-
-        LocalTokenDto userToken1 = new LocalTokenDto();
-        userToken1.setUserId(1);
-        userToken1.setUsername("user1");
-
-        LocalTokenDto userToken2 = new LocalTokenDto();
-        userToken2.setUserId(2);
-        userToken2.setUsername("user2");
-
-        ResponseEntity<LocalTokenDto> responseToken1 = ResponseEntity.of(Optional.of(userToken1));
-        ResponseEntity<LocalTokenDto> responseToken2 = ResponseEntity.of(Optional.of(userToken2));
-
-        Mockito.when(authClient.validate("token1")).thenReturn(responseToken1);
-        Mockito.when(authClient.validate("token2")).thenReturn(responseToken2);
 
         UserDto userDto1 = UserDto.builder()
                 .id(1)
@@ -87,34 +72,18 @@ class MessageControllerIntegrationTest extends AbstractContextBeans {
 
     @Order(1)
     @Test
-    void handleMessageCreationKafkaMessage() throws ExecutionException, InterruptedException {
+    void handleSocialFollowCreationKafkaMessage() throws ExecutionException, InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        KafkaMessageResource resource = KafkaMessageResource.builder()
-                .id(1)
-                .senderId(1)
-                .recipientsIds(new Integer[] {2})
-                .chatId(1)
-                .content("Hello")
-                .isDeleted(false)
-                .updatedAt(null)
+        KafkaSocialFollowResource resource = KafkaSocialFollowResource.builder()
+                .initiatingUser(1)
+                .receivingUser(2)
                 .createdAt(Instant.now())
+                .isMutualFollow(true)
                 .build();
-        ResourceEvent resourceEvent = new ResourceEvent(EventType.CREATE, ResourceType.MESSAGE, resource);
+        ResourceEvent resourceEvent = new ResourceEvent(EventType.CREATE, ResourceType.SOCIAL_FOLLOW, resource);
 
-        Runnable validationCallback = () -> {
-            List<MessageNotification> messageNotifications = messageNotificationRepository.findByMessageId(1);
-
-            Assertions.assertEquals(1, messageNotifications.size());
-
-            MessageNotification notification = messageNotifications.get(0);
-            Assertions.assertEquals(2, notification.getRecipientId());
-            Assertions.assertEquals(1, notification.getSenderId());
-            Assertions.assertEquals(1, notification.getChatId());
-            Assertions.assertEquals("Hello", notification.getContent());
-
-            countDownLatch.countDown();
-        };
+        Runnable validationCallback = countDownLatch::countDown;
 
         Consumer<Throwable> errorCallback = Assertions::fail;
 
@@ -125,8 +94,8 @@ class MessageControllerIntegrationTest extends AbstractContextBeans {
 
     @Order(2)
     @Test
-    void getUserMessageNotifications() throws Exception {
-        MvcResult messageNotificationsResult = mockMvc.perform(get("/api/v1/notification/message")
+    void getUserFollowNotifications() throws Exception {
+        MvcResult messageNotificationsResult = mockMvc.perform(get("/api/v1/notification/follow")
                         .queryParam("pageLimit", "100")
                         .queryParam("page", "0")
                         .header("username", "user2")
@@ -136,23 +105,26 @@ class MessageControllerIntegrationTest extends AbstractContextBeans {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        NotificationMessagesDto notificationMessagesDto = objectMapper.readValue(messageNotificationsResult.getResponse().getContentAsString(), NotificationMessagesDto.class);
+        NotificationFollowsDto notificationFollowsDto = objectMapper.readValue(messageNotificationsResult.getResponse().getContentAsString(), NotificationFollowsDto.class);
 
-        Assertions.assertEquals(2, notificationMessagesDto.getUserId());
-        Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().size());
-        Assertions.assertEquals(1, notificationMessagesDto.getPaginationInfo().getTotalElements());
-        Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getId());
-        Assertions.assertEquals("Hello", notificationMessagesDto.getNotificationMessages().get(0).getContent());
-        Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getChatId());
-        Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getUser().getId());
+        Assertions.assertEquals(2, notificationFollowsDto.getUserId());
+        Assertions.assertEquals(1, notificationFollowsDto.getNotificationFollows().size());
+        Assertions.assertEquals(1, notificationFollowsDto.getPaginationInfo().getTotalElements());
+        Assertions.assertEquals(2, notificationFollowsDto.getNotificationFollows().get(0).getUserId());
+        Assertions.assertEquals(1, notificationFollowsDto.getNotificationFollows().get(0).getFollower().getId());
+
+        List<FollowNotification> allFollowNotifications = followNotificationRepository.findAll();
+        Assertions.assertEquals(1, allFollowNotifications.size());
+        Assertions.assertEquals(notificationFollowsDto.getNotificationFollows().get(0).getId(), allFollowNotifications.get(0).getId());
+        Assertions.assertFalse(allFollowNotifications.get(0).isDelivered());
     }
 
     @Order(3)
     @Test
-    void acknowledgeUserMessageNotifications() throws Exception {
-        String notificationId = messageNotificationRepository.findByMessageId(1).get(0).getId();
+    void acknowledgeUserFollowNotifications() throws Exception {
+        String notificationId = followNotificationRepository.findAll().get(0).getId();
 
-        MvcResult acknowledgeResult = mockMvc.perform(patch("/api/v1/notification/message/" + notificationId + "/received")
+        MvcResult acknowledgeResult = mockMvc.perform(patch("/api/v1/notification/follow/" + notificationId + "/received")
                         .header("username", "user2")
                         .header("userId", "2")
                         .header("userRoles", "USER"))
@@ -165,6 +137,6 @@ class MessageControllerIntegrationTest extends AbstractContextBeans {
         Assertions.assertEquals("Notification updated successfully", genericResponseDto.getResponseMessage());
         Assertions.assertEquals(notificationId, genericResponseDto.getResourceId());
 
-        Assertions.assertTrue(messageNotificationRepository.findByMessageId(1).get(0).isDelivered());
+        Assertions.assertTrue(followNotificationRepository.findAll().get(0).isDelivered());
     }
 }

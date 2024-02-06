@@ -1,6 +1,7 @@
 package org.blossom.message.controller;
 
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.blossom.future.FutureCallback;
 import org.blossom.future.KafkaFutureExecutor;
@@ -17,7 +18,6 @@ import org.blossom.message.interceptor.WebSocketConnectInterceptor;
 import org.blossom.message.repository.ChatRepository;
 import org.blossom.message.repository.UserRepository;
 import org.blossom.model.*;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -204,7 +204,7 @@ class WsMessageSendingIntegrationTest extends AbstractContextBeans {
 
         user2Session.subscribe(headers, new StompFrameHandler() {
             @Override
-            public @NotNull Type getPayloadType(@Nullable StompHeaders headers) {
+            public @Nonnull Type getPayloadType(@Nullable StompHeaders headers) {
                 return MessageOperationDto.class;
             }
 
