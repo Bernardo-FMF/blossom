@@ -9,9 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface ChatRepository extends JpaRepository<Chat, Integer> {
-    @Query("SELECT c FROM Chat c WHERE c.owner.id = :userId and c.lastUpdate is not null")
+    @Query("SELECT c FROM Chat c JOIN c.participants p WHERE p.id = :userId AND c.lastUpdate IS NOT NULL")
     Page<Chat> findByUserId(@Param("userId") int userId, Pageable page);
+
+    @Query("SELECT c FROM Chat c JOIN c.participants p WHERE p.id = :userId AND c.lastUpdate IS NOT NULL")
+    List<Chat> findByUserId(@Param("userId") int userId);
 
     @Transactional
     @Modifying

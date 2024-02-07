@@ -14,6 +14,7 @@ import org.blossom.message.mapper.impl.ChatDtoMapper;
 import org.blossom.message.mapper.impl.GenericDtoMapper;
 import org.blossom.message.mapper.impl.UserChatsDtoMapper;
 import org.blossom.message.repository.ChatRepository;
+import org.blossom.message.repository.MessageRepository;
 import org.blossom.message.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,9 @@ public class ChatService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
 
     @Autowired
     private BroadcastService broadcastService;
@@ -160,6 +164,27 @@ public class ChatService {
             chatRepository.save(chat);
 
             return genericDtoMapper.toDto("User removed from chat with success", chatId, null);
+        }
+    }
+
+    public void decoupleUserFromChat(Chat chat, User user) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
+        if (chat.getParticipants().stream().noneMatch(participant -> participant.getId() == user.getId())) {
+            throw new IllegalChatOperationException("User is not in the chat");
+        }
+
+        chat.removeFromChat(user);
+
+        if (chat.getParticipants().isEmpty()) {
+            messageRepository.deleteByChatId(chat.getId());
+            chatRepository.deleteById(chat.getId());
+            broadcastService.broadcastChat(chat, BroadcastType.CHAT_DELETED);
+        } else {
+            messageRepository.decoupleUserFromChat(chat.getId(), user.getId());
+
+            Optional<User> newOwner = chat.getParticipants().stream().findFirst();
+            chat.setNewOwner(newOwner.orElse(null));
+            chatRepository.save(chat);
+            chatRepository.updateLastUpdateDate(chat.getId());
         }
     }
 
