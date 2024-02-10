@@ -54,7 +54,5 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
     @Override
     public void delete(KafkaSocialFollowResource resource) {
         log.info("discarding delete message of type social follow: {}", resource);
-
-        //TODO: Delete messages?
     }
 }
