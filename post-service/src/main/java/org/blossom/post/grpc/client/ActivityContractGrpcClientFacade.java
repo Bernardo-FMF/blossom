@@ -4,6 +4,7 @@ import io.grpc.ManagedChannel;
 import org.blossom.activitycontract.ActivityContractGrpc;
 import org.blossom.facade.BaseGrpcClientFacade;
 import org.blossom.post.configuration.GrpcActivityConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ public class ActivityContractGrpcClientFacade extends BaseGrpcClientFacade {
     private final ActivityContractGrpc.ActivityContractStub nonBlockStub;
     private final ActivityContractGrpc.ActivityContractBlockingStub blockStub;
 
+    @Autowired
     public ActivityContractGrpcClientFacade(GrpcActivityConfiguration grpcConfiguration, @Qualifier("activity-grpc-channel") ManagedChannel managedChannel) {
         super(grpcConfiguration, managedChannel);
         this.nonBlockStub = buildNonBlockingStub();

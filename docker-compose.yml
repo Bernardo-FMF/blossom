@@ -69,9 +69,6 @@ services:
       - POSTGRES_DB=auth-db
       - POSTGRES_USER=${ROOT_USER}
       - POSTGRES_PASSWORD=${ROOT_PASSWORD}
-      - PGDATA=/data/postgres
-    volumes:
-      - ./auth-service-db:/data/postgres
     restart: always
 
   activity-service-db:
@@ -83,9 +80,6 @@ services:
       - POSTGRES_DB=activity-db
       - POSTGRES_USER=${ROOT_USER}
       - POSTGRES_PASSWORD=${ROOT_PASSWORD}
-      - PGDATA=/data/postgres
-    volumes:
-      - ./activity-service-db:/data/postgres
     restart: always
 
   social-graph-service-db:
@@ -94,8 +88,6 @@ services:
     ports:
       - "6382:7474"
       - "6383:7687"
-    volumes:
-      - ./social-graph-service-db:/data
     restart: always
 
   feed-service-db:
@@ -103,8 +95,6 @@ services:
     container_name: feed-service-db
     ports:
       - "6384:9042"
-    volumes:
-      - ./feed-service-db:/var/lib/cassandra
     restart: always
 
   post-service-db:
@@ -112,8 +102,6 @@ services:
     container_name: post-service-db
     ports:
       - "6385:27017"
-    volumes:
-      - ./post-service-db:/data/db
     restart: always
 
   notification-service-db:
@@ -121,8 +109,6 @@ services:
     container_name: notification-service-db
     ports:
       - "6386:27017"
-    volumes:
-      - ./notification-service-db:/data/db
     restart: always
 
   message-service-db:
@@ -135,8 +121,6 @@ services:
       - POSTGRES_USER=${ROOT_USER}
       - POSTGRES_PASSWORD=${ROOT_PASSWORD}
       - PGDATA=/data/postgres
-    volumes:
-      - ./message-service-db:/data/postgres
     restart: always
 
   discovery-server:
