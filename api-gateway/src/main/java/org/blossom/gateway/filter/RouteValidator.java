@@ -20,6 +20,7 @@ public class RouteValidator {
     static {
         openApiEndpoints.put("/api/v1/auth/register", Collections.singletonList(HttpMethod.POST));
         openApiEndpoints.put("/api/v1/auth/login", Collections.singletonList(HttpMethod.POST));
+        openApiEndpoints.put("/api/v1/auth/verify-mfa", Collections.singletonList(HttpMethod.POST));
         openApiEndpoints.put("/api/v1/auth/validate", Collections.singletonList(HttpMethod.GET));
         openApiEndpoints.put("/api/v1/auth/password-recovery-request", Collections.singletonList(HttpMethod.POST));
         openApiEndpoints.put("/api/v1/auth/password-recovery", Collections.singletonList(HttpMethod.POST));

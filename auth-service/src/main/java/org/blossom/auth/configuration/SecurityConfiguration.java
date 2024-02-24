@@ -66,7 +66,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/mfa-qr-code").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/mfa").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/mfa").authenticated()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/verify-mfa").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/verify-mfa").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/user/profile-image").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/auth/logged-user").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()

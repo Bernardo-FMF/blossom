@@ -287,7 +287,7 @@ public class AuthService {
             throw new UserNotFoundException("Email does not match");
         }
 
-        if (!passwordEncoder.matches(emailUpdateDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(emailUpdateDto.getPasswordConfirmation(), user.getPassword())) {
             throw new BadCredentialsException("Incorrect credentials");
         }
 

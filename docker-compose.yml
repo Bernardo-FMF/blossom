@@ -120,7 +120,6 @@ services:
       - POSTGRES_DB=message-db
       - POSTGRES_USER=${ROOT_USER}
       - POSTGRES_PASSWORD=${ROOT_PASSWORD}
-      - PGDATA=/data/postgres
     restart: always
 
   discovery-server:
@@ -141,6 +140,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - BLOSSOM_GATEWAY_PORT=8181
+      - BLOSSOM_CORS_ORIGINS=${BLOSSOM_CORS}
     depends_on:
       - discovery-server
 
@@ -175,7 +175,7 @@ services:
       - BLOSSOM_EMAIL_USERNAME=${EMAIL_USERNAME}
       - BLOSSOM_EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - BLOSSOM_KAFKA=broker:29092
-      - BLOSSOM_CALLBACK=http://localhost:100/callbackUrl
+      - BLOSSOM_CALLBACK=${BLOSSOM_CALLBACK}
       - BLOSSOM_JWT_SECRET=${JWT_SECRET}
       - BLOSSOM_JWT_DURATION=${JWT_DURATION}
       - BLOSSOM_JWT_REFRESH_DURATION=${JWT_REFRESH_DURATION}

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -103,6 +104,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorMessage> invalidOperationException(InvalidOperationException exception, WebRequest request) {
         HttpStatus status = HttpStatus.FORBIDDEN;
         ErrorMessage message = new ErrorMessage(status, InvalidOperationException.class.getName(), exception.getMessage(), new Date());
+        return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(BadJwtException.class)
+    public ResponseEntity<ErrorMessage> badJwtException(BadJwtException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        ErrorMessage message = new ErrorMessage(status, BadJwtException.class.getName(), exception.getMessage(), new Date());
         return ResponseEntity.status(status).body(message);
     }
 }

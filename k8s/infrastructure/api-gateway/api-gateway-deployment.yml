@@ -28,6 +28,11 @@ spec:
         - env:
             - name: BLOSSOM_GATEWAY_PORT
               value: "8181"
+            - name: BLOSSOM_CORS_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: blossom-cors
+                  key: BLOSSOM_CORS_ORIGINS
             - name: SPRING_PROFILES_ACTIVE
               value: kubernetes
           image: bernardofmf/blossom-api-gateway:latest
