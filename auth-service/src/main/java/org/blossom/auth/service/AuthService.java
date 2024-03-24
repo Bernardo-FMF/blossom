@@ -1,5 +1,6 @@
 package org.blossom.auth.service;
 
+import jakarta.transaction.Transactional;
 import org.blossom.auth.dto.*;
 import org.blossom.auth.email.EmailService;
 import org.blossom.auth.entity.PasswordReset;
@@ -11,6 +12,7 @@ import org.blossom.auth.factory.impl.PasswordResetFactory;
 import org.blossom.auth.factory.impl.RefreshTokenFactory;
 import org.blossom.auth.factory.impl.UserFactory;
 import org.blossom.auth.factory.impl.VerificationTokenFactory;
+import org.blossom.auth.grpc.GrpcClientImageService;
 import org.blossom.auth.kafka.KafkaMessageService;
 import org.blossom.auth.mapper.impl.*;
 import org.blossom.auth.repository.PasswordResetRepository;
@@ -87,6 +89,9 @@ public class AuthService {
 
     @Autowired
     private LoggedUserDtoMapper loggedUserDtoMapper;
+
+    @Autowired
+    private GrpcClientImageService imageService;
 
     public GenericResponseDto saveUser(RegisterDto registerDto) throws UsernameInUseException, EmailInUseException, NoRoleFoundException {
         registerDto.setPassword(passwordEncoder.encode(registerDto.getPassword()));
@@ -242,6 +247,7 @@ public class AuthService {
         return genericDtoMapper.toDto("Email verified successfully", user.getId(), null);
     }
 
+    @Transactional
     public GenericResponseDto deleteTokens(int userId) throws UserNotFoundException {
         Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
         if (optionalUser.isEmpty()) {
@@ -270,12 +276,12 @@ public class AuthService {
             throw new InvalidTokenException("Invalid token for user");
         }
 
-        refreshTokenRepository.deleteByUserId(userId);
+        refreshTokenRepository.delete(refreshToken);
 
         return genericDtoMapper.toDto("Logged out all active sessions successfully", userId, null);
     }
 
-    public GenericResponseDto updateEmail(EmailUpdateDto emailUpdateDto, int userId) throws UserNotFoundException {
+    public GenericResponseDto updateEmail(EmailUpdateDto emailUpdateDto, int userId) throws UserNotFoundException, EmailInUseException {
         Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
@@ -291,13 +297,18 @@ public class AuthService {
             throw new BadCredentialsException("Incorrect credentials");
         }
 
+        if (userRepository.existsByEmail(emailUpdateDto.getNewEmail())) {
+            throw new EmailInUseException("Email is already in use");
+        }
+
         user.setEmail(emailUpdateDto.getNewEmail());
         userRepository.save(user);
 
-        return genericDtoMapper.toDto("Email updated successfully", userId, null);
+        return genericDtoMapper.toDto("Email updated successfully", userId, Map.of("newEmail", emailUpdateDto.getNewEmail()));
     }
 
-    public GenericResponseDto deleteAccount(int userId) throws UserNotFoundException {
+    @Transactional
+    public GenericResponseDto deleteAccount(int userId) throws UserNotFoundException, FileDeleteException {
         Optional<User> optionalUser = userRepository.findByIdAndVerifiedIsTrue(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
@@ -305,7 +316,14 @@ public class AuthService {
 
         User user = optionalUser.get();
 
+        refreshTokenRepository.deleteByUserId(userId);
+        verificationTokenRepository.deleteById(userId);
+        passwordResetRepository.deleteById(userId);
         userRepository.delete(user);
+
+        if (user.getImageUrl() != null) {
+            imageService.deleteImage(user.getImageUrl());
+        }
 
         messageService.publishDelete(user);
 
@@ -375,7 +393,7 @@ public class AuthService {
             throw new InvalidOperationException("Multi-factor authentication enabling failed");
         }
 
-        if (multiFactorAuthService.isOtpValid(user.getSecret(), mfaValidationDto.getCode())) {
+        if (!multiFactorAuthService.isOtpValid(user.getSecret(), mfaValidationDto.getCode())) {
             throw new BadCredentialsException("Incorrect multi-factor authentication code");
         }
 
@@ -395,7 +413,7 @@ public class AuthService {
         User user = optionalUser.get();
 
         if (!user.isMfaEnabled()) {
-            throw new InvalidOperationException("Multi-factor authentication already enabled");
+            throw new InvalidOperationException("Multi-factor authentication already disabled");
         }
 
         user.setMfaEnabled(false);
@@ -413,7 +431,7 @@ public class AuthService {
         }
 
         User user = optionalUser.get();
-        if (multiFactorAuthService.isOtpValid(user.getSecret(), mfaVerificationDto.getCode())) {
+        if (!multiFactorAuthService.isOtpValid(user.getSecret(), mfaVerificationDto.getCode())) {
             throw new BadCredentialsException("Incorrect multi-factor authentication code");
         }
 

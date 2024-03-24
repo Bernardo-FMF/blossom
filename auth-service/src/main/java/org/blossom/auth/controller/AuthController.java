@@ -58,7 +58,7 @@ public class AuthController {
     }
 
     @PutMapping("/update-email")
-    public ResponseEntity<GenericResponseDto> updateEmail(@RequestBody EmailUpdateDto emailUpdateDto, Authentication authentication) throws UserNotFoundException {
+    public ResponseEntity<GenericResponseDto> updateEmail(@RequestBody EmailUpdateDto emailUpdateDto, Authentication authentication) throws UserNotFoundException, EmailInUseException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /auth/update-email: Updating email of user {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body(authService.updateEmail(emailUpdateDto, userId));
@@ -111,7 +111,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/")
-    public ResponseEntity<GenericResponseDto> deleteAccount(Authentication authentication) throws UserNotFoundException {
+    public ResponseEntity<GenericResponseDto> deleteAccount(Authentication authentication) throws UserNotFoundException, FileDeleteException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /auth: Deleting user {}", userId);
         return ResponseEntity.status(HttpStatus.OK).body(authService.deleteAccount(userId));
