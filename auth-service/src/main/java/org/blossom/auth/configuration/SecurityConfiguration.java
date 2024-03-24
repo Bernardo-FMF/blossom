@@ -62,7 +62,7 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/auth").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/mfa-qr-code").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/mfa").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/mfa").authenticated()
