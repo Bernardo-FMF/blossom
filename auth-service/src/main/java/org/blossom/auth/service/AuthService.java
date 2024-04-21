@@ -208,6 +208,7 @@ public class AuthService {
         return genericDtoMapper.toDto("Password changed successfully", user.getId(), null);
     }
 
+    @Transactional
     public GenericResponseDto verifyUser(EmailVerificationDto emailVerificationDto) throws UserNotFoundException, InvalidOperationException, InvalidTokenException {
         Optional<User> optionalUser = userRepository.findById(emailVerificationDto.getUserId());
         if (optionalUser.isEmpty()) {
@@ -240,7 +241,7 @@ public class AuthService {
         user.setVerified(true);
 
         userRepository.save(user);
-        verificationTokenRepository.delete(verificationToken);
+        verificationTokenRepository.deleteByUserId(user.getId());
 
         messageService.publishCreation(user);
 

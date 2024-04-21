@@ -74,6 +74,6 @@ public class EmailService {
     }
 
     private String buildCallbackUrl(EmailType emailType, String token, int id) {
-        return String.format(emailType == EmailType.VALIDATE ? callbackUrlValidate : callbackUrlRecover + "?token=%s&userId=%s", token, id);
+        return String.format((emailType == EmailType.VALIDATE ? callbackUrlValidate : callbackUrlRecover) + "?token=%s&userId=%s", token, id);
     }
 }
