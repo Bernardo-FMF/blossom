@@ -31,7 +31,8 @@ public class PostController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<AggregateUserPostsDto> getPostsByUser(@PathVariable("userId") Integer userId, SearchParametersDto searchParameters, Authentication authentication) throws InterruptedException {
-        return ResponseEntity.status(HttpStatus.OK).body(postService.findByUser(userId, searchParameters));
+        Integer authUserId = authentication != null ? ((CommonUserDetails) authentication.getPrincipal()).getUserId() : null;
+        return ResponseEntity.status(HttpStatus.OK).body(postService.findByUser(userId, searchParameters, authUserId));
     }
 
     @GetMapping("/{postId}/identifier")

@@ -59,7 +59,7 @@ public class UserControllerTest extends CommonRequestHelper {
     void changeProfileImage_successful() throws Exception {
         Mockito.when(imageService.uploadImage(any())).thenReturn(MOCK_IMAGE_URL);
 
-        MockMultipartFile file = new MockMultipartFile("file", "filename.txt", MediaType.TEXT_PLAIN_VALUE, "file content".getBytes());
+        MockMultipartFile file = new MockMultipartFile("userImage", "filename.txt", MediaType.TEXT_PLAIN_VALUE, "file content".getBytes());
 
         MvcResult validateResult = mockMvc.perform(multipart("/api/v1/user/profile-image")
                         .file(file)

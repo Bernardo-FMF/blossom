@@ -119,12 +119,12 @@ public class PostService {
         return genericDtoMapper.toDto("Post deleted successfully", postId, null);
     }
 
-    public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters) throws InterruptedException {
+    public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters, Integer authUserId) throws InterruptedException {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : null;
 
         Page<Post> posts = postRepository.findByUserId(userId, page);
 
-        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, posts.stream().map(Post::getId).distinct().collect(Collectors.toList()));
+        Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(authUserId, posts.stream().map(Post::getId).distinct().collect(Collectors.toList()));
 
         return aggregateUserPostsDtoMapper.toPaginatedDto(
                 posts.getContent(),

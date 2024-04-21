@@ -26,12 +26,20 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String email;
 
-    @Value("${vendor.frontend.callback-url}")
-    private String callbackUrl;
+    @Value("${vendor.frontend.callback-url-recover}")
+    private String callbackUrlRecover;
+
+    @Value("${vendor.frontend.callback-url-validate}")
+    private String callbackUrlValidate;
+
+    private enum EmailType {
+        VALIDATE,
+        RECOVER
+    }
 
     public void sendPasswordRecoveryEmail(UserDto userDto) {
         try {
-            sendEmail(userDto, "password-recovery.html", "Blossom: Password Recovery");
+            sendEmail(userDto, "password-recovery.html", "Blossom: Password Recovery", EmailType.RECOVER);
         } catch (Exception ex) {
             log.error("Error sending recovery email to user " + userDto.getId(), ex);
         }
@@ -39,13 +47,13 @@ public class EmailService {
 
     public void sendVerificationEmail(UserDto userDto) {
         try {
-            sendEmail(userDto, "email-verification.html", "Blossom: Email Verification");
+            sendEmail(userDto, "email-verification.html", "Blossom: Email Verification", EmailType.VALIDATE);
         } catch (Exception ex) {
             log.error("Error sending verification email to user " + userDto.getId(), ex);
         }
     }
 
-    private void sendEmail(UserDto userDto, String template, String subject) throws MessagingException {
+    private void sendEmail(UserDto userDto, String template, String subject, EmailType emailType) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(
                 message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
@@ -58,14 +66,14 @@ public class EmailService {
         Map<String, Object> variables = new HashMap<>();
         variables.put("username", userDto.getUsername());
         variables.put("expiration-date", userDto.getExpirationDate());
-        variables.put("callbackUrl", buildCallbackUrl(userDto.getToken(), userDto.getId()));
+        variables.put("callbackUrl", buildCallbackUrl(emailType, userDto.getToken(), userDto.getId()));
 
         helper.setText(thymeleafService.createContent(template, variables), true);
         helper.setSubject(subject);
         mailSender.send(message);
     }
 
-    private String buildCallbackUrl(String token, int id) {
-        return String.format(callbackUrl + "?token=%s&userId=%s", token, id);
+    private String buildCallbackUrl(EmailType emailType, String token, int id) {
+        return String.format(emailType == EmailType.VALIDATE ? callbackUrlValidate : callbackUrlRecover + "?token=%s&userId=%s", token, id);
     }
 }

@@ -24,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GenericResponseDto> updateProfileImage(@RequestParam("file") MultipartFile file, Authentication authentication)
+    public ResponseEntity<GenericResponseDto> updateProfileImage(@RequestParam("userImage") MultipartFile file, Authentication authentication)
             throws InterruptedException, UserNotFoundException, FileUploadException, FileDeleteException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
         log.info("Received request on endpoint /user/profile-image: Updating profile image for user with id {}", userId);
