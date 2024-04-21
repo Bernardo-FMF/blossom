@@ -27,7 +27,8 @@ spring:
       properties.spring.json.type.mapping: event:org.blossom.model.ResourceEvent
 vendor:
   frontend:
-    callback-url: ${BLOSSOM_CALLBACK}
+    callback-url-validate: ${BLOSSOM_VALIDATE_CALLBACK}
+    callback-url-recover: ${BLOSSOM_RECOVER_CALLBACK}
 jwt:
   secret: ${BLOSSOM_JWT_SECRET}
   duration: ${BLOSSOM_JWT_DURATION}
