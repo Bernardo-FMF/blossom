@@ -56,10 +56,6 @@ public class CommentService {
 
     @Transactional
     public GenericResponseDto createComment(CommentInfoDto commentInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, CommentNotFoundException {
-        if (commentInfoDto.getUserId() != userId) {
-            throw new OperationNotAllowedException("Logged in user cannot perform this operation");
-        }
-
         if (!localPostCache.findEntry(commentInfoDto.getPostId())) {
             throw new PostNotFoundException("Post not found");
         }
