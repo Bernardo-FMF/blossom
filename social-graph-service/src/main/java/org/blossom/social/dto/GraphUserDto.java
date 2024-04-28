@@ -11,6 +11,6 @@ import java.util.List;
 @Builder
 public class GraphUserDto {
     private int userId;
-    private List<UserDto> otherUsers;
+    private List<UserDto> users;
     private PaginationInfoDto paginationInfo;
 }

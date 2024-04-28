@@ -29,7 +29,7 @@ public class GraphUserDtoMapper implements IPaginatedDtoMapper<GraphUser, GraphU
     @Override
     public GraphUserDto toPaginatedDto(Collection<GraphUser> entities, PaginationInfoDto paginationInfo) {
         return GraphUserDto.builder()
-                .otherUsers(entities.stream().map(this::toDto).toList())
+                .users(entities.stream().map(this::toDto).toList())
                 .paginationInfo(paginationInfo)
                 .build();
     }
