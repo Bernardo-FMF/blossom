@@ -57,9 +57,6 @@ public class PostService {
     private PostIdentifierDtoMapper postIdentifierDtoMapper;
 
     @Autowired
-    private AggregateUserPostsDtoMapper aggregateUserPostsDtoMapper;
-
-    @Autowired
     private GrpcClientActivityService grpcClientActivityService;
 
     public GenericResponseDto createPost(PostInfoDto postInfoDto, int userId) throws IOException, InterruptedException, PostNotValidException, FileUploadException, UserNotFoundException {
@@ -119,18 +116,20 @@ public class PostService {
         return genericDtoMapper.toDto("Post deleted successfully", postId, null);
     }
 
-    public AggregateUserPostsDto findByUser(Integer userId, SearchParametersDto searchParameters, Integer authUserId) throws InterruptedException {
+    public AggregatePostsDto findByUser(Integer userId, SearchParametersDto searchParameters, Integer authUserId) throws InterruptedException {
         Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : null;
 
         Page<Post> posts = postRepository.findByUserId(userId, page);
 
+        UserDto userDto = localUserCache.getFromCache(userId);
+
         Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(authUserId, posts.stream().map(Post::getId).distinct().collect(Collectors.toList()));
 
-        return aggregateUserPostsDtoMapper.toPaginatedDto(
+        return aggregatePostsDtoMapper.toPaginatedDto(
                 posts.getContent(),
-                userId,
+                Map.of(userId, userDto),
                 metadata,
-                aggregateUserPostsDtoMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
+                aggregatePostsDtoMapper.createPaginationInfo(posts.getNumber(), posts.getTotalPages(), posts.getTotalElements(), !posts.hasNext()));
     }
 
     public PostIdentifierDto getPostIdentifier(String postId) throws PostNotFoundException {

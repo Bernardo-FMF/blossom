@@ -1,9 +1,9 @@
 package org.blossom.social.controller;
 
+import org.blossom.model.CommonUserDetails;
 import org.blossom.social.dto.*;
 import org.blossom.social.exception.FollowNotValidException;
 import org.blossom.social.exception.UserNotFoundException;
-import org.blossom.model.CommonUserDetails;
 import org.blossom.social.service.SocialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class SocialController {
     }
 
     @DeleteMapping
-    public ResponseEntity<GenericResponseDto> deleteSocialRelation(SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException, UserNotFoundException {
+    public ResponseEntity<GenericResponseDto> deleteSocialRelation(@RequestBody SocialRelationDto socialRelationDto, Authentication authentication) throws FollowNotValidException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(socialService.deleteSocialRelation(socialRelationDto, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 

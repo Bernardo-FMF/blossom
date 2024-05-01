@@ -163,9 +163,9 @@ class PostControllerTest extends AbstractContextBeans {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        AggregateUserPostsDto aggregateUserPostsDto = objectMapper.readValue(getResult.getResponse().getContentAsString(), AggregateUserPostsDto.class);
+        AggregatePostsDto aggregateUserPostsDto = objectMapper.readValue(getResult.getResponse().getContentAsString(), AggregatePostsDto.class);
 
-        List<PostDto> posts = aggregateUserPostsDto.getPosts();
+        List<PostWithUserDto> posts = aggregateUserPostsDto.getPosts();
         Assertions.assertEquals(ids.size(), posts.size());
 
         // Guarantee the posts are in descending order in terms of creation
@@ -173,7 +173,6 @@ class PostControllerTest extends AbstractContextBeans {
             Assertions.assertEquals(ids.get(i), posts.get(posts.size() - i - 1).getId());
         }
 
-        Assertions.assertEquals(1, aggregateUserPostsDto.getUserId());
 
         Assertions.assertEquals(ids.size(), aggregateUserPostsDto.getPaginationInfo().getTotalElements());
         Assertions.assertEquals(0, aggregateUserPostsDto.getPaginationInfo().getCurrentPage());
