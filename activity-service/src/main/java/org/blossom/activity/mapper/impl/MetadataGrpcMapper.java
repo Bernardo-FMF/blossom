@@ -10,6 +10,7 @@ public class MetadataGrpcMapper implements IDtoMapper<MetadataDto, PostInfoRespo
     @Override
     public PostInfoResponse toDto(MetadataDto entity) {
         return PostInfoResponse.newBuilder()
+                .setPostId(entity.getPostId())
                 .setUserCommented(entity.getCommentMetadata().isUserCommented())
                 .setUserSavedPost(entity.getInteractionMetadata().isUserSaved())
                 .setUserLikedPost(entity.getInteractionMetadata().isUserLiked())
