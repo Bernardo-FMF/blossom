@@ -9,6 +9,10 @@ spring:
   kafka:
     bootstrap-servers: ${BLOSSOM_KAFKA}
     topic: social-follow-resource-event-message
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties.spring.json.type.mapping: event:org.blossom.model.ResourceEvent
     consumer:
       group-id: socialListenerId
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
