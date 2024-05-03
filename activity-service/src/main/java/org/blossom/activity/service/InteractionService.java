@@ -6,10 +6,9 @@ import org.blossom.activity.entity.Interaction;
 import org.blossom.activity.entity.LocalUser;
 import org.blossom.activity.enums.InteractionType;
 import org.blossom.activity.exception.*;
-import org.blossom.activity.dto.PostDto;
-import org.blossom.activity.mapper.impl.InteractionDtoMapper;
 import org.blossom.activity.factory.impl.InteractionFactory;
 import org.blossom.activity.mapper.impl.GenericDtoMapper;
+import org.blossom.activity.mapper.impl.InteractionDtoMapper;
 import org.blossom.activity.mapper.impl.UserInteractionsDtoMapper;
 import org.blossom.activity.repository.InteractionRepository;
 import org.blossom.activity.repository.LocalUserRepository;
@@ -46,11 +45,7 @@ public class InteractionService {
     @Autowired
     private UserInteractionsDtoMapper userInteractionsDtoMapper;
 
-    public GenericResponseDto createLike(InteractionInfoDto interactionInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, InteractionAlreadyExistsException {
-        if (interactionInfoDto.getUserId() != userId) {
-            throw new OperationNotAllowedException("Logged in user cannot perform this operation");
-        }
-
+    public GenericResponseDto createLike(InteractionInfoDto interactionInfoDto, int userId) throws UserNotFoundException, PostNotFoundException, InteractionAlreadyExistsException {
         Optional<LocalUser> optionalLocalUser = localUserRepository.findById(userId);
         if (optionalLocalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
@@ -71,11 +66,7 @@ public class InteractionService {
         return genericDtoMapper.toDto("Like was created successfully", newInteraction.getId(), null);
     }
 
-    public GenericResponseDto createSave(InteractionInfoDto interactionInfoDto, int userId) throws OperationNotAllowedException, UserNotFoundException, PostNotFoundException, InteractionAlreadyExistsException {
-        if (interactionInfoDto.getUserId() != userId) {
-            throw new OperationNotAllowedException("Logged in user cannot perform this operation");
-        }
-
+    public GenericResponseDto createSave(InteractionInfoDto interactionInfoDto, int userId) throws UserNotFoundException, PostNotFoundException, InteractionAlreadyExistsException {
         Optional<LocalUser> optionalLocalUser = localUserRepository.findById(userId);
         if (optionalLocalUser.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
@@ -96,8 +87,8 @@ public class InteractionService {
         return genericDtoMapper.toDto("Save was created successfully", newInteraction.getId(), null);
     }
 
-    public GenericResponseDto deleteLike(Integer interactionId, int userId) throws InteractionNotFoundException, OperationNotAllowedException, UserNotFoundException, PostNotFoundException {
-        Optional<Interaction> optionalInteraction = interactionRepository.findById(interactionId);
+    public GenericResponseDto deleteLike(String postId, int userId) throws InteractionNotFoundException, OperationNotAllowedException, UserNotFoundException, PostNotFoundException {
+        Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.LIKE);
         if (optionalInteraction.isEmpty()) {
             throw new InteractionNotFoundException("Like not found");
         }
@@ -112,13 +103,13 @@ public class InteractionService {
             throw new PostNotFoundException("Post not found");
         }
 
-        interactionRepository.deleteById(interactionId);
+        interactionRepository.delete(interaction);
 
-        return genericDtoMapper.toDto("Like was deleted successfully", interactionId, null);
+        return genericDtoMapper.toDto("Like was deleted successfully", interaction.getId(), null);
     }
 
-    public GenericResponseDto deleteSave(Integer interactionId, int userId) throws InteractionNotFoundException, OperationNotAllowedException, UserNotFoundException, PostNotFoundException {
-        Optional<Interaction> optionalInteraction = interactionRepository.findById(interactionId);
+    public GenericResponseDto deleteSave(String postId, int userId) throws InteractionNotFoundException, OperationNotAllowedException, UserNotFoundException, PostNotFoundException {
+        Optional<Interaction> optionalInteraction = interactionRepository.findByUserIdAndPostIdAndInteractionType(userId, postId, InteractionType.SAVE);
         if (optionalInteraction.isEmpty()) {
             throw new InteractionNotFoundException("Save not found");
         }
@@ -133,9 +124,9 @@ public class InteractionService {
             throw new PostNotFoundException("Post not found");
         }
 
-        interactionRepository.deleteById(interactionId);
+        interactionRepository.delete(interaction);
 
-        return genericDtoMapper.toDto("Save was deleted successfully", interactionId, null);
+        return genericDtoMapper.toDto("Save was deleted successfully", interaction.getId(), null);
     }
 
     public UserInteractionsDto getUserLikes(SearchParametersDto searchParameters, int userId) throws UserNotFoundException {

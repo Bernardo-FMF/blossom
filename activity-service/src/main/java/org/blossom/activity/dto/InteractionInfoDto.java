@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class InteractionInfoDto {
-    private int userId;
     private String postId;
 }

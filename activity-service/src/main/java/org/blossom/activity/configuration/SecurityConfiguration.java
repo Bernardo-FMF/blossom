@@ -40,8 +40,8 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/interaction/save/self").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/interaction/like").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/interaction/save").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/interaction/like/{interactionId}").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/interaction/save/{interactionId}").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/interaction/{postId}/like").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/interaction/{postId}/save").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/metadata/{postId}").permitAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
