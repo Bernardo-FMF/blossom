@@ -143,7 +143,7 @@ public class PostService {
         return postIdentifierDtoMapper.toDto(post);
     }
 
-    public PostDto getPost(String postId, Integer userId) throws PostNotFoundException, UserNotFoundException, InterruptedException {
+    public PostWithUserDto getPost(String postId, Integer userId) throws PostNotFoundException, UserNotFoundException, InterruptedException {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty()) {
             throw new PostNotFoundException("Post does not exist");
@@ -158,7 +158,7 @@ public class PostService {
 
         Map<String, MetadataDto> metadata = grpcClientActivityService.getMetadata(userId, List.of(postId));
 
-        return postDtoMapper.toDto(post, metadata.get(postId));
+        return postUserDtoMapper.toDto(post, user, metadata.get(postId));
     }
 
     private String[] parseDescription(String text) {

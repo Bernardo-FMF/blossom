@@ -41,7 +41,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDto> getPost(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, UserNotFoundException, InterruptedException {
+    public ResponseEntity<PostWithUserDto> getPost(@PathVariable("postId") String postId, Authentication authentication) throws PostNotFoundException, UserNotFoundException, InterruptedException {
         Integer userId = authentication != null ? ((CommonUserDetails) authentication.getPrincipal()).getUserId() : null;
         return ResponseEntity.status(HttpStatus.OK).body(postService.getPost(postId, userId));
     }
