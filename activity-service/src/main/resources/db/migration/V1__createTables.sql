@@ -1,11 +1,11 @@
-CREATE TABLE Blossom_Local_User (
+CREATE TABLE IF NOT EXISTS Blossom_Local_User (
     id INT PRIMARY KEY,
     username VARCHAR(255) UNIQUE,
     full_name VARCHAR(255),
     image_url VARCHAR(255)
 );
 
-create table Blossom_Interaction (
+CREATE TABLE IF NOT EXISTS Blossom_Interaction (
 	id SERIAL PRIMARY KEY,
 	user_id INT REFERENCES Blossom_Local_User(id),
     post_id VARCHAR(255),
@@ -13,13 +13,13 @@ create table Blossom_Interaction (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Blossom_Comment (
+CREATE TABLE IF NOT EXISTS Blossom_Comment (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES Blossom_Local_User(id),
     post_id VARCHAR(255),
     parent_comment_id INT REFERENCES Blossom_Comment(id),
     top_level_comment_id INT REFERENCES Blossom_Comment(id),
-    comment_content TEXT NOT NULL,
+    comment_content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     is_deleted BOOL DEFAULT FALSE

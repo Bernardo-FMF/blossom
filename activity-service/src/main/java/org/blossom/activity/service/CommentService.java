@@ -199,7 +199,7 @@ public class CommentService {
             throw new PostNotFoundException("Post not found");
         }
 
-        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "createdAt")) : Pageable.unpaged();
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.ASC, "createdAt")) : Pageable.unpaged();
 
         Page<Comment> comments = commentRepository.findByTopLevelCommentId(commentId, page);
 
