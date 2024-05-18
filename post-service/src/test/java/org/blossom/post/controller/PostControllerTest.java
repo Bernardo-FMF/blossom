@@ -202,10 +202,10 @@ class PostControllerTest extends AbstractContextBeans {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        PostDto postDto = objectMapper.readValue(getResult.getResponse().getContentAsString(), PostDto.class);
+        PostWithUserDto postDto = objectMapper.readValue(getResult.getResponse().getContentAsString(), PostWithUserDto.class);
 
         Assertions.assertEquals(ids.get(0), postDto.getId());
-        Assertions.assertEquals(1, postDto.getUserId());
+        Assertions.assertEquals(1, postDto.getUser().getId());
     }
 
     @Order(7)

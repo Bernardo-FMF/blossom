@@ -9,7 +9,10 @@ import org.blossom.post.factory.impl.PostFactory;
 import org.blossom.post.grpc.service.GrpcClientActivityService;
 import org.blossom.post.grpc.service.GrpcClientImageService;
 import org.blossom.post.kafka.outbound.KafkaMessageService;
-import org.blossom.post.mapper.impl.*;
+import org.blossom.post.mapper.impl.AggregatePostsDtoMapper;
+import org.blossom.post.mapper.impl.GenericDtoMapper;
+import org.blossom.post.mapper.impl.PostIdentifierDtoMapper;
+import org.blossom.post.mapper.impl.PostUserDtoMapper;
 import org.blossom.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,9 +43,6 @@ public class PostService {
 
     @Autowired
     private KafkaMessageService messageService;
-
-    @Autowired
-    private PostDtoMapper postDtoMapper;
 
     @Autowired
     private PostUserDtoMapper postUserDtoMapper;
