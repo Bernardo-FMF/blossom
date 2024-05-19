@@ -1,5 +1,6 @@
 package org.blossom.activity.kafka;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.blossom.activity.entity.LocalUser;
 import org.blossom.activity.factory.impl.LocalUserFactory;
@@ -46,6 +47,7 @@ public class UserResourceHandler implements KafkaResourceHandler<KafkaUserResour
     }
 
     @Override
+    @Transactional
     public void delete(KafkaUserResource resource) {
         log.info("processing delete message of type user: {}", resource);
 
