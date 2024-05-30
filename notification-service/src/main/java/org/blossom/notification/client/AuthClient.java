@@ -13,6 +13,6 @@ public interface AuthClient {
     @GetMapping("/api/v1/auth/validate")
     ResponseEntity<LocalTokenDto> validate(@RequestParam("token") String token);
 
-    @GetMapping("/api/v1/user/:userId")
+    @GetMapping("/api/v1/user/{userId}")
     ResponseEntity<UserDto> getUser(@PathVariable("userId") int userId);
 }
