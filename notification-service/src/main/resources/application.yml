@@ -19,6 +19,9 @@ spring:
               packages: "org.blossom.model"
             type:
               mapping: event:org.blossom.model.ResourceEvent
+  redis:
+    host: localhost
+    port: 6388
 broker:
   host: ${BLOSSOM_NOTIFICATION_BROKER_HOST}
   port: ${BLOSSOM_NOTIFICATION_BROKER_PORT}
