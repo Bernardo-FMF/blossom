@@ -35,10 +35,7 @@ public class SocialFollowResourceHandler implements KafkaResourceHandler<KafkaSo
 
         FollowNotification newFollowNotification = followNotificationRepository.save(followNotification);
 
-        if (broadcastService.broadcastFollow(resource.getReceivingUser(), newFollowNotification, BroadcastType.SOCIAL_FOLLOW_CREATED)) {
-            followNotification.setDelivered(true);
-            followNotificationRepository.save(newFollowNotification);
-        }
+        broadcastService.broadcastFollow(resource.getReceivingUser(), newFollowNotification, BroadcastType.SOCIAL_FOLLOW_CREATED);
     }
 
     @Override
