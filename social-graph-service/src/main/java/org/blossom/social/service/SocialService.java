@@ -81,10 +81,6 @@ public class SocialService {
 
         socialRepository.deleteFollowerRelationship(userId, socialRelationDto.getReceivingUser());
 
-        SocialFollow socialFollow = socialFollowFactory.buildEntity(socialRelationDto, userId, false);
-
-        messageService.publishCreation(socialFollow);
-
         return genericDtoMapper.toDto("Follow was deleted successfully", userId, null);
     }
 

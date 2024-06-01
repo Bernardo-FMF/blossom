@@ -2,17 +2,22 @@ package org.blossom.social.kafka.outbound;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.blossom.facade.KafkaPublisherFacade;
-import org.blossom.model.*;
+import org.blossom.model.EventType;
+import org.blossom.model.KafkaSocialFollowResource;
+import org.blossom.model.ResourceEvent;
+import org.blossom.model.ResourceType;
 import org.blossom.social.kafka.outbound.model.SocialFollow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Service
 public class KafkaMessageService implements KafkaPublisherFacade<SocialFollow> {
-    @Value("${spring.kafka.topic}")
-    private String topic;
+    @Value("${spring.kafka.topics}")
+    private String[] topics;
 
     @Autowired
     private KafkaTemplate<String, ResourceEvent> kafkaTemplate;
@@ -22,7 +27,7 @@ public class KafkaMessageService implements KafkaPublisherFacade<SocialFollow> {
         KafkaSocialFollowResource resource = entity.mapToResource();
         ResourceEvent resourceEvent = new ResourceEvent(EventType.CREATE, ResourceType.SOCIAL_FOLLOW, resource);
 
-        kafkaTemplate.send(topic, resourceEvent);
+        Arrays.stream(topics).forEach(topic -> kafkaTemplate.send(topic, resourceEvent));
     }
 
     @Override
@@ -32,9 +37,6 @@ public class KafkaMessageService implements KafkaPublisherFacade<SocialFollow> {
 
     @Override
     public void publishDelete(SocialFollow entity) {
-        KafkaSocialFollowResource resource = entity.mapToResource();
-        ResourceEvent resourceEvent = new ResourceEvent(EventType.DELETE, ResourceType.SOCIAL_FOLLOW, resource);
-
-        kafkaTemplate.send(topic, resourceEvent);
+        throw new NotImplementedException("Follow deletes are not available");
     }
 }
