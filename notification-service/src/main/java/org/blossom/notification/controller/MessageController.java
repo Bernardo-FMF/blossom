@@ -23,7 +23,7 @@ public class MessageController {
     }
 
     @PatchMapping("/{notificationId}/received")
-    public ResponseEntity<GenericResponseDto> confirmUserReceivedNotification(@PathVariable("notificationId") String notificationId, Authentication authentication) {
+    public ResponseEntity<GenericResponseDto> confirmUserReceivedMessageNotification(@PathVariable("notificationId") String notificationId, Authentication authentication) {
         return ResponseEntity.status(HttpStatus.OK).body(messageService.confirmUserReceivedNotification(notificationId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }
