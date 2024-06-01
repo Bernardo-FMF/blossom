@@ -21,11 +21,14 @@ public class JsonDtoParser {
 
         Instant followedAt = Instant.ofEpochSecond(notification.get("followedAt").asLong());
 
+        boolean isDelivered = notification.get("isDelivered").asBoolean();
+
         return NotificationFollowDto.builder()
                 .id(id)
                 .userId(userId)
                 .follower(follower)
                 .followedAt(followedAt)
+                .isDelivered(isDelivered)
                 .build();
     }
 

@@ -12,4 +12,5 @@ public class NotificationFollowDto {
     private int userId;
     private UserDto follower;
     private Instant followedAt;
+    private boolean isDelivered;
 }
