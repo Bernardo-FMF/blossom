@@ -21,7 +21,7 @@ public class GrpcClientSocialService {
     }
 
     public List<Integer> getMostFollowed() {
-        MostFollowedResponse mostFollowed = grpcClient.buildBlockingStub().getMostFollowed(MostFollowedRequest.newBuilder().build());
+        MostFollowedResponse mostFollowed = grpcClient.buildBlockingStub().getMostFollowed(MostFollowedRequest.newBuilder().setLimit(100).build());
         return mostFollowed.getUsersList();
     }
 }
