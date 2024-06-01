@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface FollowNotificationRepository extends MongoRepository<FollowNotification, String> {
-    Page<FollowNotification> findByRecipientIdAndIsDeliveredFalse(int recipientId, Pageable pageable);
+    Page<FollowNotification> findByRecipientId(int recipientId, Pageable pageable);
 }
