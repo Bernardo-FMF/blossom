@@ -1,7 +1,7 @@
-package org.blossom.notification.controller;
+package org.blossom.message.controller;
 
+import org.blossom.message.cache.SessionCacheService;
 import org.blossom.model.CommonUserDetails;
-import org.blossom.notification.cache.SessionCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/notification-session")
+@RequestMapping("/api/v1/message-session")
 public class SessionController {
     @Autowired
     private SessionCacheService sessionCacheService;

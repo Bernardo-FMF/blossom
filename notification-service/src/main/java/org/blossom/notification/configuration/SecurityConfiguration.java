@@ -35,7 +35,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.PATCH, "/api/v1/notification/message/{notificationId}/received").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/notification/follow").authenticated()
                                 .requestMatchers(HttpMethod.PATCH, "/api/v1/notification/follow/{notificationId}/received").authenticated()
-                                .requestMatchers(HttpMethod.GET, "api/v1/notification/session").authenticated())
+                                .requestMatchers(HttpMethod.GET, "api/v1/notification-session").authenticated())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(commonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
