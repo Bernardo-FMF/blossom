@@ -41,7 +41,6 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.OK).body(chatService.addToChat(chatId, userId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
-
     @DeleteMapping("/{chatId}/user/{userId}")
     public ResponseEntity<GenericResponseDto> removeFromChat(@PathVariable("chatId") Integer chatId, @PathVariable("userId") Integer userId, Authentication authentication) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(chatService.removeFromChat(chatId, userId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
