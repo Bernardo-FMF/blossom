@@ -57,7 +57,7 @@ spring:
         - id: message-service
           uri: lb://message-service
           predicates:
-            - Path=/api/{version}/message/**, /api/{version}/chat/**
+            - Path=/api/{version}/message/**, /api/{version}/chat/**, /api/{version}/message-session/**
           filters:
             - AuthenticationFilter
 
@@ -71,7 +71,7 @@ spring:
         - id: notification-service
           uri: lb://notification-service
           predicates:
-            - Path=/api/{version}/notification/message/**, /api/{version}/notification/follow/**, /api/{version}/notification/session/**
+            - Path=/api/{version}/notification/message/**, /api/{version}/notification/follow/**, /api/{version}/notification-session/**
           filters:
             - AuthenticationFilter
 
