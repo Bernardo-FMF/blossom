@@ -55,10 +55,15 @@ public class MessageService {
 
         Message message = messageFactory.buildEntity(chat, optionalUser.get(), chatMessage);
 
-        return messageRepository.save(message);
+        Message newMessage = messageRepository.save(message);
+
+        chat.setLastUpdate(Instant.now());
+        chatRepository.save(chat);
+
+        return newMessage;
     }
 
-    public Message deleteMessage(DeleteMessageDto deleteMessage, int userId) throws IllegalMessageOperationException, MessageNotFoundException {
+    public Message deleteMessage(DeleteMessageDto deleteMessage, int userId) throws IllegalMessageOperationException, MessageNotFoundException, ChatNotFoundException {
         Optional<Message> optionalMessage = messageRepository.findById(deleteMessage.getId());
         if (optionalMessage.isEmpty()) {
             throw new MessageNotFoundException("Message does not exist");
@@ -69,14 +74,26 @@ public class MessageService {
             throw new IllegalMessageOperationException("Message is not associated with the user");
         }
 
+        Optional<Chat> optionalChat = chatRepository.findById(message.getChat().getId());
+        if (optionalChat.isEmpty()) {
+            throw new ChatNotFoundException("Chat does not exist");
+        }
+
+        Chat chat = optionalChat.get();
+
         message.setUpdatedAt(Instant.now());
         message.setDeleted(true);
         message.setContent(null);
 
-        return messageRepository.save(message);
+        Message newMessage = messageRepository.save(message);
+
+        chat.setLastUpdate(Instant.now());
+        chatRepository.save(chat);
+
+        return newMessage;
     }
 
-    public Message updateMessage(UpdateMessageDto updateMessage, int userId) throws IllegalMessageOperationException, MessageNotFoundException {
+    public Message updateMessage(UpdateMessageDto updateMessage, int userId) throws IllegalMessageOperationException, MessageNotFoundException, ChatNotFoundException {
         Optional<Message> optionalMessage = messageRepository.findById(updateMessage.getId());
         if (optionalMessage.isEmpty()) {
             throw new MessageNotFoundException("Message does not exist");
@@ -87,10 +104,22 @@ public class MessageService {
             throw new IllegalMessageOperationException("Message is not associated with the user");
         }
 
+        Optional<Chat> optionalChat = chatRepository.findById(message.getChat().getId());
+        if (optionalChat.isEmpty()) {
+            throw new ChatNotFoundException("Chat does not exist");
+        }
+
+        Chat chat = optionalChat.get();
+
         message.setContent(updateMessage.getNewContent());
         message.setUpdatedAt(Instant.now());
 
-        return messageRepository.save(message);
+        Message newMessage = messageRepository.save(message);
+
+        chat.setLastUpdate(Instant.now());
+        chatRepository.save(chat);
+
+        return newMessage;
     }
 
     public ChatMessagesDto getChatMessages(Integer chatId, SearchParametersDto searchParameters, int userId) throws ChatNotFoundException, UserNotFoundException {

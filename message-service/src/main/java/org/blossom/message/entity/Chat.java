@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.blossom.message.enums.ChatType;
 
 import java.time.Instant;
 import java.util.Set;
@@ -25,7 +24,7 @@ public class Chat {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "Blossom_Chat_Participants",
             joinColumns = @JoinColumn(name = "chat_id"),
@@ -36,9 +35,8 @@ public class Chat {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "chat_type")
-    private ChatType chatType;
+    @Column(name = "is_group", nullable = false)
+    private boolean isGroup;
 
     @Column(name = "last_update")
     private Instant lastUpdate;

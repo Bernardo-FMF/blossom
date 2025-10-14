@@ -6,18 +6,16 @@ import jakarta.annotation.Nullable;
 import org.blossom.future.FutureCallback;
 import org.blossom.future.KafkaFutureExecutor;
 import org.blossom.message.AbstractContextBeans;
-import org.blossom.message.dto.LocalTokenDto;
-import org.blossom.message.dto.MessageOperationDto;
-import org.blossom.message.dto.PublishMessageDto;
-import org.blossom.message.dto.UserDto;
-import org.blossom.message.entity.Chat;
+import org.blossom.message.dto.*;
 import org.blossom.message.entity.User;
 import org.blossom.message.enums.BroadcastType;
-import org.blossom.message.enums.ChatType;
 import org.blossom.message.interceptor.WebSocketConnectInterceptor;
 import org.blossom.message.repository.ChatRepository;
 import org.blossom.message.repository.UserRepository;
-import org.blossom.model.*;
+import org.blossom.model.EventType;
+import org.blossom.model.KafkaUserResource;
+import org.blossom.model.ResourceEvent;
+import org.blossom.model.ResourceType;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -27,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -35,6 +33,8 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
@@ -44,10 +44,11 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
 @AutoConfigureMockMvc
@@ -73,7 +74,6 @@ class WsMessageSendingIntegrationTest extends AbstractContextBeans {
     void setup() {
         Map<ResourceType, List<String>> topicMap = new HashMap<>();
         topicMap.put(ResourceType.USER, List.of("user-resource-event-message"));
-        topicMap.put(ResourceType.SOCIAL_FOLLOW, List.of("social-follow-resource-event-message"));
         kafkaFutureExecutor = new KafkaFutureExecutor(kafkaTemplate, topicMap);
 
         LocalTokenDto userToken1 = new LocalTokenDto();
@@ -151,38 +151,26 @@ class WsMessageSendingIntegrationTest extends AbstractContextBeans {
 
     @Order(3)
     @Test
-    void handleSocialFollowCreationKafkaMessage() throws ExecutionException, InterruptedException {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+    void createChat() throws Exception {
+        ChatCreationDto chatCreationDto = new ChatCreationDto();
+        chatCreationDto.setName("xpto");
+        chatCreationDto.setInitialParticipants(List.of(1, 2));
+        chatCreationDto.setGroup(false);
 
-        KafkaSocialFollowResource resource = KafkaSocialFollowResource.builder()
-                .initiatingUser(1)
-                .receivingUser(2)
-                .isMutualFollow(true)
-                .createdAt(Instant.now())
-                .build();
-        ResourceEvent resourceEvent = new ResourceEvent(EventType.CREATE, ResourceType.SOCIAL_FOLLOW, resource);
+        MvcResult result = mockMvc.perform(post("/api/v1/chat")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("username", "user1")
+                        .header("userId", "1")
+                        .header("userRoles", "USER")
+                        .content(objectMapper.writeValueAsString(chatCreationDto)))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
-        Runnable validationCallback = () -> {
-            List<Chat> userChats = chatRepository.findByUserId(1, PageRequest.of(0, 10)).getContent();
+        ChatDto chatDto = objectMapper.readValue(result.getResponse().getContentAsString(), ChatDto.class);
 
-            Assertions.assertEquals(1, userChats.size());
-
-            Chat chat = userChats.get(0);
-            Assertions.assertEquals(ChatType.PRIVATE, chat.getChatType());
-
-            Set<User> participants = chat.getParticipants();
-            Assertions.assertEquals(2, participants.size());
-            List<Integer> list = participants.stream().map(User::getId).toList();
-            Assertions.assertTrue(list.containsAll(List.of(1, 2)));
-
-            countDownLatch.countDown();
-        };
-
-        Consumer<Throwable> errorCallback = Assertions::fail;
-
-        kafkaFutureExecutor.execute(resourceEvent, 3, new FutureCallback<>(validationCallback, errorCallback));
-
-        countDownLatch.await();
+        Assertions.assertEquals("xpto", chatDto.getName());
+        Assertions.assertFalse(chatDto.isGroup());
     }
 
     @Order(4)

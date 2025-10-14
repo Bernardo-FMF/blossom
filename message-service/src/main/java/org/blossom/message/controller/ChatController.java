@@ -1,7 +1,6 @@
 package org.blossom.message.controller;
 
 import org.blossom.message.dto.*;
-import org.blossom.message.enums.ChatType;
 import org.blossom.message.exception.ChatNotFoundException;
 import org.blossom.message.exception.IllegalChatOperationException;
 import org.blossom.message.exception.InvalidChatException;
@@ -22,8 +21,8 @@ public class ChatController {
     private ChatService chatService;
 
     @PostMapping
-    public ResponseEntity<ChatDto> createChat(ChatCreationDto chatCreation, Authentication authentication) throws InvalidChatException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(chatService.createChat(chatCreation, ((CommonUserDetails) authentication.getPrincipal()).getUserId(), ChatType.GROUP));
+    public ResponseEntity<ChatDto> createChat(@RequestBody ChatCreationDto chatCreation, Authentication authentication) throws InvalidChatException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatService.createChat(chatCreation, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 
     @DeleteMapping("/{chatId}/leave")
@@ -44,5 +43,10 @@ public class ChatController {
     @DeleteMapping("/{chatId}/user/{userId}")
     public ResponseEntity<GenericResponseDto> removeFromChat(@PathVariable("chatId") Integer chatId, @PathVariable("userId") Integer userId, Authentication authentication) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(chatService.removeFromChat(chatId, userId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
+    }
+
+    @DeleteMapping("/{chatId}")
+    public ResponseEntity<GenericResponseDto> deleteChat(@PathVariable("chatId") Integer chatId, Authentication authentication) throws ChatNotFoundException, IllegalChatOperationException, UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(chatService.deleteChat(chatId, ((CommonUserDetails) authentication.getPrincipal()).getUserId()));
     }
 }

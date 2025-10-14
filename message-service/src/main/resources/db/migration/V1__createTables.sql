@@ -9,7 +9,7 @@ CREATE TABLE Blossom_Chat (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
     owner_id INT REFERENCES Blossom_Chat_User(id),
-    chat_type VARCHAR(255),
+    is_group BOOL DEFAULT FALSE,
     last_update TIMESTAMP
 );
 

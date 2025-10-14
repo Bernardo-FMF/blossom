@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 @Service
 public class SessionCacheService {
@@ -15,13 +16,14 @@ public class SessionCacheService {
 
     public String[] getFromCache(Integer key) {
         String concatKey = PREFIX + key;
-        return redisTemplate.opsForValue().get(concatKey);
+        String[] ids = redisTemplate.opsForValue().get(concatKey);
+        return Objects.isNull(ids) ? new String[] {} : ids;
     }
 
     public void addToCache(Integer key, String value) {
         String[] cachedIds = getFromCache(key);
         String concatKey = PREFIX + key;
-        if (cachedIds == null) {
+        if (cachedIds == null || cachedIds.length == 0) {
             redisTemplate.opsForValue().set(concatKey, new String[] {value});
         } else {
             String[] newIds = Arrays.copyOf(cachedIds, cachedIds.length + 1);

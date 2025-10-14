@@ -9,5 +9,6 @@ import java.util.List;
 @Setter
 public class ChatCreationDto {
     private List<Integer> initialParticipants;
+    private boolean isGroup;
     private String name;
 }
