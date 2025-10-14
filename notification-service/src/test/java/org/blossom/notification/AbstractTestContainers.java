@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.blossom.container.KafkaContainerBuilder;
 import org.blossom.container.MongoDbContainerBuilder;
 import org.blossom.container.RabbitMqContainerBuilder;
+import org.blossom.container.RedisContainerBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.test.annotation.DirtiesContext;
@@ -29,6 +30,9 @@ public abstract class AbstractTestContainers {
     @Container
     protected static final KafkaContainer kafkaContainer = KafkaContainerBuilder.getKafkaContainer(zookeeperContainer);
 
+    @Container
+    protected static final GenericContainer<?> redisContainer = RedisContainerBuilder.getRedisContainer();
+
     @AfterAll
     static void afterAll() {
         if (mongoDbContainer != null) {
@@ -45,5 +49,8 @@ public abstract class AbstractTestContainers {
 
         zookeeperContainer.stop();
         Assertions.assertFalse(zookeeperContainer.isRunning());
+
+        redisContainer.stop();
+        Assertions.assertFalse(redisContainer.isRunning());
     }
 }

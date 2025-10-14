@@ -8,7 +8,8 @@ import java.time.Instant;
 @Builder
 @Getter
 public class NotificationMessageDto {
-    private int id;
+    private String id;
+    private int messageId;
     private UserDto user;
     private int chatId;
     private String content;

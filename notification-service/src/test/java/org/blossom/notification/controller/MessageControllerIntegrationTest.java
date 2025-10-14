@@ -141,7 +141,6 @@ class MessageControllerIntegrationTest extends AbstractContextBeans {
         Assertions.assertEquals(2, notificationMessagesDto.getUserId());
         Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().size());
         Assertions.assertEquals(1, notificationMessagesDto.getPaginationInfo().getTotalElements());
-        Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getId());
         Assertions.assertEquals("Hello", notificationMessagesDto.getNotificationMessages().get(0).getContent());
         Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getChatId());
         Assertions.assertEquals(1, notificationMessagesDto.getNotificationMessages().get(0).getUser().getId());

@@ -11,7 +11,8 @@ public class NotificationMessageDtoMapper implements ICompoundDtoMapper<MessageN
     @Override
     public NotificationMessageDto toDto(MessageNotification messageNotification, UserDto user) {
         return NotificationMessageDto.builder()
-                .id(messageNotification.getMessageId())
+                .id(messageNotification.getId())
+                .messageId(messageNotification.getMessageId())
                 .user(user)
                 .chatId(messageNotification.getChatId())
                 .content(messageNotification.getContent())

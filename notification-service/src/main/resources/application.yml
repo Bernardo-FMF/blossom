@@ -1,3 +1,6 @@
+logging:
+  level:
+    root: DEBUG
 spring:
   application:
     name: Notification-Service
@@ -20,8 +23,8 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
   redis:
-    host: localhost
-    port: 6388
+    host: ${BLOSSOM_NOTIFICATION_CACHE_HOST}
+    port: ${BLOSSOM_NOTIFICATION_CACHE_PORT}
 broker:
   host: ${BLOSSOM_NOTIFICATION_BROKER_HOST}
   port: ${BLOSSOM_NOTIFICATION_BROKER_PORT}
@@ -29,6 +32,10 @@ broker:
   password: ${BLOSSOM_NOTIFICATION_BROKER_PASSWORD}
 server:
   port: ${BLOSSOM_NOTIFICATION_PORT}
+websocket:
+  origins: ${BLOSSOM_NOTIFICATION_ALLOWED_ORIGINS}
+  test:
+    enabled: ${BLOSSOM_NOTIFICATION_TEST_MODE_ENABLED}
 eureka:
   client:
     service-url:

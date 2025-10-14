@@ -25,6 +25,12 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Value("${broker.password}")
     private String brokerPass;
 
+    @Value("${websocket.origins}")
+    private String[] allowedOrigins;
+
+    @Value("${websocket.test.enabled}")
+    private boolean testModeEnabled;
+
     @Autowired
     private WebSocketChannelInterceptor channelInterceptor;
 
