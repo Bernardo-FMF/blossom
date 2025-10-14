@@ -4,7 +4,6 @@ import lombok.extern.log4j.Log4j2;
 import org.blossom.auth.dto.*;
 import org.blossom.auth.exception.*;
 import org.blossom.auth.service.AuthService;
-import org.blossom.auth.service.UserService;
 import org.blossom.model.CommonUserDetails;
 import org.blossom.model.dto.ValidatedUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     private AuthService authService;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private AuthenticationManager authenticationManager;

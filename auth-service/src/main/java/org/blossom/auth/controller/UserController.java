@@ -1,6 +1,6 @@
 package org.blossom.auth.controller;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.Logger;
 import org.blossom.auth.dto.GenericResponseDto;
 import org.blossom.auth.dto.SimplifiedUserDto;
 import org.blossom.auth.exception.FileDeleteException;
@@ -18,8 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@Log4j2
 public class UserController {
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UserController.class);
+
     @Autowired
     private UserService userService;
 
