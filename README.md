@@ -115,7 +115,14 @@ Notes:
 
 ![image-architecture.jpg](./docs/assets/image-architecture.png)
 
+The image microservice exposes a gRPC server that handles the upload and delete of images.
+It's an internal microservice used by the auth and post microservices.
 
+- The image upload is handled using a client streaming RPC, where the client sends blocks of bytes that compose the image instead of the full image in one go. When the client completes the streaming and the server finishes writing the image, the server generates the identifier of that image which is just the URL the client can use to access the image.
+  - There are 2 ways that images are stored, depending on the environment configuration:
+    - AWS S3 bucket;
+    - Disk;
+- The image delete is handled using a unary RPC using the previously mentioned identifier to delete the image from the S3 bucket or from disk.
 
 ### [Post microservice](https://github.com/Bernardo-FMF/blossom/tree/master/post-service)
 
