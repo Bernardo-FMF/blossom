@@ -90,16 +90,65 @@ It also validates JWT, and creates headers that each microservice uses to identi
 
 ### [Auth microservice](https://github.com/Bernardo-FMF/blossom/tree/master/auth-service) and security practices
 
+![auth-architecture.jpg](./docs/assets/auth-architecture.png)
+
+The auth microservice handles all authentication and authorization flows of the application.
+#### &#10022;Features&#10022;
+- User registration;
+- User login;
+- User logout (specific session or all sessions);
+- Email verification;
+- Email change;
+- Password change;
+- JWT validation and refresh;
+- Enable and disable MFA, and also MFA code validation;
+- Delete account;
+- Profile image change;
+- User search;
+
+Notes:
+- All requests that sent to the gateway that require the user to be authenticated, will send a request to the auth microservice to validate the JWT.
+- If a user has MFA enabled and tries to login, the response will only be the user model. The client needs to check a flag of that model to know if MFA is enabled and so to obtain a JWT, a new request needs to be sent to validate the MFA code using the chosen application for authentication. 
+- When a user is created, a kafka message is propagated to the different microservices that require this information, as shown in the above diagram.
+
 ### [Image microservice](https://github.com/Bernardo-FMF/blossom/tree/master/image-service)
+
+![image-architecture.jpg](./docs/assets/image-architecture.png)
+
+
 
 ### [Post microservice](https://github.com/Bernardo-FMF/blossom/tree/master/post-service)
 
+![post-architecture.jpg](./docs/assets/post-architecture.png)
+
+
+
 ### [Activity microservice](https://github.com/Bernardo-FMF/blossom/tree/master/activity-service)
+
+![activity-architecture.jpg](./docs/assets/activity-architecture.png)
+
+
 
 ### [Social graph microservice](https://github.com/Bernardo-FMF/blossom/tree/master/social-graph-service)
 
+![social-graph-architecture.jpg](./docs/assets/social-graph-architecture.png)
+
+
+
 ### [Feed microservice](https://github.com/Bernardo-FMF/blossom/tree/master/feed-service)
+
+![feed-architecture.jpg](./docs/assets/feed-architecture.png)
+
+
 
 ### [Notification microservice](https://github.com/Bernardo-FMF/blossom/tree/master/notification-service)
 
+![notification-architecture.jpg](./docs/assets/notification-architecture.png)
+
+
+
 ### [Message microservice](https://github.com/Bernardo-FMF/blossom/tree/master/message-service)
+
+![message-architecture.jpg](./docs/assets/message-architecture.png)
+
+

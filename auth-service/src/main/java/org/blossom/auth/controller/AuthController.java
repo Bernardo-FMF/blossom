@@ -98,7 +98,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.updatePassword(passwordChangeDto, userId));
     }
 
-
     @GetMapping("/logged-user")
     public ResponseEntity<LoggedUserDto> getSelf(Authentication authentication) throws UserNotFoundException {
         int userId = ((CommonUserDetails) authentication.getPrincipal()).getUserId();
