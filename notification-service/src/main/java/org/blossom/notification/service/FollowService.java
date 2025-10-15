@@ -33,9 +33,9 @@ public class FollowService {
     private GenericDtoMapper genericDtoMapper;
 
     public NotificationFollowsDto getFollowNotifications(SearchParametersDto searchParameters, int userId) {
-        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "followedAt")) : Pageable.unpaged();
+        Pageable page = searchParameters.hasPagination() ? PageRequest.of(searchParameters.getPage(), searchParameters.getPageLimit(), Sort.by(Sort.Direction.DESC, "followedAt", "isDelivered")) : Pageable.unpaged();
 
-        Page<FollowNotification> followNotifications = followNotificationRepository.findByRecipientIdAndIsDeliveredFalse(userId, page);
+        Page<FollowNotification> followNotifications = followNotificationRepository.findByRecipientId(userId, page);
 
         List<Integer> userIds = followNotifications.get().map(FollowNotification::getSenderId).toList();
 

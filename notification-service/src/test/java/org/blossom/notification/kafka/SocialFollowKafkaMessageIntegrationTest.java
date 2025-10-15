@@ -181,6 +181,6 @@ public class SocialFollowKafkaMessageIntegrationTest extends AbstractContextBean
         Assertions.assertEquals(polledNotification.getId(), dbNotification.getId());
         Assertions.assertEquals(2, polledNotification.getUserId());
         Assertions.assertEquals(1, polledNotification.getFollower().getId());
-        Assertions.assertTrue(dbNotification.isDelivered());
+        Assertions.assertFalse(dbNotification.isDelivered());
     }
 }

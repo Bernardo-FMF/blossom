@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.StompWebSocketEndpointRegistration;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
@@ -25,14 +26,22 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Value("${broker.password}")
     private String brokerPass;
 
+    @Value("${websocket.origins}")
+    private String[] allowedOrigins;
+
+    @Value("${websocket.test.enabled}")
+    private boolean testModeEnabled;
+
     @Autowired
     private WebSocketChannelInterceptor channelInterceptor;
 
     @Override
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-notification")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+        StompWebSocketEndpointRegistration stompWebSocketEndpointRegistration = registry.addEndpoint("/ws-notification")
+                .setAllowedOriginPatterns(allowedOrigins);
+        if (testModeEnabled) {
+            stompWebSocketEndpointRegistration.withSockJS();
+        }
     }
 
     @Override

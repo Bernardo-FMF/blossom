@@ -122,6 +122,13 @@ services:
       - POSTGRES_PASSWORD=${ROOT_PASSWORD}
     restart: always
 
+  websocket-session-cache:
+    image: redis:7.2.3-bookworm
+    container_name: websocket-session-cache
+    ports:
+      - "6388:6379"
+    restart: always
+
   discovery-server:
     image: bernardofmf/blossom-discovery-server:latest
     container_name: discovery-server

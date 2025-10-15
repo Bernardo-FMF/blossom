@@ -5,5 +5,6 @@ public enum BroadcastType {
     MESSAGE_DELETED,
     MESSAGE_UPDATED,
     CHAT_CREATED,
-    CHAT_DELETED
+    CHAT_DELETED,
+    CHAT_UPDATED
 }

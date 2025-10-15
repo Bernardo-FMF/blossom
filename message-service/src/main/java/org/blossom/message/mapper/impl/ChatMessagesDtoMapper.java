@@ -18,7 +18,7 @@ public class ChatMessagesDtoMapper {
     public ChatMessagesDto toPaginatedDto(Collection<Message> entities, ChatDto chatDto, PaginationInfoDto paginationInfo) {
         return ChatMessagesDto.builder()
                 .chat(chatDto)
-                .messageDtos(entities.stream().map(this::toDto).toList())
+                .messages(entities.stream().map(this::toDto).toList())
                 .paginationInfo(paginationInfo)
                 .build();
     }

@@ -19,13 +19,16 @@ public class JsonDtoParser {
         int userId = notification.get("userId").asInt();
         UserDto follower = mapJsonUser(notification.get("follower"));
 
-        Instant followedAt = Instant.ofEpochSecond(notification.get("followedAt").asLong());
+        Instant followedAt = Instant.parse(notification.get("followedAt").asText());
+
+        boolean isDelivered = notification.get("delivered").asBoolean();
 
         return NotificationFollowDto.builder()
                 .id(id)
                 .userId(userId)
                 .follower(follower)
                 .followedAt(followedAt)
+                .isDelivered(isDelivered)
                 .build();
     }
 

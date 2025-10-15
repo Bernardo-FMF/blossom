@@ -9,7 +9,7 @@ import java.time.Instant;
 @Getter
 public class LocalPostDto {
     private String id;
-    private LocalUserDto creator;
+    private LocalUserDto user;
     private String[] media;
     private String[] hashtags;
     private String description;

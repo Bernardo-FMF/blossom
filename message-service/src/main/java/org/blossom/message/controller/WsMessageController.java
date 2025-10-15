@@ -38,8 +38,6 @@ public class WsMessageController {
 
         Message message = messageService.createMessage(publishMessage, chatId, userDetails.getUserId());
 
-        chatService.updateActivity(chatId);
-
         broadcastService.broadcastMessage(chatService.getUsersInChat(chatId), message, BroadcastType.MESSAGE_CREATED);
     }
 

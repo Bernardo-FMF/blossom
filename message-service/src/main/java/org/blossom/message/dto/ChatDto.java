@@ -2,16 +2,19 @@ package org.blossom.message.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.blossom.message.enums.ChatType;
+import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Set;
 
 @Getter
+@Setter
 @Builder
 public class ChatDto {
     private int id;
     private String name;
     private Set<UserDto> participants;
     private UserDto owner;
-    private ChatType chatType;
+    private boolean isGroup;
+    private Instant lastUpdate;
 }

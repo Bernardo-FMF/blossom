@@ -35,7 +35,6 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(@Nullable Message<?> message, @Nullable MessageChannel channel) {
         final StompHeaderAccessor accessor = readHeaderAccessor(message);
-
         if (accessor.getCommand() == StompCommand.CONNECT) {
             String authHeader = readAuthenticationHeader(accessor);
             String sessionId = readSessionId(accessor);

@@ -8,7 +8,7 @@ spring:
       password: ${BLOSSOM_SOCIAL_DB_PASSWORD}
   kafka:
     bootstrap-servers: ${BLOSSOM_KAFKA}
-    topic: social-follow-resource-event-message
+    topics: social-follow-resource-event-notification
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -25,10 +25,10 @@ spring:
             type:
               mapping: event:org.blossom.model.ResourceEvent
 server:
-  port: ${BLOSSOM_SOCIAL_PORT}
+  port: 8084
 grpc:
   server:
-    port: ${BLOSSOM_SOCIAL_GRPC_PORT}
+    port: 8085
     awaitTerminationInSeconds: 10
 eureka:
   client:

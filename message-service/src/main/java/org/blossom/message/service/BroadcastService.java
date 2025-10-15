@@ -39,8 +39,8 @@ public class BroadcastService {
         }
     }
 
-    public void broadcastChat(Chat chat, BroadcastType type) {
-        for (User user: chat.getParticipants()) {
+    public void broadcastChat(Chat chat, BroadcastType type, Set<User> broadcastTo) {
+        for (User user: broadcastTo) {
             if (registryService.checkIfUserHasOpenConnection(user.getUsername())) {
                 messagingTemplate.convertAndSendToUser(user.getUsername(), "/exchange/amq.direct/chat", chatOperationDtoMapper.toDto(chat, type));
             }

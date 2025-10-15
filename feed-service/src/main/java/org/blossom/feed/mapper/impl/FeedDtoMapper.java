@@ -38,7 +38,7 @@ public class FeedDtoMapper {
     private LocalPostDto toDto(FeedEntry entry, LocalUserDto localUser, MetadataDto metadataDto) {
         return LocalPostDto.builder()
                 .id(entry.getPostId())
-                .creator(localUser)
+                .user(localUser)
                 .media(Objects.isNull(entry.getMedia()) ? new String[] {} : entry.getMedia().toArray(new String[0]))
                 .hashtags(Objects.isNull(entry.getHashtags()) ? new String[] {} : entry.getHashtags().toArray(new String[0]))
                 .description(entry.getDescription())
@@ -50,7 +50,7 @@ public class FeedDtoMapper {
     public LocalPostDto toDto(LocalPostByUser entry, LocalUserDto localUser, MetadataDto metadataDto) {
         return LocalPostDto.builder()
                 .id(entry.getPostId())
-                .creator(localUser)
+                .user(localUser)
                 .media(Objects.isNull(entry.getMedia()) ? new String[] {} : entry.getMedia().toArray(new String[0]))
                 .hashtags(Objects.isNull(entry.getHashtags()) ? new String[] {} : entry.getHashtags().toArray(new String[0]))
                 .description(entry.getDescription())
