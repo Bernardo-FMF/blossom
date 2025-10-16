@@ -128,34 +128,118 @@ It's an internal microservice used by the auth and post microservices.
 
 ![post-architecture.jpg](./docs/assets/post-architecture.png)
 
+The post microservice handles all content created by users.
 
+#### &#10022;Features&#10022;
+- Post creation;
+- Post delete;
+- Find specific post;
+- Find posts by user;
+- Search posts by hashtag;
+
+Kafka messages related to users are propagated to this microservice, storing the users in a Redis cache instance. If the user is not present in cache, a REST request is done to the auth service to try and find that specific user.
+Like the auth microservice, here we also access the gRPC server in the image microservice, since posts can have image content.
+Whenever a post is created or deleted, a kafka message is sent from this microservice.
 
 ### [Activity microservice](https://github.com/Bernardo-FMF/blossom/tree/master/activity-service)
 
 ![activity-architecture.jpg](./docs/assets/activity-architecture.png)
 
+The activity microservice handles data related to posts: comments, likes and saves.
 
+#### &#10022;Features&#10022;
+- Add, delete and update comments;
+- Nested comment system;
+- Save, like, remove save and remove likes on posts;
+- Obtain metadata on a post: if the logged user liked it, saved it, commented it, number of likes and number of comments;
+
+Kafka messages related to CRUD operations on users and posts are propagated to this microservice:
+- Users are persisted on the database;
+- Posts are stored on a Redis cache instance;
+User data availability is more important, hence the persistence, while posts are less accessed so a cache fits the microservices needs. If the post is not available in the cache a REST request is done to the post microservice to fetch it.
+
+The microservice also exposes a gRPC server, to get metadata related to a list of posts.
 
 ### [Social graph microservice](https://github.com/Bernardo-FMF/blossom/tree/master/social-graph-service)
 
 ![social-graph-architecture.jpg](./docs/assets/social-graph-architecture.png)
 
+The social graph microservice handles relationships between users by leveraging a graph database.
+These relationships can be unidirectional or bidirectional, since users can be mutually following each other, or just user A following user B.
 
+#### &#10022;Features&#10022;
+- Follow user;
+- Unfollow user;
+- Find follow information about how other users are related to the logged user;
+- Get logged user followers;
+- Get users the logged user is following;
+- Get follow recommendations;
+
+The recommendation algorithm is only using a single-depth search. This means if user A is following users B and C, the follow recommendations given to user A will be people that users B and C are following.
+The auth microservice user kafka messages are also propagated to this microservice, since the database needs to have accurate information regarding available users.
 
 ### [Feed microservice](https://github.com/Bernardo-FMF/blossom/tree/master/feed-service)
 
 ![feed-architecture.jpg](./docs/assets/feed-architecture.png)
 
+The feed microservice generates user feeds consisting of posts.
 
+#### &#10022;Features&#10022;
+- Generate user feed;
+
+Whenever a CRUD operation is performed on a post, a kafka message is propagated. The feed microservice reads this message, and acts accordingly:
+- If the post was created, we need to fetch a list of users that follow the creator of the post, and we add this new post to those followers feeds.
+- If the post was deleted, we remove that post from every feed.
+
+There are 2 types of feeds: feeds for authenticated users, and a generic feed.
+- For authenticated users, the logic explained above applies.
+- For the generic feed, I obtain a list of the most followed users, and obtain their most recent posts to display.
+
+Each post model reported by the feed microservice, contains metadata relating the logged user to that specific post. This metadata is obtained from the activity microservice by doing an RPC call.
 
 ### [Notification microservice](https://github.com/Bernardo-FMF/blossom/tree/master/notification-service)
 
 ![notification-architecture.jpg](./docs/assets/notification-architecture.png)
 
+The notification microservice stores notifications related to follows and messages:
+- When a user is followed by a different user, the social graph microservice propagates a kafka message to represent that event. The notification microservice intercepts that message, and tries to send it to the user.
+  - If the user has an open websocket connection, we send that follow notification directly;
+  - Otherwise, it's stored to the database. At this point, it will only be received by the recipient when the client performs a REST request to obtain undelivered notifications.
+- When a user sends a message to a chat, the message microservice propagates a kafka message to represent that event.
+  - At this point, we only store the message notification to the database. This is because if the recipient had an open websocket connection, the message microservice would've already sent the message through it, instead of sending this kafka message.
 
+The notifications must be acknowledged by the client through a REST request. Only this way will the specific notification be marked as delivered in the database. They are not deleted to preserve notification history.
 
 ### [Message microservice](https://github.com/Bernardo-FMF/blossom/tree/master/message-service)
 
 ![message-architecture.jpg](./docs/assets/message-architecture.png)
 
+The message microservice stores chats and messages between users.
 
+#### &#10022;Features&#10022;
+- Create, delete and leave chats;
+- Get user chats;
+- Add and remove users from chats;
+- Send, update and delete messages;
+
+We use websockets to have real-time messaging.
+
+- Chat operation flow:
+  - When a user performs an operation on a chat (the user created a chat for example), a message is sent through the websocket if the recipient has an open websocket connection.
+  - Otherwise, a kafka message is sent to the notification microservice to be delivered later.
+- Messages flow:
+  - Initially the client fetches all the chats messages through a REST request.
+  - The messages sent afterward are all sent and received through the websocket connections of the users.
+  - If the recipients have an active websocket connection, the messages are received in real-time.
+  - Otherwise, a kafka message is sent to the notification microservice, as explained in the notification microservice section.
+
+### Websockets and STOMP Broker relay
+
+As documented previously, the notification and message microservices use websockets to communicate with the client.
+But when there are multiple instances of these microservices, we encounter an issue:
+- What if the user 1 has an open websocket connection in message microservice A but user 2 has an open websocket connection in message microservice B?
+
+In this scenario the message will not be delivered in real-time, therefore I needed a way to maintain coordination between microservice instances.
+
+To ensure real-time delivery across all instances, I used RabbitMQ with STOMP enabled as a message broker.
+Each instance subscribes to relevant events, allowing them to relay messages to connected clients regardless of which instance the message originated from.
