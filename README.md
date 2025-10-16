@@ -23,23 +23,23 @@ Then you also need to clone this repository:
 
 In the root of the repository, create an .env file, and refer to the following table to define the necessary environment variables:
 
-| Env variable name    | Description                                                                                 |
-|----------------------|---------------------------------------------------------------------------------------------|
-| ROOT_USER_RELAY      | RabbitMQ username                                                                           |
-| ROOT_PASSWORD_RELAY  | RabbitMQ password                                                                           |
-| ROOT_USER            | Username for database connections                                                           |
-| ROOT_PASSWORD        | Password for database connections                                                           |
-| S3_MOCK              | Determines if an AWS S3 bucket or the disk should be used ('true' corresponds to S3 bucket) |
-| S3_REGION            | AWS S3 bucket region                                                                        |
-| S3_BUCKET            | AWS S3 bucket name                                                                          |
-| EMAIL_USERNAME       | The email that will be used to send emails to users                                         |
-| EMAIL_PASSWORD       | The email password                                                                          |
-| JWT_SECRET           | Secret to encrypt the JWT                                                                   |
-| JWT_DURATION         | TTL of the JWT in milliseconds                                                              |
-| JWT_REFRESH_DURATION | Refresh duration of the JWT in milliseconds                                                 |
-| CORS                 | CORS origin URL of the application client                                                   |
-| VALIDATE_CALLBACK    | URL of the client that handles the email validation. This URL is received through email     |
-| RECOVER_CALLBACK     | URL of the client that handles the email recovery. This URL is received through email       |
+| Env variable name    | Description                                                                                 | Example                             |
+|----------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
+| ROOT_USER_RELAY      | RabbitMQ username                                                                           | rootUserRelay                       |
+| ROOT_PASSWORD_RELAY  | RabbitMQ password                                                                           | admin                               |
+| ROOT_USER            | Username for database connections                                                           | rootUser                            |
+| ROOT_PASSWORD        | Password for database connections                                                           | admin                               |
+| S3_MOCK              | Determines if an AWS S3 bucket or the disk should be used ('true' corresponds to S3 bucket) | false                               |
+| S3_REGION            | AWS S3 bucket region                                                                        | us-east-1                           |
+| S3_BUCKET            | AWS S3 bucket name                                                                          | blossom                             |
+| EMAIL_USERNAME       | The email that will be used to send emails to users                                         | email@email.com                     |
+| EMAIL_PASSWORD       | The email password                                                                          | emailPassword                       |
+| JWT_SECRET           | Secret to encrypt the JWT                                                                   | 111111111                           |
+| JWT_DURATION         | TTL of the JWT in milliseconds                                                              | 86400000                            |
+| JWT_REFRESH_DURATION | Refresh duration of the JWT in milliseconds                                                 | 604800000                           |
+| CORS                 | CORS origin URL of the application client                                                   | http://localhost:3000               |
+| VALIDATE_CALLBACK    | URL of the client that handles the email validation. This URL is received through email     | http://localhost:3000/auth/validate |
+| RECOVER_CALLBACK     | URL of the client that handles the email recovery. This URL is received through email       | http://localhost:3000/auth/recover  |
 
 Now the .env file should be in the same level as the docker-compose.yml file, all that is left is to run this file:
 
