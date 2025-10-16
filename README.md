@@ -23,7 +23,23 @@ Then you also need to clone this repository:
 
 In the root of the repository, create an .env file, and refer to the following table to define the necessary environment variables:
 
-TODO
+| Env variable name    | Description                                                                                 |
+|----------------------|---------------------------------------------------------------------------------------------|
+| ROOT_USER_RELAY      | RabbitMQ username                                                                           |
+| ROOT_PASSWORD_RELAY  | RabbitMQ password                                                                           |
+| ROOT_USER            | Username for database connections                                                           |
+| ROOT_PASSWORD        | Password for database connections                                                           |
+| S3_MOCK              | Determines if an AWS S3 bucket or the disk should be used ('true' corresponds to S3 bucket) |
+| S3_REGION            | AWS S3 bucket region                                                                        |
+| S3_BUCKET            | AWS S3 bucket name                                                                          |
+| EMAIL_USERNAME       | The email that will be used to send emails to users                                         |
+| EMAIL_PASSWORD       | The email password                                                                          |
+| JWT_SECRET           | Secret to encrypt the JWT                                                                   |
+| JWT_DURATION         | TTL of the JWT in milliseconds                                                              |
+| JWT_REFRESH_DURATION | Refresh duration of the JWT in milliseconds                                                 |
+| CORS                 | CORS origin URL of the application client                                                   |
+| VALIDATE_CALLBACK    | URL of the client that handles the email validation. This URL is received through email     |
+| RECOVER_CALLBACK     | URL of the client that handles the email recovery. This URL is received through email       |
 
 Now the .env file should be in the same level as the docker-compose.yml file, all that is left is to run this file:
 
@@ -50,6 +66,7 @@ Below is a brief introduction to all the microservices that are part of this pro
 - [Feed microservice](#feed-microservice)
 - [Notification microservice](#notification-microservice)
 - [Message microservice](#message-microservice)
+- [Websockets and STOMP broker relay](#websockets-and-stomp-broker-relay)
 
 ### Docker containers
 
